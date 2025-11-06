@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickAgenda - Plataforma de Agendamento para Barbearias</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <i class="fas fa-cut"></i>
+                    <span>ClickAgenda</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#home">Início</a>
+                    <a href="#features">Funcionalidades</a>
+                    <a href="#dashboard">Dashboard</a>
+                    <button class="btn btn-secondary" onclick="showLogin()">Entrar</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Simplifique seus agendamentos com ClickAgenda</h1>
+            <p>A solução completa para gerenciar sua barbearia de forma profissional e automatizada</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="showDashboard()">Começar Agora</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">Conhecer Funcionalidades</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Funcionalidades Principais</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                    <h3>Agendamento Online</h3>
+                    <p>Clientes agendam serviços de forma autônoma, visualizando horários disponíveis em tempo real</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-bell"></i></div>
+                    <h3>Lembretes Automáticos</h3>
+                    <p>Sistema envia notificações e lembretes para reduzir faltas e otimizar sua agenda</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-users"></i></div>
+                    <h3>Gestão de Clientes</h3>
+                    <p>Cadastro completo com histórico de atendimentos e preferências de cada cliente</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-scissors"></i></div>
+                    <h3>Catálogo de Serviços</h3>
+                    <p>Cadastre e gerencie todos os serviços oferecidos com valores personalizados</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Relatórios e Estatísticas</h3>
+                    <p>Acompanhe o desempenho do seu negócio com dashboards intuitivos</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>100% Responsivo</h3>
+                    <p>Acesse de qualquer dispositivo: computador, tablet ou smartphone</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard hidden" id="dashboard">
+        <div class="container">
+            <h2 class="section-title">Painel de Controle</h2>
+            <div class="dashboard-container">
+                <aside class="sidebar">
+                    <div class="sidebar-item active" onclick="showSection('overview')">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Visão Geral</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('appointments')">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Agendamentos</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('clients')">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('services')">
+                        <i class="fas fa-scissors"></i>
+                        <span>Serviços</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('settings')">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </div>
+                </aside>
+
+                <main class="main-content">
+                    <!-- Overview Section -->
+                    <div id="overview-section">
+                        <h3>Bem-vindo ao ClickAgenda!</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number">24</div>
+                                <div class="stat-label">Agendamentos Hoje</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">156</div>
+                                <div class="stat-label">Clientes Cadastrados</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">R$ 3.850</div>
+                                <div class="stat-label">Faturamento do Mês</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">98%</div>
+                                <div class="stat-label">Taxa de Presença</div>
+                            </div>
+                        </div>
+
+                        <div class="calendar-section">
+                            <div class="calendar-header">
+                                <h3>Agenda da Semana</h3>
+                                <button class="btn btn-primary" onclick="showModal('new-appointment')">
+                                    <i class="fas fa-plus"></i> Novo Agendamento
+                                </button>
+                            </div>
+                            <div class="calendar-grid">
+                                <div class="calendar-day"><strong>DOM</strong><br>10</div>
+                                <div class="calendar-day"><strong>SEG</strong><br>11</div>
+                                <div class="calendar-day"><strong>TER</strong><br>12</div>
+                                <div class="calendar-day today has-appointment"><strong>QUA</strong><br>13</div>
+                                <div class="calendar-day has-appointment"><strong>QUI</strong><br>14</div>
+                                <div class="calendar-day"><strong>SEX</strong><br>15</div>
+                                <div class="calendar-day"><strong>SÁB</strong><br>16</div>
+                            </div>
+                        </div>
+
+                        <div class="appointments-list">
+                            <h3>Próximos Agendamentos</h3>
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <div class="appointment-time">10:00</div>
+                                    <div class="appointment-details">
+                                        <h4>Carlos Silva</h4>
+                                        <p><i class="fas fa-cut"></i> Corte + Barba • R$ 60,00</p>
+                                    </div>
+                                </div>
+                                <div class="appointment-actions">
+                                    <button class="btn-icon btn-edit"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <div class="appointment-time">11:30</div>
+                                    <div class="appointment-details">
+                                        <h4>João Pedro</h4>
+                                        <p><i class="fas fa-cut"></i> Corte Degradê • R$ 45,00</p>
+                                    </div>
+                                </div>
+                                <div class="appointment-actions">
+                                    <button class="btn-icon btn-edit"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <div class="appointment-time">14:00</div>
+                                    <div class="appointment-details">
+                                        <h4>Rafael Costa</h4>
+                                        <p><i class="fas fa-cut"></i> Sobrancelha + Barba • R$ 50,00</p>
+                                    </div>
+                                </div>
+                                <div class="appointment-actions">
+                                    <button class="btn-icon btn-edit"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services Section -->
+                    <div id="services-section" class="hidden">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                            <h3>Serviços Oferecidos</h3>
+                            <button class="btn btn-primary" onclick="showModal('new-service')">
+                                <i class="fas fa-plus"></i> Adicionar Serviço
+                            </button>
+                        </div>
+                        <div class="services-grid">
+                            <div class="service-card">
+                                <h4><i class="fas fa-cut"></i> Corte Masculino</h4>
+                                <div class="service-price">R$ 40,00</div>
+                                <p>Duração: 30 min</p>
+                            </div>
+                            <div class="service-card">
+                                <h4><i class="fas fa-cut"></i> Corte + Barba</h4>
+                                <div class="service-price">R$ 60,00</div>
+                                <p>Duração: 50 min</p>
+                            </div>
+                            <div class="service-card">
+                                <h4><i class="fas fa-cut"></i> Barba Completa</h4>
+                                <div class="service-price">R$ 35,00</div>
+                                <p>Duração: 25 min</p>
+                            </div>
+                            <div class="service-card">
+                                <h4><i class="fas fa-cut"></i> Sobrancelha</h4>
+                                <div class="service-price">R$ 15,00</div>
+                                <p>Duração: 15 min</p>
+                            </div>
+                            <div class="service-card">
+                                <h4><i class="fas fa-cut"></i> Degradê</h4>
+                                <div class="service-price">R$ 45,00</div>
+                                <p>Duração: 35 min</p>
+                            </div>
+                            <div class="service-card">
+                                <h4><i class="fas fa-cut"></i> Platinado</h4>
+                                <div class="service-price">R$ 120,00</div>
+                                <p>Duração: 90 min</p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal: Novo Agendamento -->
+    <div class="modal" id="new-appointment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Agendamento</h2>
+                <button class="close-modal" onclick="closeModal('new-appointment')">&times;</button>
+            </div>
+            <form id="appointment-form">
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <select required>
+                        <option value="">Selecione o cliente</option>
+                        <option>Carlos Silva</option>
+                        <option>João Pedro</option>
+                        <option>Rafael Costa</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Serviço</label>
+                    <select required>
+                        <option value="">Selecione o serviço</option>
+                        <option>Corte Masculino - R$ 40,00</option>
+                        <option>Corte + Barba - R$ 60,00</option>
+                        <option>Barba Completa - R$ 35,00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Horário</label>
+                    <input type="time" required>
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea rows="3" placeholder="Observações adicionais (opcional)"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Confirmar Agendamento</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Serviço -->
+    <div class="modal" id="new-service-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Serviço</h2>
+                <button class="close-modal" onclick="closeModal('new-service')">&times;</button>
+            </div>
+            <form id="service-form">
+                <div class="form-group">
+                    <label>Nome do Serviço</label>
+                    <input type="text" placeholder="Ex: Corte Masculino" required>
+                </div>
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" placeholder="40.00" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Duração (minutos)</label>
+                    <input type="number" placeholder="30" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea rows="3" placeholder="Descrição do serviço (opcional)"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Adicionar Serviço</button>
+            </form>
+        </div>
+    </div>
+   <!-- Modal: Login -->
+<div class="modal" id="login-modal">
+    <div class="modal-content login-modal-content">
+        <div class="modal-header">
+            <div class="login-logo">
+                <i class="fas fa-cut"></i>
+                <h2>ClickAgenda</h2>
+            </div>
+            <button class="close-modal" onclick="closeModal('login')">&times;</button>
+        </div>
+
+        <!-- Formulário de Login -->
+        <form id="login-form" class="auth-form">
+            <h3 class="form-title">Bem-vindo de volta!</h3>
+            <p class="form-description">Entre com sua conta para continuar</p>
+
+            <div class="form-group">
+                <label>E-mail</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" placeholder="seu@email.com" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Senha</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('login-password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-text">Lembrar-me</span>
+                </label>
+                <a href="#" class="forgot-link">Esqueceu a senha?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+
+            <div class="form-footer">
+                <p>Não tem uma conta? <a href="#" onclick="switchToRegister(); return false;">Cadastre-se gratuitamente</a></p>
+            </div>
+        </form>
+
+        <!-- Formulário de Cadastro -->
+        <form id="register-form" class="auth-form hidden">
+            <h3 class="form-title">Cadastre sua Barbearia</h3>
+            <p class="form-description">Crie sua conta e comece a gerenciar seus agendamentos</p>
+
+            <div class="form-group">
+                <label>Nome da Barbearia</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-store"></i>
+                    <input type="text" placeholder="Ex: Barbearia do João" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nome do Responsável</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" placeholder="João Silva" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>E-mail Profissional</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" placeholder="contato@suabarbearia.com" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Telefone / WhatsApp</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="phone-input" placeholder="(00) 00000-0000" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Endereço da Barbearia</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" placeholder="Rua, número, bairro - cidade" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="register-password" placeholder="Mínimo 6 caracteres" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('register-password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="password-strength" id="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strength-fill"></div>
+                    </div>
+                    <span class="strength-text" id="strength-text"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Confirmar Senha</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="register-password-confirm" placeholder="Digite a senha novamente" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('register-password-confirm')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="barbershop-info-box">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Como funciona?</strong>
+                    <p>Após o cadastro, você terá acesso ao painel administrativo onde poderá configurar seus serviços, horários e gerar seu link personalizado de agendamento para compartilhar com seus clientes.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" required>
+                    <span class="checkbox-text">
+                        Aceito os <a href="#" onclick="return false;">Termos de Uso</a> e 
+                        <a href="#" onclick="return false;">Política de Privacidade</a>
+                    </span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                <i class="fas fa-check-circle"></i> Criar Conta Profissional
+            </button>
+
+            <div class="form-footer">
+                <p>Já tem uma conta? <a href="#" onclick="switchToLogin(); return false;">Fazer login</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 ClickAgenda - Universidade São Francisco | Engenharia de Software</p>
+            <p>Desenvolvido por: Nayara Victória, Matheus Rubens, Mirela Rosa</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
