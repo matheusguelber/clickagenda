@@ -60,25 +60,38 @@ window.onclick = function(event) {
     }
 }
 
+// ========================================================
+//  INÍCIO DA CORREÇÃO 1
+// ========================================================
+
 // ===== FORMULÁRIOS =====
 
 function initializeForms() {
-    // Prevenir envio padrão dos formulários (demo)
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function(e) {
+    // Formulário de Agendamento
+    const appointmentForm = document.getElementById('appointment-form');
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            // Identifica qual formulário foi enviado
-            if (this.id === 'appointment-form') {
-                handleAppointmentSubmit(this);
-            } else if (this.id === 'service-form') {
-                handleServiceSubmit(this);
-            }
+            handleAppointmentSubmit(this);
         });
-    });
+    }
 
-    initializeLoginForms();
+    // Formulário de Serviço
+    const serviceForm = document.getElementById('service-form');
+    if (serviceForm) {
+        serviceForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleServiceSubmit(this);
+        });
+    }
+    
+    // REMOVIDA A CHAMADA DUPLICADA DAQUI
 }
+
+// ========================================================
+//  FIM DA CORREÇÃO 1
+// ========================================================
+
 
 /**
  * Processa envio do formulário de agendamento
@@ -387,6 +400,16 @@ function initializeLoginForms() {
             // Coletar dados do formulário
             const formData = new FormData(this);
             
+            // ========================================================
+            //  DEBUG (OPCIONAL, PODE REMOVER DEPOIS)
+            // ========================================================
+            console.log("----- DADOS QUE ESTÃO SENDO ENVIADOS (CADASTRO) -----");
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ': ' + value);
+            }
+            console.log("---------------------------------------------------");
+            // ========================================================
+            
             // Enviar para o back-end
             fetch('http://localhost/agendamento_barbeiro/backend/cadastro_usuario.php', {
                 method: 'POST',
@@ -419,18 +442,27 @@ function initializeLoginForms() {
     }
 }
 
+// ========================================================
+//  INÍCIO DA CORREÇÃO 2
+// ========================================================
+
 // ===== INICIALIZAÇÃO =====
 
 /**
  */
 document.addEventListener('DOMContentLoaded', function() {
-    initializeForms();
+    initializeForms();        // Inicializa forms de agendamento/serviço
+    initializeLoginForms();   // Inicializa forms de login/cadastro
     initializeCalendar();
     initializePageTransition();
-    initializeLoginForms();
     
     console.log('ClickAgenda inicializado com sucesso!');
 });
+
+// ========================================================
+//  FIM DA CORREÇÃO 2
+// ========================================================
+
 
 // ===== EXPORTAÇÕES
 
