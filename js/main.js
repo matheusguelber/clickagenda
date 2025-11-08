@@ -6,8 +6,6 @@ function showDashboard() {
     document.querySelector('.dashboard').classList.remove('hidden');
 }
 
-
-
 function showLogin() {
     showModal('login');
 }
@@ -17,7 +15,6 @@ function showLogin() {
  * @param {string} section - Nome da seção a ser exibida
  */
 function showSection(section) {
-   
     const sidebarItems = document.querySelectorAll('.sidebar-item');
     sidebarItems.forEach(item => item.classList.remove('active'));
     
@@ -57,7 +54,6 @@ function closeModal(modalId) {
     document.getElementById(modalId + '-modal').classList.remove('active');
 }
 
-
 window.onclick = function(event) {
     if (event.target.classList.contains('modal')) {
         event.target.classList.remove('active');
@@ -82,7 +78,6 @@ function initializeForms() {
     });
 
     initializeLoginForms();
-
 }
 
 /**
@@ -90,18 +85,26 @@ function initializeForms() {
  * @param {HTMLFormElement} form - Formulário de agendamento
  */
 function handleAppointmentSubmit(form) {
-    // Coletar dados do formulário
     const formData = new FormData(form);
     
-    // possivel requisição AJAX para o backend PHP
-    // fetch('/api/appointments', {
-    //     method: 'POST',
-    //     body: formData
-    // })
-    
-    alert('Agendamento salvo com sucesso! (Demo)');
-    closeModal('new-appointment');
-    form.reset();
+    fetch('http://localhost/agendamento_barbeiro/backend/agendar.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);  // Ex.: "Agendamento realizado!"
+            closeModal('new-appointment');
+            form.reset();
+        } else {
+            alert('Erro: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+        alert('Erro ao conectar ao servidor.');
+    });
 }
 
 /**
@@ -109,18 +112,26 @@ function handleAppointmentSubmit(form) {
  * @param {HTMLFormElement} form - Formulário de serviço
  */
 function handleServiceSubmit(form) {
-    // Coletar dados do formulário
     const formData = new FormData(form);
     
-    //possivel requisição requisição AJAX para o backend PHP
-    // fetch('/api/services', {
-    //     method: 'POST',
-    //     body: formData
-    // })
-    
-    alert('Serviço adicionado com sucesso! (Demo)');
-    closeModal('new-service');
-    form.reset();
+    fetch('http://localhost/agendamento_barbeiro/backend/adicionar_servico.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);  // Ex.: "Serviço adicionado!"
+            closeModal('new-service');
+            form.reset();
+        } else {
+            alert('Erro: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+        alert('Erro ao conectar ao servidor.');
+    });
 }
 
 // ===== AGENDAMENTOS =====
@@ -216,7 +227,6 @@ function validateEmail(email) {
 
 // ===== FUNÇÕES DE LOGIN/CADASTRO =====
 
-
 function switchToLogin() {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
@@ -224,7 +234,6 @@ function switchToLogin() {
     loginForm.classList.remove('hidden');
     registerForm.classList.add('hidden');
 }
-
 
 function switchToRegister() {
     const loginForm = document.getElementById('login-form');
@@ -330,18 +339,29 @@ function initializeLoginForms() {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // possivel requisição para o backend
-            // const email = this.querySelector('input[type="email"]').value;
-            // const password = this.querySelector('input[type="password"]').value;
-            // fetch('/api/login', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ email, password })
-            // })
+            const formData = new FormData(this);
             
-            alert('Login realizado com sucesso! (Demo)');
-            closeModal('login');
-            showDashboard();
+            fetch('http://localhost/agendamento_barbeiro/backend/login.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);  // Ex.: "Login realizado!"
+                    closeModal('login');
+                    showDashboard();
+                    // Salva dados do usuário
+                    localStorage.setItem('user_tipo', data.tipo);
+                    localStorage.setItem('user_id', data.user_id || '');  // Adicione no PHP se precisar
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                alert('Erro ao conectar ao servidor.');
+            });
         });
     }
 
@@ -364,10 +384,28 @@ function initializeLoginForms() {
                 return;
             }
             
-            // requisição de login para o backend 
-            alert('Cadastro realizado com sucesso! (Demo)');
-            closeModal('login');
-            showDashboard();
+            // Coletar dados do formulário
+            const formData = new FormData(this);
+            
+            // Enviar para o back-end
+            fetch('http://localhost/agendamento_barbeiro/backend/cadastro_usuario.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);  // Ex.: "Usuário cadastrado com sucesso!"
+                    closeModal('login');
+                    showDashboard();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                alert('Erro ao conectar ao servidor.');
+            });
         });
     }
 
@@ -380,8 +418,6 @@ function initializeLoginForms() {
         });
     }
 }
-
-
 
 // ===== INICIALIZAÇÃO =====
 
