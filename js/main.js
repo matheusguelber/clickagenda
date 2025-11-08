@@ -91,7 +91,7 @@ function handleAppointmentSubmit(form) {
     const formData = new FormData(form);
     
     // ========================================================
-    // CORREÇÃO NGROK 1: Caminho relativo
+    // CAMINHO CORRETO (relativo ao index.html)
     // ========================================================
     fetch('backend/agendar.php', {
         method: 'POST',
@@ -121,7 +121,7 @@ function handleServiceSubmit(form) {
     const formData = new FormData(form);
     
     // ========================================================
-    // CORREÇÃO NGROK 2: Caminho relativo
+    // CAMINHO CORRETO (relativo ao index.html)
     // ========================================================
     fetch('backend/adicionar_servico.php', {
         method: 'POST',
@@ -160,11 +160,6 @@ function editAppointment(appointmentId) {
  */
 function deleteAppointment(appointmentId) {
     if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
-        // possivel requisição DELETE para o backend
-        // fetch('/api/appointments/' + appointmentId, {
-        //     method: 'DELETE'
-        // })
-        
         alert('Agendamento cancelado! (Demo)');
         console.log('Deletando agendamento:', appointmentId);
     }
@@ -186,9 +181,7 @@ function initializeCalendar() {
     
     calendarDays.forEach(day => {
         day.addEventListener('click', function() {
-            // Exibir agendamentos do dia selecionado
             console.log('Dia selecionado:', this.textContent);
-        
         });
     });
 }
@@ -204,11 +197,6 @@ function initializePageTransition() {
 
 // ===== UTILITÁRIOS =====
 
-/**
- * Formata valor monetário
- * @param {number} value
- * @returns {string}
- */
 function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
@@ -216,19 +204,10 @@ function formatCurrency(value) {
     }).format(value);
 }
 
-/**
- * Formata data
- * @param {Date} date 
- */
 function formatDate(date) {
     return new Intl.DateTimeFormat('pt-BR').format(date);
 }
 
-/**
- * Valida formato de email
- * @param {string} email - Email a ser validado
- * @returns {boolean} True se válido
- */
 function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
@@ -252,10 +231,6 @@ function switchToRegister() {
     registerForm.classList.remove('hidden');
 }
 
-/**
- * Alterna visibilidade da senha
- * @param {string} inputId 
- */
 function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     const button = input.parentElement.querySelector('.toggle-password i');
@@ -271,11 +246,6 @@ function togglePassword(inputId) {
     }
 }
 
-/**
- * telefone padrao brasil
- * @param {string} value - 
- * @returns {string} 
- */
 function phoneMask(value) {
     if (!value) return '';
     value = value.replace(/\D/g, '');
@@ -284,18 +254,11 @@ function phoneMask(value) {
     return value;
 }
 
-/**
- * Verifica força da senha
- * @param {string} password - Senha a ser verificada
- * @returns {Object} Objeto com força e texto
- */
 function checkPasswordStrength(password) {
     if (!password) {
         return { level: '', text: '' };
     }
-    
     let strength = 0;
-    
     if (password.length >= 8) strength++;
     if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
     if (password.match(/\d/)) strength++;
@@ -347,11 +310,10 @@ function initializeLoginForms() {
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const formData = new FormData(this);
             
             // ========================================================
-            // CORREÇÃO NGROK 3: Caminho relativo
+            // CAMINHO CORRETO (relativo ao index.html)
             // ========================================================
             fetch('backend/login.php', {
                 method: 'POST',
@@ -363,9 +325,8 @@ function initializeLoginForms() {
                     alert(data.message);  // Ex.: "Login realizado!"
                     closeModal('login');
                     showDashboard();
-                    // Salva dados do usuário
                     localStorage.setItem('user_tipo', data.tipo);
-                    localStorage.setItem('user_id', data.user_id || '');  // Adicione no PHP se precisar
+                    localStorage.setItem('user_id', data.user_id || '');
                 } else {
                     alert('Erro: ' + data.message);
                 }
@@ -390,25 +351,15 @@ function initializeLoginForms() {
                 alert('As senhas não coincidem!');
                 return;
             }
-            
             if (password.length < 6) {
                 alert('A senha deve ter pelo menos 6 caracteres!');
                 return;
             }
             
-            // Coletar dados do formulário
             const formData = new FormData(this);
             
-            // DEBUG (OPCIONAL)
-            console.log("----- DADOS QUE ESTÃO SENDO ENVIADOS (CADASTRO) -----");
-            for (let [key, value] of formData.entries()) {
-                console.log(key + ': ' + value);
-            }
-            console.log("---------------------------------------------------");
-            
-            
             // ========================================================
-            // CORREÇÃO NGROK 4: Caminho relativo
+            // CAMINHO CORRETO (relativo ao index.html)
             // ========================================================
             fetch('backend/cadastro_usuario.php', {
                 method: 'POST',
@@ -441,28 +392,33 @@ function initializeLoginForms() {
     }
 }
 
+
+/**
+ * Inicializa o menu hamburger para telemóveis
+ */
+function initializeHamburgerMenu() {
+    const toggleButton = document.getElementById('hamburger-toggle');
+    const menu = document.getElementById('nav-links-menu');
+
+    if (toggleButton && menu) {
+        toggleButton.addEventListener('click', function() {
+            // Adiciona ou remove a classe ".active" do menu
+            menu.classList.toggle('active');
+        });
+    }
+}
+
+
 // ===== INICIALIZAÇÃO =====
 
 /**
  */
 document.addEventListener('DOMContentLoaded', function() {
-    initializeForms();        // Inicializa forms de agendamento/serviço
-    initializeLoginForms();   // Inicializa forms de login/cadastro
+    initializeForms();
+    initializeLoginForms();
     initializeCalendar();
     initializePageTransition();
+    initializeHamburgerMenu(); 
     
     console.log('ClickAgenda inicializado com sucesso!');
 });
-
-// ===== EXPORTAÇÕES
-
-// export {
-//     showDashboard,
-//     showLogin,
-//     showSection,
-//     showModal,
-//     closeModal,
-//     formatCurrency,
-//     formatDate,
-//     validateEmail
-// };

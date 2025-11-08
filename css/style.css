@@ -78,6 +78,25 @@ body {
     color: var(--secondary);
 }
 
+/* ======================================================== */
+/* INÍCIO DA ALTERAÇÃO 1 (Botão Hamburger)                  */
+/* ======================================================== */
+
+.hamburger-menu {
+    display: none; /* Escondido no desktop */
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: white; 
+    cursor: pointer;
+    z-index: 1001; /* Garante que fique acima de outros itens se houver sobreposição */
+}
+
+/* ======================================================== */
+/* FIM DA ALTERAÇÃO 1                                       */
+/* ======================================================== */
+
+
 /* ===== BOTÕES ===== */
 .btn {
     padding: 0.75rem 1.5rem;
@@ -516,9 +535,52 @@ body {
         grid-template-columns: 1fr;
     }
 
+    /* ======================================================== */
+    /* INÍCIO DA ALTERAÇÃO 2 (Regras do Menu Responsivo)        */
+    /* ======================================================== */
+
+    /* Altera .nav-links de 'display: none' para um menu dropdown */
     .nav-links {
-        display: none;
+        /* O MENU COMPLETO FICA ESCONDIDO POR PADRÃO */
+        display: none; 
+
+        /* Estilo do menu quando aberto (dropdown) */
+        position: absolute;
+        top: 60px; /* Ajuste se a altura da sua navbar for diferente */
+        left: 0;
+        width: 100%;
+        background-color: var(--primary); /* Fundo igual ao da navbar */
+        flex-direction: column; /* Links em coluna */
+        padding: 1rem 0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
+
+    /* Esta classe ".active" será adicionada pelo JavaScript */
+    .nav-links.active {
+        display: flex; /* MOSTRA O MENU QUANDO CLICADO */
+    }
+
+    /* Estilo dos links dentro do menu mobile */
+    .nav-links a,
+    .nav-links button {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem 0;
+    }
+
+    .nav-links button {
+        margin: 0.5rem 1rem 0 1rem;
+        width: auto; /* Botão "Entrar" não fica 100% */
+    }
+    
+    /* Mostra o botão hamburger no mobile */
+    .hamburger-menu {
+        display: block;
+    }
+
+    /* ======================================================== */
+    /* FIM DA ALTERAÇÃO 2                                       */
+    /* ======================================================== */
 
     .calendar-grid {
         grid-template-columns: repeat(7, 1fr);
@@ -886,8 +948,5 @@ body {
     line-height: 1.5;
     margin: 0;
 }
-
-
-
 
 }
