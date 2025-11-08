@@ -60,10 +60,6 @@ window.onclick = function(event) {
     }
 }
 
-// ========================================================
-//  INÍCIO DA CORREÇÃO 1
-// ========================================================
-
 // ===== FORMULÁRIOS =====
 
 function initializeForms() {
@@ -84,13 +80,7 @@ function initializeForms() {
             handleServiceSubmit(this);
         });
     }
-    
-    // REMOVIDA A CHAMADA DUPLICADA DAQUI
 }
-
-// ========================================================
-//  FIM DA CORREÇÃO 1
-// ========================================================
 
 
 /**
@@ -100,7 +90,10 @@ function initializeForms() {
 function handleAppointmentSubmit(form) {
     const formData = new FormData(form);
     
-    fetch('http://localhost/agendamento_barbeiro/backend/agendar.php', {
+    // ========================================================
+    // CORREÇÃO NGROK 1: Caminho relativo
+    // ========================================================
+    fetch('backend/agendar.php', {
         method: 'POST',
         body: formData
     })
@@ -127,7 +120,10 @@ function handleAppointmentSubmit(form) {
 function handleServiceSubmit(form) {
     const formData = new FormData(form);
     
-    fetch('http://localhost/agendamento_barbeiro/backend/adicionar_servico.php', {
+    // ========================================================
+    // CORREÇÃO NGROK 2: Caminho relativo
+    // ========================================================
+    fetch('backend/adicionar_servico.php', {
         method: 'POST',
         body: formData
     })
@@ -354,7 +350,10 @@ function initializeLoginForms() {
             
             const formData = new FormData(this);
             
-            fetch('http://localhost/agendamento_barbeiro/backend/login.php', {
+            // ========================================================
+            // CORREÇÃO NGROK 3: Caminho relativo
+            // ========================================================
+            fetch('backend/login.php', {
                 method: 'POST',
                 body: formData
             })
@@ -400,18 +399,18 @@ function initializeLoginForms() {
             // Coletar dados do formulário
             const formData = new FormData(this);
             
-            // ========================================================
-            //  DEBUG (OPCIONAL, PODE REMOVER DEPOIS)
-            // ========================================================
+            // DEBUG (OPCIONAL)
             console.log("----- DADOS QUE ESTÃO SENDO ENVIADOS (CADASTRO) -----");
             for (let [key, value] of formData.entries()) {
                 console.log(key + ': ' + value);
             }
             console.log("---------------------------------------------------");
-            // ========================================================
             
-            // Enviar para o back-end
-            fetch('http://localhost/agendamento_barbeiro/backend/cadastro_usuario.php', {
+            
+            // ========================================================
+            // CORREÇÃO NGROK 4: Caminho relativo
+            // ========================================================
+            fetch('backend/cadastro_usuario.php', {
                 method: 'POST',
                 body: formData
             })
@@ -442,10 +441,6 @@ function initializeLoginForms() {
     }
 }
 
-// ========================================================
-//  INÍCIO DA CORREÇÃO 2
-// ========================================================
-
 // ===== INICIALIZAÇÃO =====
 
 /**
@@ -458,11 +453,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('ClickAgenda inicializado com sucesso!');
 });
-
-// ========================================================
-//  FIM DA CORREÇÃO 2
-// ========================================================
-
 
 // ===== EXPORTAÇÕES
 
