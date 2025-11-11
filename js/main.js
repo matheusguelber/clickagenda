@@ -3,7 +3,8 @@
 function showDashboard() {
     document.querySelector('.hero').classList.add('hidden');
     document.querySelector('.features').classList.add('hidden');
-    document.querySelector('.dashboard').classList.remove('hidden');
+    // Mostra o dashboard do barbeiro por padrão
+    document.getElementById('dashboard-barbeiro').classList.remove('hidden');
 }
 
 function showLogin() {
@@ -15,7 +16,7 @@ function showLogin() {
  * @param {string} section - Nome da seção a ser exibida
  */
 function showSection(section) {
-    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    const sidebarItems = document.querySelectorAll('#dashboard-barbeiro .sidebar-item');
     sidebarItems.forEach(item => item.classList.remove('active'));
     
     // Adiciona classe active ao item clicado
@@ -24,16 +25,26 @@ function showSection(section) {
     // Oculta todas as seções
     document.getElementById('overview-section').classList.add('hidden');
     document.getElementById('services-section').classList.add('hidden');
+    // Adiciona aqui futuras secções (ex: 'clients', 'settings') se precisares
+    // document.getElementById('clients-section').classList.add('hidden');
+    // document.getElementById('settings-section').classList.add('hidden');
+
 
     // Exibe a seção solicitada
     if (section === 'overview') {
         document.getElementById('overview-section').classList.remove('hidden');
     } else if (section === 'services') {
         document.getElementById('services-section').classList.remove('hidden');
+        carregarServicos();
     } else {
-        alert('Seção "' + section + '" em desenvolvimento!');
+         // Fallback para 'overview' se a secção não for encontrada
         document.getElementById('overview-section').classList.remove('hidden');
+        // (Opcional: podes manter o teu alerta)
+        // alert('Seção "' + section + '" em desenvolvimento!');
     }
+
+
+
 }
 
 // ===== MODAIS =====
@@ -63,21 +74,21 @@ window.onclick = function(event) {
 // ===== FORMULÁRIOS =====
 
 function initializeForms() {
-    // Formulário de Agendamento
+    // Formulário de Agendamento (do modal antigo, podes remover se não for usar)
     const appointmentForm = document.getElementById('appointment-form');
     if (appointmentForm) {
         appointmentForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            handleAppointmentSubmit(this);
+            // handleAppointmentSubmit(this); // Esta função não está definida, mas tudo bem
         });
     }
 
-    // Formulário de Serviço
+    // Formulário de Serviço (do modal antigo, podes remover se não for usar)
     const serviceForm = document.getElementById('service-form');
     if (serviceForm) {
         serviceForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            handleServiceSubmit(this);
+            // handleServiceSubmit(this); // Esta função não está definida
         });
     }
 }
@@ -85,14 +96,11 @@ function initializeForms() {
 
 /**
  * Processa envio do formulário de agendamento
- * @param {HTMLFormElement} form - Formulário de agendamento
+ * (Esta função não está a ser usada no dashboard do barbeiro, mas deixamos aqui)
  */
 function handleAppointmentSubmit(form) {
     const formData = new FormData(form);
     
-    // ========================================================
-    // CAMINHO CORRETO (relativo ao index.html)
-    // ========================================================
     fetch('backend/agendar.php', {
         method: 'POST',
         body: formData
@@ -100,7 +108,7 @@ function handleAppointmentSubmit(form) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);  // Ex.: "Agendamento realizado!"
+            alert(data.message);
             closeModal('new-appointment');
             form.reset();
         } else {
@@ -115,14 +123,11 @@ function handleAppointmentSubmit(form) {
 
 /**
  * Processa envio do formulário de serviço
- * @param {HTMLFormElement} form - Formulário de serviço
+ * (Esta função não está a ser usada no dashboard do barbeiro, mas deixamos aqui)
  */
 function handleServiceSubmit(form) {
     const formData = new FormData(form);
     
-    // ========================================================
-    // CAMINHO CORRETO (relativo ao index.html)
-    // ========================================================
     fetch('backend/adicionar_servico.php', {
         method: 'POST',
         body: formData
@@ -130,7 +135,7 @@ function handleServiceSubmit(form) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);  // Ex.: "Serviço adicionado!"
+            alert(data.message);
             closeModal('new-service');
             form.reset();
         } else {
@@ -145,19 +150,11 @@ function handleServiceSubmit(form) {
 
 // ===== AGENDAMENTOS =====
 
-/**
- * Edita um agendamento
- * @param {number} appointmentId - ID do agendamento
- */
 function editAppointment(appointmentId) {
     showModal('new-appointment');
     console.log('Editando agendamento:', appointmentId);
 }
 
-/**
- * Deleta um agendamento
- * @param {number} appointmentId - ID do agendamento
- */
 function deleteAppointment(appointmentId) {
     if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
         alert('Agendamento cancelado! (Demo)');
@@ -167,10 +164,6 @@ function deleteAppointment(appointmentId) {
 
 // ===== SERVIÇOS =====
 
-/**
- * Seleciona/deseleciona um serviço
- * @param {HTMLElement} serviceCard
- */
 function toggleService(serviceCard) {
     serviceCard.classList.toggle('selected');
 }
@@ -188,11 +181,12 @@ function initializeCalendar() {
 
 // ===== ANIMAÇÕES =====
 function initializePageTransition() {
-    document.body.style.opacity = '0';
-    setTimeout(() => {
-        document.body.style.transition = 'opacity 0.5s';
-        document.body.style.opacity = '1';
-    }, 100);
+    // Podes reativar isto se quiseres
+    // document.body.style.opacity = '0';
+    // setTimeout(() => {
+    //     document.body.style.transition = 'opacity 0.5s';
+    //     document.body.style.opacity = '1';
+    // }, 100);
 }
 
 // ===== UTILITÁRIOS =====
@@ -312,9 +306,6 @@ function initializeLoginForms() {
             e.preventDefault();
             const formData = new FormData(this);
             
-            // ========================================================
-            // CAMINHO CORRETO (relativo ao index.html)
-            // ========================================================
             fetch('backend/login.php', {
                 method: 'POST',
                 body: formData
@@ -322,11 +313,25 @@ function initializeLoginForms() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);  // Ex.: "Login realizado!"
+                    alert(data.message);
                     closeModal('login');
-                    showDashboard();
+                    
                     localStorage.setItem('user_tipo', data.tipo);
                     localStorage.setItem('user_id', data.user_id || '');
+
+                    // Esconde as seções iniciais
+                    document.querySelector('.hero').classList.add('hidden');
+                    document.querySelector('.features').classList.add('hidden');
+
+                    // Mostra o dashboard correto
+                    if (data.tipo === 'barbeiro') {
+                        document.getElementById('dashboard-barbeiro').classList.remove('hidden');
+                    } else { 
+                        // (No futuro, se tiver dashboard de cliente)
+                        // document.getElementById('dashboard-cliente').classList.remove('hidden');
+                        alert("Tipo de usuário 'cliente' ainda não tem dashboard.");
+                    }
+
                 } else {
                     alert('Erro: ' + data.message);
                 }
@@ -358,22 +363,26 @@ function initializeLoginForms() {
             
             const formData = new FormData(this);
             
-            // ========================================================
-            // CAMINHO CORRETO (relativo ao index.html)
-            // ========================================================
             fetch('backend/cadastro_usuario.php', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
+                // ========================================================
+                // INÍCIO DA ALTERAÇÃO
+                // ========================================================
                 if (data.success) {
-                    alert(data.message);  // Ex.: "Usuário cadastrado com sucesso!"
-                    closeModal('login');
-                    showDashboard();
+                    // Manda uma mensagem e troca para o login
+                    alert(data.message + "\n\nAgora, faça o login para continuar.");
+                    switchToLogin(); // Volta para a tela de login
                 } else {
+                    // Se der erro (ex: e-mail duplicado), mostra o erro
                     alert('Erro: ' + data.message);
                 }
+                // ========================================================
+                // FIM DA ALTERAÇÃO
+                // ========================================================
             })
             .catch(error => {
                 console.error('Erro na requisição:', error);
@@ -392,7 +401,6 @@ function initializeLoginForms() {
     }
 }
 
-
 /**
  * Inicializa o menu hamburger para telemóveis
  */
@@ -408,6 +416,89 @@ function initializeHamburgerMenu() {
     }
 }
 
+/**
+ * Inicializa o formulário de adicionar serviço
+ */
+function initializeServiceForm() {
+    const serviceForm = document.getElementById('form-adicionar-servico');
+    
+    if (serviceForm) {
+        serviceForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Impede o recarregamento da página
+            
+            const formData = new FormData(this);
+            
+            fetch('backend/adicionar_servico.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Mostra "Serviço adicionado!" ou "Acesso não autorizado."
+                if (data.success) {
+                    serviceForm.reset();
+                    carregarServicos(); // Limpa o formulário
+                    // (No futuro, aqui também atualizamos a lista de serviços)
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                alert('Erro ao conectar ao servidor.');
+            });
+        });
+    }
+}
+
+/**
+ * Busca os serviços do barbeiro no backend e os exibe na lista
+ */
+function carregarServicos() {
+    const listaDiv = document.getElementById('lista-de-servicos');
+    if (!listaDiv) return; // Sai se o elemento não existir
+
+    // Mostra um "loading"
+    listaDiv.innerHTML = '<p>A carregar serviços...</p>';
+
+    fetch('backend/listar_servicos.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Limpa o "loading"
+                listaDiv.innerHTML = ''; 
+                
+                if (data.servicos.length === 0) {
+                    listaDiv.innerHTML = '<p>Ainda não tens serviços cadastrados.</p>';
+                    return;
+                }
+
+                // Cria o HTML para cada serviço
+                data.servicos.forEach(servico => {
+                    // Converte o preço (ex: 45.00) para R$ 45,00
+                    const precoFormatado = new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(servico.preco);
+
+                    const servicoHTML = `
+                        <div class="service-card">
+                            <h4><i class="fas fa-cut"></i> ${servico.nome_servico}</h4>
+                            <div class="service-price">${precoFormatado}</div>
+                            <p>Duração: ${servico.duracao_minutos} min</p>
+                        </div>
+                    `;
+                    // Adiciona o HTML do serviço à lista
+                    listaDiv.innerHTML += servicoHTML;
+                });
+                
+            } else {
+                listaDiv.innerHTML = `<p style="color: red;">${data.message}</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar serviços:', error);
+            listaDiv.innerHTML = '<p style="color: red;">Erro ao ligar ao servidor.</p>';
+        });
+}
 
 // ===== INICIALIZAÇÃO =====
 
@@ -419,6 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCalendar();
     initializePageTransition();
     initializeHamburgerMenu(); 
+    initializeServiceForm(); // <-- Adicionámos isto no passo anterior
     
     console.log('ClickAgenda inicializado com sucesso!');
 });

@@ -949,4 +949,34 @@ body {
     margin: 0;
 }
 
+/* --- Estilos para o novo formulário de serviço --- */
+.form-card {
+    background: var(--bg);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.divider {
+    border: none;
+    height: 1px;
+    background: var(--bg);
+    margin: 2.5rem 0;
+}
+
+/* Ajusta o grid de serviços para a lista */
+#lista-de-servicos {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+#lista-de-servicos .service-card {
+    background: white;
+    border: 1px solid var(--bg);
+}
+
 }
