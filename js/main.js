@@ -35,27 +35,77 @@ function showSection(section) {
     const sidebarItems = document.querySelectorAll('#dashboard-barbeiro .sidebar-item');
     sidebarItems.forEach(item => item.classList.remove('active'));
     
-    event.target.closest('.sidebar-item').classList.add('active');
+    // Adiciona classe active ao item clicado
+    if (event && event.target) {
+        event.target.closest('.sidebar-item').classList.add('active');
+    }
 
-    // Oculta todas as seções
-    document.getElementById('overview-section').classList.add('hidden');
-    document.getElementById('services-section').classList.add('hidden');
-    const myLinkSection = document.getElementById('my-link-section');
-    if (myLinkSection) myLinkSection.classList.add('hidden');
+    // Oculta TODAS as seções
+    const sections = [
+        'overview-section',
+        'appointments-section', 
+        'clients-section',
+        'services-section',
+        'my-link-section'
+    ];
+    
+    sections.forEach(sectionId => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
 
     // Exibe a seção solicitada
-    if (section === 'overview') {
-        document.getElementById('overview-section').classList.remove('hidden');
-    } else if (section === 'services') {
-        document.getElementById('services-section').classList.remove('hidden');
-        carregarServicos();
-    } else if (section === 'my-link') {
-        if (myLinkSection) {
-            myLinkSection.classList.remove('hidden');
-            carregarLinkAgendamento();
-        }
-    } else {
-        document.getElementById('overview-section').classList.remove('hidden');
+    let targetSection = null;
+    
+    switch(section) {
+        case 'overview':
+            targetSection = document.getElementById('overview-section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                carregarDadosDashboard();
+            }
+            break;
+            
+        case 'appointments':
+            targetSection = document.getElementById('appointments-section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                carregarTodosAgendamentos();
+            }
+            break;
+            
+        case 'clients':
+            targetSection = document.getElementById('clients-section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                carregarClientes();
+            }
+            break;
+            
+        case 'services':
+            targetSection = document.getElementById('services-section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                carregarServicos();
+            }
+            break;
+            
+        case 'my-link':
+            targetSection = document.getElementById('my-link-section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                carregarLinkAgendamento();
+            }
+            break;
+            
+        default:
+            targetSection = document.getElementById('overview-section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                carregarDadosDashboard();
+            }
     }
 }
 
@@ -740,6 +790,186 @@ function fazerLogout() {
     }
 }
 
+// ===== SEÇÃO DE AGENDAMENTOS COMPLETOS =====
+
+/**
+ * Carrega todos os agendamentos com filtros
+ */
+function carregarTodosAgendamentos() {
+    const status = document.getElementById('filter-status')?.value || 'todos';
+    const data = document.getElementById('filter-date')?.value || '';
+    
+    const params = new URLSearchParams();
+    if (status !== 'todos') params.append('status', status);
+    if (data) params.append('data', data);
+    
+    fetch('backend/listar_todos_agendamentos.php?' + params.toString())
+        .then(response => response.json())
+        .then(data => {
+            const lista = document.getElementById('lista-agendamentos-completa');
+            
+            if (!data.success || data.agendamentos.length === 0) {
+                lista.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Nenhum agendamento encontrado.</p>';
+                return;
+            }
+            
+            lista.innerHTML = '';
+            
+            data.agendamentos.forEach(ag => {
+                const statusClass = 'status-' + ag.status;
+                const badgeClass = 'badge-' + ag.status;
+                
+                const card = `
+                    <div class="appointment-card ${statusClass}">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                <span class="appointment-badge ${badgeClass}">${ag.status}</span>
+                                <span style="color: var(--text-light);">
+                                    <i class="fas fa-calendar"></i> ${ag.data_formatada}
+                                </span>
+                                <span style="color: var(--text-light);">
+                                    <i class="fas fa-clock"></i> ${ag.hora}
+                                </span>
+                            </div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.25rem;">
+                                <i class="fas fa-user"></i> ${ag.cliente_nome}
+                            </h4>
+                            <p style="color: var(--text-light); margin-bottom: 0.25rem;">
+                                <i class="fas fa-phone"></i> ${ag.cliente_telefone}
+                            </p>
+                            <p style="color: var(--text);">
+                                <i class="fas fa-cut"></i> ${ag.servico_nome} • <strong>R$ ${ag.preco}</strong>
+                            </p>
+                            ${ag.observacoes ? `<p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.5rem;"><i class="fas fa-comment"></i> ${ag.observacoes}</p>` : ''}
+                        </div>
+                        <div class="appointment-actions">
+                            ${ag.status !== 'cancelado' ? `
+                                <button class="btn-icon btn-edit" onclick="confirmarAgendamento(${ag.id})" title="Confirmar">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" onclick="cancelarAgendamento(${ag.id})" title="Cancelar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                lista.innerHTML += card;
+            });
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            document.getElementById('lista-agendamentos-completa').innerHTML = 
+                '<p style="text-align: center; color: red;">Erro ao carregar agendamentos.</p>';
+        });
+}
+
+/**
+ * Confirma um agendamento
+ */
+function confirmarAgendamento(agendamentoId) {
+    const formData = new FormData();
+    formData.append('agendamento_id', agendamentoId);
+    formData.append('status', 'confirmado');
+    
+    fetch('backend/atualizar_status_agendamento.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.success) {
+            carregarTodosAgendamentos();
+            carregarEstatisticas();
+        }
+    })
+    .catch(error => console.error('Erro:', error));
+}
+
+/**
+ * Limpa os filtros de agendamentos
+ */
+function limparFiltros() {
+    document.getElementById('filter-status').value = 'todos';
+    document.getElementById('filter-date').value = '';
+    carregarTodosAgendamentos();
+}
+
+// ===== SEÇÃO DE CLIENTES =====
+
+/**
+ * Carrega lista de clientes
+ */
+function carregarClientes() {
+    fetch('backend/listar_clientes.php')
+        .then(response => response.json())
+        .then(data => {
+            const lista = document.getElementById('lista-clientes');
+            
+            if (!data.success || data.clientes.length === 0) {
+                lista.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Nenhum cliente encontrado.</p>';
+                return;
+            }
+            
+            lista.innerHTML = '';
+            
+            data.clientes.forEach(cliente => {
+                const iniciais = cliente.cliente_nome.split(' ')
+                    .map(n => n[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase();
+                
+                const card = `
+                    <div class="client-card">
+                        <div class="client-header">
+                            <div class="client-avatar">${iniciais}</div>
+                            <div class="client-info">
+                                <h4>${cliente.cliente_nome}</h4>
+                                <p><i class="fas fa-phone"></i> ${cliente.cliente_telefone}</p>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <div class="client-stat">
+                                <div class="client-stat-number">${cliente.total_agendamentos}</div>
+                                <div class="client-stat-label">Agendamentos</div>
+                            </div>
+                            <div class="client-stat">
+                                <div class="client-stat-number">R$ ${cliente.total_gasto}</div>
+                                <div class="client-stat-label">Total Gasto</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                lista.innerHTML += card;
+            });
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            document.getElementById('lista-clientes').innerHTML = 
+                '<p style="text-align: center; color: red;">Erro ao carregar clientes.</p>';
+        });
+}
+
+/**
+ * Busca clientes por nome ou telefone
+ */
+function buscarClientes() {
+    const termo = document.getElementById('search-client').value.toLowerCase();
+    const cards = document.querySelectorAll('.client-card');
+    
+    cards.forEach(card => {
+        const texto = card.textContent.toLowerCase();
+        if (texto.includes(termo)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
 
 // ===== INICIALIZAÇÃO =====
 
