@@ -22,11 +22,11 @@
                 </button>
 
                 <div class="nav-links" id="nav-links-menu">
-                    <a href="#home">Início</a>
-                    <a href="#features">Funcionalidades</a>
-                    <a href="#dashboard">Dashboard</a>
-                    <button class="btn btn-secondary" onclick="showLogin()">Entrar</button>
-                </div>
+             <a href="#home">Início</a>
+             <a href="#features">Funcionalidades</a>
+          <a href="#dashboard">Dashboard</a>
+            <button class="btn btn-secondary" id="btn-auth" onclick="handleAuthButton()">Entrar</button>
+            </div>
             </div>
         </div>
     </nav>
@@ -100,6 +100,10 @@
                         <i class="fas fa-scissors"></i>
                         <span>Serviços</span>
                     </div>
+                    <div class="sidebar-item" onclick="showSection('my-link')">
+    <i class="fas fa-link"></i>
+    <span>Meu Link</span>
+</div>
                     <div class="sidebar-item" onclick="showSection('settings')">
                         <i class="fas fa-cog"></i>
                         <span>Configurações</span>
@@ -147,49 +151,37 @@
                         </div>
 
                         <div class="appointments-list">
-                            <h3>Próximos Agendamentos</h3>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="appointment-time">10:00</div>
-                                    <div class="appointment-details">
-                                        <h4>Carlos Silva</h4>
-                                        <p><i class="fas fa-cut"></i> Corte + Barba • R$ 60,00</p>
-                                    </div>
-                                </div>
-                                <div class="appointment-actions">
-                                    <button class="btn-icon btn-edit"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-icon btn-delete"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="appointment-time">11:30</div>
-                                    <div class="appointment-details">
-                                        <h4>João Pedro</h4>
-                                        <p><i class="fas fa-cut"></i> Corte Degradê • R$ 45,00</p>
-                                    </div>
-                                </div>
-                                <div class="appointment-actions">
-                                    <button class="btn-icon btn-edit"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-icon btn-delete"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="appointment-time">14:00</div>
-                                    <div class="appointment-details">
-                                        <h4>Rafael Costa</h4>
-                                        <p><i class="fas fa-cut"></i> Sobrancelha + Barba • R$ 50,00</p>
-                                    </div>
-                                </div>
-                                <div class="appointment-actions">
-                                    <button class="btn-icon btn-edit"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-icon btn-delete"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </div>
+                        <h3>Próximos Agendamentos</h3>
                         </div>
                     </div>
+                    <div id="my-link-section" class="hidden">
+    <h3>Meu Link de Agendamento</h3>
+    <div class="link-card">
+        <div class="link-info">
+            <i class="fas fa-info-circle"></i>
+            <p>Compartilhe este link com seus clientes para que eles possam agendar serviços diretamente!</p>
+        </div>
+        
+        <div class="link-display">
+            <label>Seu Link Personalizado:</label>
+            <div class="link-box">
+                <input type="text" id="link-agendamento" readonly>
+                <button class="btn btn-primary" onclick="copiarLink()">
+                    <i class="fas fa-copy"></i> Copiar
+                </button>
+            </div>
+            <small class="link-help">Cole este link em suas redes sociais, WhatsApp ou Bio do Instagram!</small>
+        </div>
 
+        <div class="link-preview">
+            <h4><i class="fas fa-eye"></i> Pré-visualização</h4>
+            <p>Veja como seus clientes verão sua página de agendamento:</p>
+            <button class="btn btn-secondary" onclick="abrirPreview()">
+                <i class="fas fa-external-link-alt"></i> Abrir Página de Agendamento
+            </button>
+        </div>
+    </div>
+</div>
                     <div id="services-section" class="hidden">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                             <h3>Meus Serviços</h3>

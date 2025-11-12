@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-require_once __DIR__ . '/conexao.php'; // Conexão PDO em $pdo
+require_once __DIR__ . '/conexao.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -8,9 +8,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['email'] ?? '');
         $senha = $_POST['senha'] ?? '';
         $telefone = trim($_POST['telefone'] ?? '');
-        
-        // Esta é a parte nova:
-        // Assume que este formulário regista SEMPRE um barbeiro.
         $tipo = 'barbeiro'; 
 
         if (!$nome || !$email || !$senha) {
@@ -18,18 +15,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Criptografa a senha (como já fazias, está perfeito)
+        // Gera um slug único baseado no nome da barbearia
+        $slug_base = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $nome));
+        $slug_base = trim($slug_base, '-');
+        
+        // Verifica se o slug já existe e adiciona número se necessário
+        $slug = $slug_base;
+        $contador = 1;
+        
+        while (true) {
+            $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE slug = ?");
+            $stmt->execute([$slug]);
+            if ($stmt->rowCount() == 0) {
+                break;
+            }
+            $slug = $slug_base . '-' . $contador;
+            $contador++;
+        }
+
         $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
-        // Atualiza o INSERT para a nova tabela 'usuarios'
-        $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, telefone, tipo) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$nome, $email, $senha_hash, $telefone, $tipo]);
+        $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, slug, senha, telefone, tipo) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$nome, $email, $slug, $senha_hash, $telefone, $tipo]);
 
         echo json_encode(['success' => true, 'message' => 'Barbeiro cadastrado com sucesso!']);
     
     } catch (PDOException $e) {
         http_response_code(500);
-        // Verifica se é o erro de e-mail duplicado
         if ($e->errorInfo[1] == 1062) {
             echo json_encode(['success' => false, 'message' => 'Este e-mail já está em uso.']);
         } else {

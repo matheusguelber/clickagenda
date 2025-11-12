@@ -1,10 +1,26 @@
 // ===== NAVEGAÇÃO E VISUALIZAÇÃO =====
 
 function showDashboard() {
+    // Verifica se o usuário está logado
+    const userId = localStorage.getItem('user_id');
+    const userTipo = localStorage.getItem('user_tipo');
+    
+    if (!userId || !userTipo) {
+        // Se não estiver logado, redireciona direto para o login
+        showModal('login');
+        return;
+    }
+    
+    // Se estiver logado, mostra o dashboard
     document.querySelector('.hero').classList.add('hidden');
     document.querySelector('.features').classList.add('hidden');
-    // Mostra o dashboard do barbeiro por padrão
-    document.getElementById('dashboard-barbeiro').classList.remove('hidden');
+    
+    if (userTipo === 'barbeiro') {
+        document.getElementById('dashboard-barbeiro').classList.remove('hidden');
+        carregarDadosDashboard(); // Carrega os dados reais do barbeiro
+    } else {
+        alert("Dashboard de cliente ainda não implementado.");
+    }
 }
 
 function showLogin() {
@@ -19,16 +35,13 @@ function showSection(section) {
     const sidebarItems = document.querySelectorAll('#dashboard-barbeiro .sidebar-item');
     sidebarItems.forEach(item => item.classList.remove('active'));
     
-    // Adiciona classe active ao item clicado
     event.target.closest('.sidebar-item').classList.add('active');
 
     // Oculta todas as seções
     document.getElementById('overview-section').classList.add('hidden');
     document.getElementById('services-section').classList.add('hidden');
-    // Adiciona aqui futuras secções (ex: 'clients', 'settings') se precisares
-    // document.getElementById('clients-section').classList.add('hidden');
-    // document.getElementById('settings-section').classList.add('hidden');
-
+    const myLinkSection = document.getElementById('my-link-section');
+    if (myLinkSection) myLinkSection.classList.add('hidden');
 
     // Exibe a seção solicitada
     if (section === 'overview') {
@@ -36,15 +49,14 @@ function showSection(section) {
     } else if (section === 'services') {
         document.getElementById('services-section').classList.remove('hidden');
         carregarServicos();
+    } else if (section === 'my-link') {
+        if (myLinkSection) {
+            myLinkSection.classList.remove('hidden');
+            carregarLinkAgendamento();
+        }
     } else {
-         // Fallback para 'overview' se a secção não for encontrada
         document.getElementById('overview-section').classList.remove('hidden');
-        // (Opcional: podes manter o teu alerta)
-        // alert('Seção "' + section + '" em desenvolvimento!');
     }
-
-
-
 }
 
 // ===== MODAIS =====
@@ -318,14 +330,17 @@ function initializeLoginForms() {
                     
                     localStorage.setItem('user_tipo', data.tipo);
                     localStorage.setItem('user_id', data.user_id || '');
-
+                    localStorage.setItem('user_slug', data.slug || '');
+                    localStorage.setItem('user_nome', data.nome || '');
+                    atualizarBotaoAuth();
                     // Esconde as seções iniciais
                     document.querySelector('.hero').classList.add('hidden');
                     document.querySelector('.features').classList.add('hidden');
 
                     // Mostra o dashboard correto
                     if (data.tipo === 'barbeiro') {
-                        document.getElementById('dashboard-barbeiro').classList.remove('hidden');
+                    document.getElementById('dashboard-barbeiro').classList.remove('hidden');
+                    carregarDadosDashboard();
                     } else { 
                         // (No futuro, se tiver dashboard de cliente)
                         // document.getElementById('dashboard-cliente').classList.remove('hidden');
@@ -500,6 +515,232 @@ function carregarServicos() {
         });
 }
 
+// ===== FUNÇÕES DO LINK DE AGENDAMENTO =====
+
+function carregarLinkAgendamento() {
+    const slug = localStorage.getItem('user_slug');
+    if (!slug) {
+        alert('Erro: Slug não encontrado. Faça login novamente.');
+        return;
+    }
+    
+    const linkCompleto = window.location.origin + '/clickagenda/agendar.php?barbeiro=' + slug;
+    const inputLink = document.getElementById('link-agendamento');
+    
+    if (inputLink) {
+        inputLink.value = linkCompleto;
+    }
+}
+
+function copiarLink() {
+    const inputLink = document.getElementById('link-agendamento');
+    inputLink.select();
+    inputLink.setSelectionRange(0, 99999);
+    
+    try {
+        document.execCommand('copy');
+        alert('✅ Link copiado com sucesso! Cole no WhatsApp, Instagram ou onde preferir.');
+    } catch (err) {
+        alert('Erro ao copiar. Por favor, copie manualmente o link.');
+    }
+}
+
+function abrirPreview() {
+    const slug = localStorage.getItem('user_slug');
+    if (!slug) {
+        alert('Erro: Slug não encontrado.');
+        return;
+    }
+    
+    const url = window.location.origin + '/clickagenda/agendar.php?barbeiro=' + slug;
+    window.open(url, '_blank');
+}
+
+// ===== CARREGAR DADOS DO DASHBOARD =====
+
+/**
+ * Carrega todos os dados do dashboard do barbeiro logado
+ */
+function carregarDadosDashboard() {
+    carregarEstatisticas();
+    carregarProximosAgendamentos();
+}
+
+/**
+ * Carrega as estatísticas do barbeiro (cards de números)
+ */
+function carregarEstatisticas() {
+    fetch('backend/obter_estatisticas.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Atualiza os cards de estatísticas
+                const stats = data.estatisticas;
+                
+                const statCards = document.querySelectorAll('.stat-card');
+                if (statCards.length >= 4) {
+                    statCards[0].querySelector('.stat-number').textContent = stats.agendamentos_hoje || 0;
+                    statCards[1].querySelector('.stat-number').textContent = stats.total_clientes || 0;
+                    statCards[2].querySelector('.stat-number').textContent = 'R$ ' + (stats.faturamento_mes || '0,00');
+                    statCards[3].querySelector('.stat-number').textContent = stats.taxa_presenca || '0%';
+                }
+            }
+        })
+        .catch(error => console.error('Erro ao carregar estatísticas:', error));
+}
+
+/**
+ * Carrega os próximos agendamentos do barbeiro
+ */
+function carregarProximosAgendamentos() {
+    fetch('backend/obter_agendamentos.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const lista = document.querySelector('.appointments-list');
+                const agendamentos = data.agendamentos;
+                
+                // Mantém o título e remove agendamentos antigos
+                lista.innerHTML = '<h3>Próximos Agendamentos</h3>';
+                
+                if (agendamentos.length === 0) {
+                    lista.innerHTML += '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Nenhum agendamento próximo.</p>';
+                    return;
+                }
+                
+                // Adiciona os agendamentos reais
+                agendamentos.forEach(agendamento => {
+                    const itemHTML = `
+                        <div class="appointment-item">
+                            <div class="appointment-info">
+                                <div class="appointment-time">${agendamento.hora}</div>
+                                <div class="appointment-details">
+                                    <h4>${agendamento.cliente_nome}</h4>
+                                    <p><i class="fas fa-cut"></i> ${agendamento.servico_nome} • R$ ${agendamento.preco}</p>
+                                    <small style="color: var(--text-light);"><i class="fas fa-calendar"></i> ${agendamento.data_formatada}</small>
+                                </div>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="btn-icon btn-edit" onclick="editarAgendamento(${agendamento.id})" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" onclick="cancelarAgendamento(${agendamento.id})" title="Cancelar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    lista.innerHTML += itemHTML;
+                });
+            }
+        })
+        .catch(error => console.error('Erro ao carregar agendamentos:', error));
+}
+
+/**
+ * Cancela um agendamento
+ */
+function cancelarAgendamento(agendamentoId) {
+    if (!confirm('Tem certeza que deseja cancelar este agendamento?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('agendamento_id', agendamentoId);
+    
+    fetch('backend/cancelar_agendamento.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.success) {
+            carregarProximosAgendamentos(); // Recarrega a lista
+            carregarEstatisticas(); // Atualiza as estatísticas
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao cancelar agendamento.');
+    });
+}
+
+/**
+ * Edita um agendamento (placeholder para implementação futura)
+ */
+function editarAgendamento(agendamentoId) {
+    alert('Funcionalidade de edição em desenvolvimento! ID: ' + agendamentoId);
+    // Futuramente: abrir modal com dados do agendamento
+}
+
+// ===== SISTEMA DE AUTENTICAÇÃO (LOGIN/LOGOUT) =====
+
+/**
+ * Atualiza o botão de login/logout baseado no estado de autenticação
+ */
+function atualizarBotaoAuth() {
+    const btnAuth = document.getElementById('btn-auth');
+    const userId = localStorage.getItem('user_id');
+    const userName = localStorage.getItem('user_nome');
+    
+    if (!btnAuth) return;
+    
+    if (userId) {
+        // Usuário está logado
+        btnAuth.innerHTML = '<i class="fas fa-sign-out-alt"></i> Sair';
+        btnAuth.onclick = fazerLogout;
+        
+        // Opcional: Mostrar nome do usuário
+        if (userName) {
+            btnAuth.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]} | Sair`;
+        }
+    } else {
+        // Usuário não está logado
+        btnAuth.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+        btnAuth.onclick = handleAuthButton;
+    }
+}
+
+/**
+ * Gerencia o clique no botão de autenticação
+ */
+function handleAuthButton() {
+    const userId = localStorage.getItem('user_id');
+    
+    if (userId) {
+        fazerLogout();
+    } else {
+        showLogin();
+    }
+}
+
+/**
+ * Faz logout do usuário
+ */
+function fazerLogout() {
+    if (confirm('Tem certeza que deseja sair?')) {
+        // Limpa os dados do localStorage
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('user_tipo');
+        localStorage.removeItem('user_nome');
+        localStorage.removeItem('user_slug');
+        
+        // Esconde o dashboard
+        document.getElementById('dashboard-barbeiro').classList.add('hidden');
+        
+        // Mostra as seções iniciais
+        document.querySelector('.hero').classList.remove('hidden');
+        document.querySelector('.features').classList.remove('hidden');
+        
+        // Atualiza o botão
+        atualizarBotaoAuth();
+        
+        alert('Você saiu com sucesso!');
+    }
+}
+
+
 // ===== INICIALIZAÇÃO =====
 
 /**
@@ -511,6 +752,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initializePageTransition();
     initializeHamburgerMenu(); 
     initializeServiceForm(); // <-- Adicionámos isto no passo anterior
-    
+    atualizarBotaoAuth();
     console.log('ClickAgenda inicializado com sucesso!');
 });
