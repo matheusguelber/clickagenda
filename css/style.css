@@ -528,6 +528,17 @@ body {
     font-weight: bold;
 }
 
+.calendar-day.selected {
+    background: var(--secondary) !important;
+    color: var(--primary) !important;
+    font-weight: bold;
+    border-color: var(--secondary) !important;
+}
+
+.calendar-day {
+    cursor: pointer;
+}
+
 /* ===== AGENDAMENTOS ===== */
 .appointments-list {
     margin-top: 2rem;

@@ -607,6 +607,7 @@ function abrirPreview() {
 function carregarDadosDashboard() {
     carregarEstatisticas();
     carregarProximosAgendamentos();
+    gerarCalendarioSemana();
 }
 
 /**
@@ -1237,6 +1238,74 @@ function navegarParaDashboard() {
     
     showDashboard();
 }
+
+/**
+ * Gera o calendário da semana atual
+ */
+function gerarCalendarioSemana() {
+    const calendarGrid = document.querySelector('.calendar-grid');
+    if (!calendarGrid) return;
+    
+    // Limpa o calendário
+    calendarGrid.innerHTML = '';
+    
+    // Pega a data de hoje
+    const hoje = new Date();
+    const diaSemana = hoje.getDay(); // 0 = Domingo, 1 = Segunda, etc.
+    
+    // Calcula o domingo da semana atual
+    const domingo = new Date(hoje);
+    domingo.setDate(hoje.getDate() - diaSemana);
+    
+    // Dias da semana
+    const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+    
+    // Gera os 7 dias da semana
+    for (let i = 0; i < 7; i++) {
+        const dia = new Date(domingo);
+        dia.setDate(domingo.getDate() + i);
+        
+        const diaNumero = dia.getDate();
+        const mesAtual = dia.getMonth() === hoje.getMonth();
+        const ehHoje = dia.toDateString() === hoje.toDateString();
+        
+        // Verifica se tem agendamentos neste dia (vamos fazer isso depois)
+        const temAgendamento = false; // Por enquanto false
+        
+        // Cria o elemento do dia
+        const diaElement = document.createElement('div');
+        diaElement.className = 'calendar-day';
+        
+        if (ehHoje) {
+            diaElement.classList.add('today');
+        }
+        
+        if (temAgendamento) {
+            diaElement.classList.add('has-appointment');
+        }
+        
+        if (!mesAtual) {
+            diaElement.style.opacity = '0.5';
+        }
+        
+        diaElement.innerHTML = `
+            <strong>${diasSemana[i]}</strong><br>${diaNumero}
+        `;
+        
+        // Adiciona evento de clique
+        diaElement.onclick = function() {
+            // Remove seleção anterior
+            document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+            // Adiciona seleção ao dia clicado
+            this.classList.add('selected');
+            // Filtra agendamentos deste dia (implementar depois)
+            console.log('Dia clicado:', dia.toISOString().split('T')[0]);
+        };
+        
+        calendarGrid.appendChild(diaElement);
+    }
+}
+
 
 
 // ===== INICIALIZAÇÃO =====
