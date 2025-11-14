@@ -903,58 +903,182 @@ function limparFiltros() {
  * Carrega lista de clientes
  */
 function carregarClientes() {
+    const lista = document.getElementById('lista-clientes');
+    
+    // Aplica o estilo de grid diretamente (mais compacto)
+    lista.style.display = 'grid';
+    lista.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+    lista.style.gap = '1.5rem';
+    lista.style.marginTop = '1.5rem';
+    
+    // Mostra loading
+    lista.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem; grid-column: 1/-1;">Carregando clientes...</p>';
+    
     fetch('backend/listar_clientes.php')
         .then(response => response.json())
         .then(data => {
-            const lista = document.getElementById('lista-clientes');
-
             const totalCountSpan = document.getElementById('total-clientes-count');
             if (totalCountSpan && data.clientes) {
                 totalCountSpan.textContent = data.clientes.length;
             }
-            if (!data.success || data.clientes.length === 0) {
-                lista.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Nenhum cliente encontrado.</p>';
+            
+            if (!data.success || !data.clientes || data.clientes.length === 0) {
+                lista.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem; grid-column: 1/-1;">Nenhum cliente encontrado.</p>';
                 return;
             }
             
+            // LIMPA a lista
             lista.innerHTML = '';
             
+            // Gera os cards
             data.clientes.forEach(cliente => {
-                const iniciais = cliente.cliente_nome.split(' ')
+                const iniciais = cliente.cliente_nome
+                    .split(' ')
                     .map(n => n[0])
                     .slice(0, 2)
                     .join('')
                     .toUpperCase();
                 
-                const card = `
-                    <div class="client-card">
-                        <div class="client-header">
-                            <div class="client-avatar">${iniciais}</div>
-                            <div class="client-info">
-                                <h4>${cliente.cliente_nome}</h4>
-                                <p><i class="fas fa-phone"></i> ${cliente.cliente_telefone}</p>
-                            </div>
+                // Cria o card com estilos inline (mais compacto)
+                const card = document.createElement('div');
+                card.style.cssText = `
+                    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+                    border-radius: 16px;
+                    padding: 0;
+                    border: 1px solid #e9ecef;
+                    overflow: hidden;
+                    transition: all 0.3s;
+                `;
+                
+                card.innerHTML = `
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                        padding: 1.25rem;
+                        background: linear-gradient(135deg, #1a1a2e 0%, #2a2a3e 100%);
+                    ">
+                        <div style="
+                            width: 50px;
+                            height: 50px;
+                            min-width: 50px;
+                            border-radius: 14px;
+                            background: linear-gradient(135deg, #d4af37 0%, #f4a261 100%);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.25rem;
+                            color: white;
+                            font-weight: bold;
+                            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+                        ">${iniciais}</div>
+                        <div style="flex: 1; min-width: 0;">
+                            <h4 style="
+                                color: white;
+                                margin: 0 0 0.25rem 0;
+                                font-size: 1rem;
+                                font-weight: 700;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            ">${cliente.cliente_nome}</h4>
+                            <p style="
+                                color: rgba(255, 255, 255, 0.8);
+                                font-size: 0.85rem;
+                                display: flex;
+                                align-items: center;
+                                gap: 0.35rem;
+                                margin: 0;
+                            ">
+                                <i class="fas fa-phone" style="color: #d4af37; font-size: 0.75rem;"></i> 
+                                ${cliente.cliente_telefone}
+                            </p>
                         </div>
-                        <div class="client-stats">
-                            <div class="client-stat">
-                                <div class="client-stat-number">${cliente.total_agendamentos}</div>
-                                <div class="client-stat-label">Agendamentos</div>
-                            </div>
-                            <div class="client-stat">
-                                <div class="client-stat-number">R$ ${cliente.total_gasto}</div>
-                                <div class="client-stat-label">Total Gasto</div>
-                            </div>
+                    </div>
+                    <div style="
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 0;
+                        padding: 1.25rem;
+                    ">
+                        <div style="
+                            padding: 0.75rem;
+                            text-align: center;
+                            border-right: 1px solid #e9ecef;
+                        ">
+                            <i class="fas fa-calendar-check" style="
+                                font-size: 1.25rem;
+                                color: #d4af37;
+                                margin-bottom: 0.35rem;
+                                display: block;
+                                opacity: 0.7;
+                            "></i>
+                            <span style="
+                                font-size: 1.5rem;
+                                font-weight: 800;
+                                color: #1a1a2e;
+                                display: block;
+                                line-height: 1;
+                                margin-bottom: 0.25rem;
+                            ">${cliente.total_agendamentos}</span>
+                            <span style="
+                                font-size: 0.7rem;
+                                color: #999;
+                                text-transform: uppercase;
+                                font-weight: 600;
+                                letter-spacing: 0.5px;
+                                display: block;
+                            ">Agendamentos</span>
+                        </div>
+                        <div style="
+                            padding: 0.75rem;
+                            text-align: center;
+                        ">
+                            <i class="fas fa-coins" style="
+                                font-size: 1.25rem;
+                                color: #d4af37;
+                                margin-bottom: 0.35rem;
+                                display: block;
+                                opacity: 0.7;
+                            "></i>
+                            <span style="
+                                font-size: 1.5rem;
+                                font-weight: 800;
+                                color: #1a1a2e;
+                                display: block;
+                                line-height: 1;
+                                margin-bottom: 0.25rem;
+                            ">R$ ${cliente.total_gasto}</span>
+                            <span style="
+                                font-size: 0.7rem;
+                                color: #999;
+                                text-transform: uppercase;
+                                font-weight: 600;
+                                letter-spacing: 0.5px;
+                                display: block;
+                            ">Total Gasto</span>
                         </div>
                     </div>
                 `;
                 
-                lista.innerHTML += card;
+                // Adiciona hover effect
+                card.onmouseenter = function() {
+                    this.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                    this.style.transform = 'translateY(-4px)';
+                    this.style.borderColor = '#d4af37';
+                };
+                card.onmouseleave = function() {
+                    this.style.boxShadow = 'none';
+                    this.style.transform = 'translateY(0)';
+                    this.style.borderColor = '#e9ecef';
+                };
+                
+                lista.appendChild(card);
             });
         })
         .catch(error => {
             console.error('Erro:', error);
-            document.getElementById('lista-clientes').innerHTML = 
-                '<p style="text-align: center; color: red;">Erro ao carregar clientes.</p>';
+            lista.innerHTML = '<p style="text-align: center; color: red; grid-column: 1/-1;">Erro ao carregar clientes.</p>';
         });
 }
 
