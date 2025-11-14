@@ -156,10 +156,6 @@ function initializeForms() {
 }
 
 
-/**
- * Processa envio do formulário de agendamento
- * (Esta função não está a ser usada no dashboard do barbeiro, mas deixamos aqui)
- */
 function handleAppointmentSubmit(form) {
     const formData = new FormData(form);
     
@@ -183,10 +179,7 @@ function handleAppointmentSubmit(form) {
     });
 }
 
-/**
- * Processa envio do formulário de serviço
- * (Esta função não está a ser usada no dashboard do barbeiro, mas deixamos aqui)
- */
+
 function handleServiceSubmit(form) {
     const formData = new FormData(form);
     
@@ -706,8 +699,8 @@ function cancelarAgendamento(agendamentoId) {
     .then(data => {
         alert(data.message);
         if (data.success) {
-            carregarProximosAgendamentos(); // Recarrega a lista
-            carregarEstatisticas(); // Atualiza as estatísticas
+            carregarTodosAgendamentos(); // Recarrega a lista
+            carregarEstatisticas(); // Atualiza estatísticas
         }
     })
     .catch(error => {
@@ -803,65 +796,158 @@ function carregarTodosAgendamentos() {
     if (status !== 'todos') params.append('status', status);
     if (data) params.append('data', data);
     
+    const lista = document.getElementById('lista-agendamentos-completa');
+    
+    // Aplica estilos ao container
+    lista.style.display = 'grid';
+    lista.style.gap = '1rem';
+    lista.style.marginTop = '1rem';
+    
+    lista.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Carregando...</p>';
+    
     fetch('backend/listar_todos_agendamentos.php?' + params.toString())
         .then(response => response.json())
         .then(data => {
-            const lista = document.getElementById('lista-agendamentos-completa');
-            
             if (!data.success || data.agendamentos.length === 0) {
-                lista.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Nenhum agendamento encontrado.</p>';
+                lista.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Nenhum agendamento encontrado.</p>';
                 return;
             }
             
             lista.innerHTML = '';
             
             data.agendamentos.forEach(ag => {
-                const statusClass = 'status-' + ag.status;
-                const badgeClass = 'badge-' + ag.status;
+                const card = document.createElement('div');
                 
-                const card = `
-                    <div class="appointment-card ${statusClass}">
-                        <div>
-                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                                <span class="appointment-badge ${badgeClass}">${ag.status}</span>
-                                <span style="color: var(--text-light);">
-                                    <i class="fas fa-calendar"></i> ${ag.data_formatada}
-                                </span>
-                                <span style="color: var(--text-light);">
-                                    <i class="fas fa-clock"></i> ${ag.hora}
-                                </span>
-                            </div>
-                            <h4 style="color: var(--primary); margin-bottom: 0.25rem;">
-                                <i class="fas fa-user"></i> ${ag.cliente_nome}
-                            </h4>
-                            <p style="color: var(--text-light); margin-bottom: 0.25rem;">
-                                <i class="fas fa-phone"></i> ${ag.cliente_telefone}
-                            </p>
-                            <p style="color: var(--text);">
-                                <i class="fas fa-cut"></i> ${ag.servico_nome} • <strong>R$ ${ag.preco}</strong>
-                            </p>
-                            ${ag.observacoes ? `<p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.5rem;"><i class="fas fa-comment"></i> ${ag.observacoes}</p>` : ''}
-                        </div>
-                        <div class="appointment-actions">
-                            ${ag.status !== 'cancelado' ? `
-                                <button class="btn-icon btn-edit" onclick="confirmarAgendamento(${ag.id})" title="Confirmar">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="btn-icon btn-delete" onclick="cancelarAgendamento(${ag.id})" title="Cancelar">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
+                // Define cores por status
+                let statusColor = '#f39c12';
+                let statusBg = '#fff3cd';
+                let statusText = 'PENDENTE';
+                
+                if (ag.status === 'confirmado') {
+                    statusColor = '#27ae60';
+                    statusBg = '#d4edda';
+                    statusText = 'CONFIRMADO';
+                } else if (ag.status === 'cancelado') {
+                    statusColor = '#e74c3c';
+                    statusBg = '#f8d7da';
+                    statusText = 'CANCELADO';
+                }
+                
+                card.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    padding: 1.5rem;
+                    border-left: 4px solid ${statusColor};
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                    transition: all 0.3s;
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    gap: 1rem;
+                    align-items: center;
+                    ${ag.status === 'cancelado' ? 'opacity: 0.7;' : ''}
                 `;
                 
-                lista.innerHTML += card;
+                // Monta o HTML do conteúdo
+                let botoesHTML = '';
+                
+                // Só mostra botões se o status for PENDENTE
+                if (ag.status === 'pendente') {
+                    botoesHTML = `
+                        <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                            <button onclick="confirmarAgendamento(${ag.id})" style="
+                                width: 45px;
+                                height: 45px;
+                                border-radius: 10px;
+                                border: none;
+                                background: #27ae60;
+                                color: white;
+                                cursor: pointer;
+                                transition: all 0.3s;
+                                font-size: 1.1rem;
+                            " onmouseover="this.style.transform='scale(1.1)'; this.style.background='#229954';" 
+                               onmouseout="this.style.transform='scale(1)'; this.style.background='#27ae60';"
+                               title="Confirmar">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button onclick="cancelarAgendamento(${ag.id})" style="
+                                width: 45px;
+                                height: 45px;
+                                border-radius: 10px;
+                                border: none;
+                                background: #e74c3c;
+                                color: white;
+                                cursor: pointer;
+                                transition: all 0.3s;
+                                font-size: 1.1rem;
+                            " onmouseover="this.style.transform='scale(1.1)'; this.style.background='#c0392b';" 
+                               onmouseout="this.style.transform='scale(1)'; this.style.background='#e74c3c';"
+                               title="Cancelar">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                card.innerHTML = `
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+                            <span style="
+                                background: ${statusBg};
+                                color: ${statusColor};
+                                padding: 0.35rem 0.75rem;
+                                border-radius: 20px;
+                                font-size: 0.75rem;
+                                font-weight: 700;
+                                letter-spacing: 0.5px;
+                            ">${statusText}</span>
+                            <span style="color: #666; font-size: 0.9rem;">
+                                <i class="fas fa-calendar" style="color: #d4af37;"></i> ${ag.data_formatada}
+                            </span>
+                            <span style="color: #666; font-size: 0.9rem;">
+                                <i class="fas fa-clock" style="color: #d4af37;"></i> ${ag.hora}
+                            </span>
+                        </div>
+                        
+                        <h4 style="color: #1a1a2e; margin-bottom: 0.5rem; font-size: 1.1rem;">
+                            <i class="fas fa-user" style="color: #d4af37;"></i> ${ag.cliente_nome}
+                        </h4>
+                        
+                        <p style="color: #666; margin-bottom: 0.25rem; font-size: 0.9rem;">
+                            <i class="fas fa-phone" style="color: #d4af37; width: 14px;"></i> ${ag.cliente_telefone}
+                        </p>
+                        
+                        <p style="color: #333; margin-bottom: 0.25rem; font-size: 0.95rem;">
+                            <i class="fas fa-cut" style="color: #d4af37; width: 14px;"></i> ${ag.servico_nome} • <strong>R$ ${ag.preco}</strong>
+                        </p>
+                        
+                        ${ag.observacoes ? `
+                            <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;">
+                                <i class="fas fa-comment" style="color: #d4af37;"></i> ${ag.observacoes}
+                            </p>
+                        ` : ''}
+                    </div>
+                    
+                    ${botoesHTML}
+                `;
+                
+                // Hover effect
+                card.onmouseenter = function() {
+                    if (ag.status !== 'cancelado') {
+                        this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+                        this.style.transform = 'translateY(-2px)';
+                    }
+                };
+                card.onmouseleave = function() {
+                    this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                    this.style.transform = 'translateY(0)';
+                };
+                
+                lista.appendChild(card);
             });
         })
         .catch(error => {
             console.error('Erro:', error);
-            document.getElementById('lista-agendamentos-completa').innerHTML = 
-                '<p style="text-align: center; color: red;">Erro ao carregar agendamentos.</p>';
+            lista.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar agendamentos.</p>';
         });
 }
 
@@ -881,11 +967,16 @@ function confirmarAgendamento(agendamentoId) {
     .then(data => {
         alert(data.message);
         if (data.success) {
+            // Recarrega TUDO para garantir que atualiza
             carregarTodosAgendamentos();
             carregarEstatisticas();
+            carregarProximosAgendamentos();
         }
     })
-    .catch(error => console.error('Erro:', error));
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao confirmar agendamento.');
+    });
 }
 
 /**

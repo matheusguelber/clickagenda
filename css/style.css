@@ -78,23 +78,17 @@ body {
     color: var(--secondary);
 }
 
-/* ======================================================== */
-/* INÍCIO DA ALTERAÇÃO 1 (Botão Hamburger)                  */
-/* ======================================================== */
 
 .hamburger-menu {
-    display: none; /* Escondido no desktop */
+    display: none; 
     font-size: 1.5rem;
     background: none;
     border: none;
     color: white; 
     cursor: pointer;
-    z-index: 1001; /* Garante que fique acima de outros itens se houver sobreposição */
+    z-index: 1001; 
 }
 
-/* ======================================================== */
-/* FIM DA ALTERAÇÃO 1                                       */
-/* ======================================================== */
 
 
 /* ===== BOTÕES ===== */
@@ -534,33 +528,26 @@ body {
     .dashboard-container {
         grid-template-columns: 1fr;
     }
-
-    /* ======================================================== */
-    /* INÍCIO DA ALTERAÇÃO 2 (Regras do Menu Responsivo)        */
-    /* ======================================================== */
-
-    /* Altera .nav-links de 'display: none' para um menu dropdown */
-    .nav-links {
-        /* O MENU COMPLETO FICA ESCONDIDO POR PADRÃO */
+        .nav-links {
         display: none; 
 
-        /* Estilo do menu quando aberto (dropdown) */
+        
         position: absolute;
-        top: 60px; /* Ajuste se a altura da sua navbar for diferente */
+        top: 60px; 
         left: 0;
         width: 100%;
-        background-color: var(--primary); /* Fundo igual ao da navbar */
-        flex-direction: column; /* Links em coluna */
+        background-color: var(--primary); 
+        flex-direction: column;
         padding: 1rem 0;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    /* Esta classe ".active" será adicionada pelo JavaScript */
+    
     .nav-links.active {
-        display: flex; /* MOSTRA O MENU QUANDO CLICADO */
+        display: flex; 
     }
 
-    /* Estilo dos links dentro do menu mobile */
+   
     .nav-links a,
     .nav-links button {
         width: 100%;
@@ -570,17 +557,14 @@ body {
 
     .nav-links button {
         margin: 0.5rem 1rem 0 1rem;
-        width: auto; /* Botão "Entrar" não fica 100% */
+        width: auto;
     }
     
-    /* Mostra o botão hamburger no mobile */
+    
     .hamburger-menu {
         display: block;
     }
 
-    /* ======================================================== */
-    /* FIM DA ALTERAÇÃO 2                                       */
-    /* ======================================================== */
 
     .calendar-grid {
         grid-template-columns: repeat(7, 1fr);
@@ -602,7 +586,7 @@ body {
         min-width: auto;
     }
 
-/* ===== MODAL DE LOGIN - HARMONIZADO COM O DESIGN ===== */
+/*MODAL DE LOGIN  */
 .login-modal-content {
     max-width: 480px;
     padding: 2rem;
@@ -1068,30 +1052,68 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* ===== FILTROS E BUSCA ===== */
+/*FILTROS E BUSCA*/
+
+.filters-bar input[type="date"] {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s;
+    min-width: 180px;
+    color: #333;
+}
+
+.filters-bar input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    color: #d4af37;
+    font-size: 1.1rem;
+}
+
+.filters-bar input[type="date"]:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+
 .filters-bar {
     display: flex;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .filters-bar select,
 .filters-bar input[type="date"] {
-    padding: 0.75rem;
-    border: 2px solid var(--bg);
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s;
+    min-width: 180px;
 }
 
 .filters-bar select:focus,
 .filters-bar input[type="date"]:focus {
     outline: none;
     border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.filters-bar select:hover,
+.filters-bar input[type="date"]:hover {
+    border-color: #d4af37;
 }
 
 .search-bar {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .search-bar .input-with-icon {
@@ -1105,20 +1127,28 @@ body {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-light);
+    color: #999;
+    font-size: 1rem;
 }
 
 .search-bar input {
     width: 100%;
-    padding: 0.75rem 1rem 0.75rem 3rem;
-    border: 2px solid var(--bg);
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s;
 }
 
 .search-bar input:focus {
     outline: none;
     border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.search-bar input::placeholder {
+    color: #aaa;
 }
 
 /* ===== LISTA COMPLETA DE AGENDAMENTOS ===== */
@@ -1385,7 +1415,7 @@ body {
     }
 }
 
-/* ===== GRID DE CLIENTES - DESIGN MODERNO ===== */
+/*GRID DE CLIENTES */
 .clients-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

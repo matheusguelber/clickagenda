@@ -164,19 +164,19 @@
                         </div>
 
                         <div class="filters-bar">
-                            <select id="filter-status" onchange="carregarTodosAgendamentos()">
-                                <option value="todos">Todos os Status</option>
-                                <option value="pendente">Pendentes</option>
-                                <option value="confirmado">Confirmados</option>
-                                <option value="cancelado">Cancelados</option>
-                            </select>
-                            
-                            <input type="date" id="filter-date" onchange="carregarTodosAgendamentos()">
-                            
-                            <button class="btn btn-secondary" onclick="limparFiltros()">
-                                <i class="fas fa-times"></i> Limpar Filtros
-                            </button>
-                        </div>
+    <select id="filter-status" onchange="carregarTodosAgendamentos()">
+        <option value="todos">Todos os Status</option>
+        <option value="pendente">Pendentes</option>
+        <option value="confirmado">Confirmados</option>
+        <option value="cancelado">Cancelados</option>
+    </select>
+    
+    <input type="date" id="filter-date" onchange="carregarTodosAgendamentos()">
+    
+    <button class="btn btn-secondary" onclick="limparFiltros()">
+        <i class="fas fa-times"></i> Limpar Filtros
+    </button>
+</div>
 
                         <div id="lista-agendamentos-completa" class="appointments-list-full">
                             <p style="text-align: center; color: var(--text-light); padding: 2rem;">
