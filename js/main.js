@@ -1307,6 +1307,59 @@ function gerarCalendarioSemana() {
 }
 
 
+// Modal de recuperação de senha
+    const forgotLink = document.querySelector('.forgot-link');
+    if (forgotLink) {
+        forgotLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            solicitarRecuperacaoSenha();
+        });
+    }
+
+
+
+/**
+ * Solicita recuperação de senha
+ */
+function solicitarRecuperacaoSenha() {
+    const email = prompt('Digite seu e-mail cadastrado:');
+    
+    if (!email) {
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        alert('Por favor, digite um e-mail válido.');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('email', email);
+    
+    // Mostra mensagem de carregamento
+    const btnOriginal = event.target;
+    const textoOriginal = btnOriginal.textContent;
+    btnOriginal.textContent = 'Enviando...';
+    btnOriginal.disabled = true;
+    
+    fetch('backend/esqueci_senha.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao conectar ao servidor.');
+    })
+    .finally(() => {
+        btnOriginal.textContent = textoOriginal;
+        btnOriginal.disabled = false;
+    });
+}
+
 
 // ===== INICIALIZAÇÃO =====
 
