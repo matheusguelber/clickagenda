@@ -907,7 +907,11 @@ function carregarClientes() {
         .then(response => response.json())
         .then(data => {
             const lista = document.getElementById('lista-clientes');
-            
+
+            const totalCountSpan = document.getElementById('total-clientes-count');
+            if (totalCountSpan && data.clientes) {
+                totalCountSpan.textContent = data.clientes.length;
+            }
             if (!data.success || data.clientes.length === 0) {
                 lista.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Nenhum cliente encontrado.</p>';
                 return;
