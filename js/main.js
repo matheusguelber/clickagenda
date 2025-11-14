@@ -6,7 +6,7 @@ function showDashboard() {
     const userTipo = localStorage.getItem('user_tipo');
     
     if (!userId || !userTipo) {
-        // Se não estiver logado, redireciona direto para o login
+        // Se não estiver logado, abre o modal de login
         showModal('login');
         return;
     }
@@ -17,7 +17,7 @@ function showDashboard() {
     
     if (userTipo === 'barbeiro') {
         document.getElementById('dashboard-barbeiro').classList.remove('hidden');
-        carregarDadosDashboard(); // Carrega os dados reais do barbeiro
+        carregarDadosDashboard();
     } else {
         alert("Dashboard de cliente ainda não implementado.");
     }
@@ -1189,6 +1189,55 @@ function buscarClientes() {
         }
     });
 }
+
+/**
+ * Navega para a página inicial (Hero + Features)
+ */
+function navegarParaInicio() {
+    // Esconde o dashboard
+    document.getElementById('dashboard-barbeiro').classList.add('hidden');
+    
+    // Mostra as seções iniciais
+    document.querySelector('.hero').classList.remove('hidden');
+    document.querySelector('.features').classList.remove('hidden');
+    
+    // Scroll suave para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Navega para a seção de funcionalidades
+ */
+function navegarParaFuncionalidades() {
+    // Esconde o dashboard se estiver aberto
+    document.getElementById('dashboard-barbeiro').classList.add('hidden');
+    
+    // Mostra as seções iniciais
+    document.querySelector('.hero').classList.remove('hidden');
+    document.querySelector('.features').classList.remove('hidden');
+    
+    // Scroll suave até a seção de funcionalidades
+    setTimeout(() => {
+        document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+}
+
+/**
+ * Navega para o dashboard (se logado)
+ */
+function navegarParaDashboard() {
+    const userId = localStorage.getItem('user_id');
+    const userTipo = localStorage.getItem('user_tipo');
+    
+    if (!userId || !userTipo) {
+        // Se não estiver logado, abre o modal de login
+        showModal('login');
+        return;
+    }
+    
+    showDashboard();
+}
+
 
 // ===== INICIALIZAÇÃO =====
 

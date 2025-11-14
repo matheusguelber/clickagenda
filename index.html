@@ -22,11 +22,11 @@
                 </button>
 
                 <div class="nav-links" id="nav-links-menu">
-             <a href="#home">Início</a>
-             <a href="#features">Funcionalidades</a>
-          <a href="#dashboard">Dashboard</a>
-            <button class="btn btn-secondary" id="btn-auth" onclick="handleAuthButton()">Entrar</button>
-            </div>
+    <a href="#home" onclick="navegarParaInicio(); return false;">Início</a>
+    <a href="#features" onclick="navegarParaFuncionalidades(); return false;">Funcionalidades</a>
+    <a href="#dashboard" onclick="navegarParaDashboard(); return false;">Dashboard</a>
+    <button class="btn btn-secondary" id="btn-auth" onclick="handleAuthButton()">Entrar</button>
+</div>
             </div>
         </div>
     </nav>
@@ -36,7 +36,7 @@
             <p>A solução completa para gerenciar sua barbearia de forma profissional e automatizada</p>
             <div class="hero-buttons">
                 <button class="btn btn-primary" onclick="showDashboard()">Começar Agora</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">Conhecer Funcionalidades</button>
+                <button class="btn btn-secondary" onclick="navegarParaFuncionalidades()">Conhecer Funcionalidades</button>
             </div>
         </div>
     </section>
