@@ -17,6 +17,8 @@
                     <span>ClickAgenda</span>
                 </div>
 
+                <audio id="notification-sound" src="assets/notification.mp3" preload="auto"></audio>
+
                 <button class="hamburger-menu" id="hamburger-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -25,6 +27,32 @@
                     <a href="#home" onclick="navegarParaInicio(); return false;">Início</a>
                     <a href="#features" onclick="navegarParaFuncionalidades(); return false;">Funcionalidades</a>
                     <a href="#dashboard" onclick="navegarParaDashboard(); return false;">Dashboard</a>
+                    
+                    <div id="notification-bell" onclick="verPendentes()" style="
+                        position: relative; 
+                        cursor: pointer; 
+                        display: none; 
+                        align-items: center; 
+                        margin-right: 10px;
+                    ">
+                        <i class="fas fa-bell" style="font-size: 1.3rem; color: white;"></i>
+                        <span id="notification-badge" style="
+                            position: absolute;
+                            top: -6px;
+                            right: -6px;
+                            background-color: #e74c3c;
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 5px;
+                            font-size: 0.7rem;
+                            font-weight: bold;
+                            display: none;
+                            border: 1px solid #1a1a2e;
+                            min-width: 16px;
+                            text-align: center;
+                        ">0</span>
+                    </div>
+
                     <button class="btn btn-secondary" id="btn-auth" onclick="handleAuthButton()">Entrar</button>
                 </div>
             </div>
@@ -336,7 +364,7 @@
                             </div>
 
                             <p style="color: #666; margin-bottom: 2rem;">
-                                Configure os dias em que a barbearia abre. Dias marcados como "Fechado" não aparecerão para o cliente.
+                                Defina os dias e horários em que sua barbearia está aberta.
                             </p>
 
                             <form id="form-horarios">
@@ -346,96 +374,13 @@
                                     <div class="schedule-header">Abertura</div>
                                     <div class="schedule-header">Fechamento</div>
 
-                                    <div class="schedule-row">
-                                        <div class="day-label">Domingo</div>
-                                        <div class="day-status">
-                                            <label class="switch">
-                                                <input type="checkbox" name="aberto_0" onchange="toggleInputs(0)">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="status-text">Fechado</span>
-                                        </div>
-                                        <div><input type="time" name="inicio_0" disabled></div>
-                                        <div><input type="time" name="fim_0" disabled></div>
-                                    </div>
-
-                                    <div class="schedule-row">
-                                        <div class="day-label">Segunda-feira</div>
-                                        <div class="day-status">
-                                            <label class="switch">
-                                                <input type="checkbox" name="aberto_1" checked onchange="toggleInputs(1)">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="status-text">Aberto</span>
-                                        </div>
-                                        <div><input type="time" name="inicio_1" value="09:00"></div>
-                                        <div><input type="time" name="fim_1" value="18:00"></div>
-                                    </div>
-
-                                    <div class="schedule-row">
-                                        <div class="day-label">Terça-feira</div>
-                                        <div class="day-status">
-                                            <label class="switch">
-                                                <input type="checkbox" name="aberto_2" checked onchange="toggleInputs(2)">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="status-text">Aberto</span>
-                                        </div>
-                                        <div><input type="time" name="inicio_2" value="09:00"></div>
-                                        <div><input type="time" name="fim_2" value="18:00"></div>
-                                    </div>
-
-                                    <div class="schedule-row">
-                                        <div class="day-label">Quarta-feira</div>
-                                        <div class="day-status">
-                                            <label class="switch">
-                                                <input type="checkbox" name="aberto_3" checked onchange="toggleInputs(3)">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="status-text">Aberto</span>
-                                        </div>
-                                        <div><input type="time" name="inicio_3" value="09:00"></div>
-                                        <div><input type="time" name="fim_3" value="18:00"></div>
-                                    </div>
-
-                                    <div class="schedule-row">
-                                        <div class="day-label">Quinta-feira</div>
-                                        <div class="day-status">
-                                            <label class="switch">
-                                                <input type="checkbox" name="aberto_4" checked onchange="toggleInputs(4)">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="status-text">Aberto</span>
-                                        </div>
-                                        <div><input type="time" name="inicio_4" value="09:00"></div>
-                                        <div><input type="time" name="fim_4" value="18:00"></div>
-                                    </div>
-
-                                    <div class="schedule-row">
-                                        <div class="day-label">Sexta-feira</div>
-                                        <div class="day-status">
-                                            <label class="switch">
-                                                <input type="checkbox" name="aberto_5" checked onchange="toggleInputs(5)">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="status-text">Aberto</span>
-                                        </div>
-                                        <div><input type="time" name="inicio_5" value="09:00"></div>
-                                        <div><input type="time" name="fim_5" value="18:00"></div>
-                                    </div>
-
-                                    <div class="schedule-row">
-                                        <div class="day-label">Sábado</div>
-                                        <div class="day-status">
-                                            <label class="switch">
-                                                <input type="checkbox" name="aberto_6" checked onchange="toggleInputs(6)">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="status-text">Aberto</span>
-                                        </div>
-                                        <div><input type="time" name="inicio_6" value="09:00"></div>
-                                        <div><input type="time" name="fim_6" value="14:00"></div>
-                                    </div>
+                                    <div class="schedule-row"><div class="day-label">Domingo</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_0" onchange="toggleInputs(0)"><span class="slider round"></span></label><span class="status-text">Fechado</span></div><div><input type="time" name="inicio_0" disabled></div><div><input type="time" name="fim_0" disabled></div></div>
+                                    <div class="schedule-row"><div class="day-label">Segunda-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_1" checked onchange="toggleInputs(1)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_1" value="09:00"></div><div><input type="time" name="fim_1" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Terça-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_2" checked onchange="toggleInputs(2)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_2" value="09:00"></div><div><input type="time" name="fim_2" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Quarta-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_3" checked onchange="toggleInputs(3)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_3" value="09:00"></div><div><input type="time" name="fim_3" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Quinta-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_4" checked onchange="toggleInputs(4)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_4" value="09:00"></div><div><input type="time" name="fim_4" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Sexta-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_5" checked onchange="toggleInputs(5)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_5" value="09:00"></div><div><input type="time" name="fim_5" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Sábado</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_6" checked onchange="toggleInputs(6)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_6" value="09:00"></div><div><input type="time" name="fim_6" value="14:00"></div></div>
                                 </div>
                             </form>
                         </div>
@@ -443,7 +388,6 @@
 
                     <div id="settings-section" class="hidden">
                         <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">Configurações da Conta</h2>
-                        
                         <div class="settings-card">
                             <div class="card-header-row">
                                 <h3><i class="fas fa-user-cog"></i> Meus Dados</h3>

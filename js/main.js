@@ -40,19 +40,19 @@ function showSection(section) {
     if (event && event.currentTarget) {
         event.currentTarget.classList.add('active');
     } else if (event && event.target) {
-        // Fallback caso o currentTarget não seja capturado (dependendo de como foi chamado)
+        // Fallback caso o currentTarget não seja capturado
         const item = event.target.closest('.sidebar-item');
         if(item) item.classList.add('active');
     }
 
-    // 2. ESCONDE TODAS AS SEÇÕES (Limpa a tela)
+    // 2. ESCONDE TODAS AS SEÇÕES
     const sections = [
         'overview-section',
         'appointments-section', 
         'clients-section',
         'services-section',
         'my-link-section',
-        'settings-section' // Importante: garante que configurações seja escondida
+        'settings-section'
     ];
     
     sections.forEach(sectionId => {
@@ -111,7 +111,6 @@ function showSection(section) {
             targetSection = document.getElementById('settings-section');
             if (targetSection) {
                 targetSection.classList.remove('hidden');
-                // No futuro: carregarDadosPerfil();
             }
             break;
             
@@ -143,7 +142,6 @@ window.onclick = function(event) {
 // ===== FORMULÁRIOS =====
 
 function initializeForms() {
-    // Formulários antigos, se existirem
     const appointmentForm = document.getElementById('appointment-form');
     if (appointmentForm) {
         appointmentForm.addEventListener('submit', function(e) {
@@ -160,7 +158,6 @@ function editAppointment(appointmentId) {
 
 function deleteAppointment(appointmentId) {
     if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
-        // Esta é a função visual da demo antiga, a função real é cancelarAgendamento()
         console.log('Deletando agendamento (visual):', appointmentId);
     }
 }
@@ -177,7 +174,6 @@ function initializeServiceForm() {
     if (serviceForm) {
         serviceForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const formData = new FormData(this);
             
             fetch('backend/adicionar_servico.php', {
@@ -245,7 +241,6 @@ function carregarServicos() {
 
 // ===== CALENDÁRIO =====
 function initializeCalendar() {
-    // Apenas listeners visuais para o calendário da dashboard
     const calendarDays = document.querySelectorAll('.calendar-day');
     calendarDays.forEach(day => {
         day.addEventListener('click', function() {
@@ -262,7 +257,6 @@ function gerarCalendarioSemana() {
     
     const hoje = new Date();
     const diaSemana = hoje.getDay(); 
-    
     const domingo = new Date(hoje);
     domingo.setDate(hoje.getDate() - diaSemana);
     
@@ -400,6 +394,16 @@ function initializeLoginForms() {
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // Tenta destravar o áudio no clique do login
+            const audio = document.getElementById('notification-sound');
+            if(audio) {
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }).catch(err => console.log("Áudio desbloqueado ou erro"));
+            }
+
             const formData = new FormData(this);
             
             fetch('backend/login.php', {
@@ -424,6 +428,8 @@ function initializeLoginForms() {
                     if (data.tipo === 'barbeiro') {
                         document.getElementById('dashboard-barbeiro').classList.remove('hidden');
                         carregarDadosDashboard();
+                        // Inicia o sistema de notificação
+                        iniciarSistemaNotificacao();
                     } else { 
                         alert("Dashboard de cliente ainda não implementado.");
                     }
@@ -508,6 +514,7 @@ function atualizarBotaoAuth() {
     const btnAuth = document.getElementById('btn-auth');
     const userId = localStorage.getItem('user_id');
     const userName = localStorage.getItem('user_nome');
+    const bell = document.getElementById('notification-bell');
     
     if (!btnAuth) return;
     
@@ -517,9 +524,17 @@ function atualizarBotaoAuth() {
             btnAuth.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]} | Sair`;
         }
         btnAuth.onclick = fazerLogout;
+        
+        // Mostra o sino se for barbeiro
+        if (localStorage.getItem('user_tipo') === 'barbeiro' && bell) {
+            bell.style.display = 'flex'; 
+            iniciarSistemaNotificacao();
+        }
     } else {
         btnAuth.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
         btnAuth.onclick = handleAuthButton;
+        // Esconde o sino se não estiver logado
+        if (bell) bell.style.display = 'none';
     }
 }
 
@@ -649,8 +664,16 @@ function carregarTodosAgendamentos() {
                 if (ag.status === 'pendente') {
                     botoesHTML = `
                         <div style="display: flex; gap: 0.5rem; flex-direction: column;">
-                            <button onclick="confirmarAgendamento(${ag.id})" style="width: 45px; height: 45px; border-radius: 10px; border: none; background: #27ae60; color: white; cursor: pointer;" title="Confirmar"><i class="fas fa-check"></i></button>
-                            <button onclick="cancelarAgendamento(${ag.id})" style="width: 45px; height: 45px; border-radius: 10px; border: none; background: #e74c3c; color: white; cursor: pointer;" title="Cancelar"><i class="fas fa-times"></i></button>
+                            <button onclick="confirmarAgendamento(${ag.id}, '${ag.cliente_telefone}', '${ag.cliente_nome}', '${ag.data_formatada}', '${ag.hora}')" 
+                                    style="width: 45px; height: 45px; border-radius: 10px; border: none; background: #27ae60; color: white; cursor: pointer;" 
+                                    title="Confirmar e Enviar WhatsApp">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button onclick="cancelarAgendamento(${ag.id})" 
+                                    style="width: 45px; height: 45px; border-radius: 10px; border: none; background: #e74c3c; color: white; cursor: pointer;" 
+                                    title="Cancelar">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                     `;
                 }
@@ -692,24 +715,37 @@ function cancelarAgendamento(agendamentoId) {
             carregarTodosAgendamentos();
             carregarEstatisticas();
             carregarProximosAgendamentos();
+            verificarNotificacoes();
         }
     })
     .catch(error => alert('Erro ao cancelar agendamento.'));
 }
 
-function confirmarAgendamento(agendamentoId) {
+function confirmarAgendamento(agendamentoId, telefone, nome, data, hora) {
+    if(!confirm("Deseja confirmar este agendamento?")) return;
+
     const formData = new FormData();
     formData.append('agendamento_id', agendamentoId);
     formData.append('status', 'confirmado');
     
     fetch('backend/atualizar_status_agendamento.php', { method: 'POST', body: formData })
     .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) {
+    .then(resp => {
+        if (resp.success) {
+            if(confirm("✅ Agendamento Confirmado!\n\nDeseja enviar a confirmação para o cliente no WhatsApp agora?")) {
+                let cleanPhone = telefone.replace(/\D/g, '');
+                if(cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
+
+                const mensagem = `Olá *${nome}*! 👋💈\n\nPassando para confirmar seu horário na Barbearia da Nay.\n\n🗓 *Data:* ${data}\n⏰ *Horário:* ${hora}\n\nEstá tudo certo! Te aguardo.`;
+                const linkZap = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(mensagem)}`;
+                window.open(linkZap, '_blank');
+            }
             carregarTodosAgendamentos();
             carregarEstatisticas();
             carregarProximosAgendamentos();
+            verificarNotificacoes(); 
+        } else {
+            alert(resp.message);
         }
     })
     .catch(error => alert('Erro ao confirmar agendamento.'));
@@ -785,7 +821,7 @@ function carregarClientes() {
 
 function buscarClientes() {
     const termo = document.getElementById('search-client').value.toLowerCase();
-    const cards = document.querySelectorAll('#lista-clientes > div'); // Ajustado para pegar os filhos diretos
+    const cards = document.querySelectorAll('#lista-clientes > div'); 
     
     cards.forEach(card => {
         const texto = card.textContent.toLowerCase();
@@ -834,10 +870,7 @@ function carregarLinkAgendamento() {
         return;
     }
     
-    // Detecta se está rodando localmente ou em produção
-    // Exemplo: http://localhost/clickagenda/agendar.php?barbeiro=slug
     const baseUrl = window.location.origin + window.location.pathname.replace('/index.html', '').replace(/\/$/, '');
-    // Corrige caso o pathname seja apenas "/"
     const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
     
     const linkCompleto = cleanBaseUrl + '/agendar.php?barbeiro=' + slug;
@@ -928,7 +961,6 @@ function carregarConfiguracoesHorario() {
                 
                 if (checkbox && inicio && fim) {
                     checkbox.checked = (regra.aberto == 1);
-                    // Corta os segundos HH:MM:SS -> HH:MM
                     inicio.value = regra.hora_inicio.substring(0, 5);
                     fim.value = regra.hora_fim.substring(0, 5);
                     toggleInputs(i);
@@ -939,6 +971,69 @@ function carregarConfiguracoesHorario() {
     .catch(err => console.log("Ainda não há horários configurados ou erro de conexão."));
 }
 
+// ==================================================
+// SISTEMA DE NOTIFICAÇÕES E WHATSAPP
+// ==================================================
+
+let ultimoTotalPendentes = 0; // Memória do total anterior
+
+function iniciarSistemaNotificacao() {
+    // Só roda se for barbeiro logado
+    if (localStorage.getItem('user_id') && localStorage.getItem('user_tipo') === 'barbeiro') {
+        const bell = document.getElementById('notification-bell');
+        if(bell) bell.style.display = 'flex'; // Flex para alinhar badge e ícone
+        
+        verificarNotificacoes();
+        setInterval(verificarNotificacoes, 10000); // 10 segundos
+    } else {
+        // Esconde se não estiver logado (segurança extra)
+        document.getElementById('notification-bell').style.display = 'none';
+    }
+}
+
+function verificarNotificacoes() {
+    const userId = localStorage.getItem('user_id');
+    if (!userId) return;
+
+    fetch('backend/verificar_notificacoes.php')
+    .then(res => res.json())
+    .then(data => {
+        const totalAtual = parseInt(data.total);
+        const badge = document.getElementById('notification-badge');
+        const bellIcon = document.querySelector('#notification-bell i');
+        const audio = document.getElementById('notification-sound');
+        
+        if (totalAtual > 0) {
+            badge.style.display = 'flex'; // Garante que aparece
+            badge.innerText = totalAtual;
+            bellIcon.classList.add('fa-shake');
+        } else {
+            badge.style.display = 'none';
+            bellIcon.classList.remove('fa-shake');
+        }
+
+        // TOCA O SOM SE O NÚMERO AUMENTOU
+        if (totalAtual > ultimoTotalPendentes) {
+            if(audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Som bloqueado (falta interação)"));
+            }
+        }
+
+        ultimoTotalPendentes = totalAtual;
+    })
+    .catch(err => console.log("Erro polling"));
+}
+
+function verPendentes() {
+    showSection('appointments');
+    const filtro = document.getElementById('filter-status');
+    if(filtro) {
+        filtro.value = 'pendente';
+        carregarTodosAgendamentos();
+    }
+}
+
 // ===== INICIALIZAÇÃO =====
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -947,6 +1042,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCalendar();
     initializeHamburgerMenu(); 
     initializeServiceForm();
+    
+    // Verifica login e notificações ao carregar
     atualizarBotaoAuth();
+    
     console.log('ClickAgenda inicializado com sucesso!');
 });
