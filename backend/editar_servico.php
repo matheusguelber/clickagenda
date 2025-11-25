@@ -9,20 +9,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = $_POST['id'];
-    $nome = $_POST['nome_servico'];
-    $preco = $_POST['preco'];
-    $duracao = $_POST['duracao'];
+    // Força conversão para garantir que o ID é número
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $nome = trim($_POST['nome_servico'] ?? '');
+    $preco = $_POST['preco'] ?? 0;
+    $duracao = $_POST['duracao'] ?? 0;
     $barbeiro_id = $_SESSION['user_id'];
 
+    if ($id <= 0 || empty($nome)) {
+        echo json_encode(['success' => false, 'message' => 'Dados inválidos.']);
+        exit;
+    }
+
     try {
-        // Garante que só edita se o serviço pertencer ao barbeiro logado
+        // Atualiza apenas se o ID bater E o dono for o barbeiro logado
         $stmt = $pdo->prepare("UPDATE servicos SET nome_servico=?, preco=?, duracao_minutos=? WHERE id=? AND barbeiro_id=?");
         $stmt->execute([$nome, $preco, $duracao, $id, $barbeiro_id]);
 
-        echo json_encode(['success' => true, 'message' => 'Serviço atualizado!']);
+        echo json_encode(['success' => true, 'message' => 'Serviço atualizado com sucesso!']);
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Erro ao atualizar.']);
+        echo json_encode(['success' => false, 'message' => 'Erro ao atualizar: ' . $e->getMessage()]);
     }
 }
 ?>

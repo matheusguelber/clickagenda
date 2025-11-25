@@ -162,7 +162,9 @@ function deleteAppointment(appointmentId) {
     }
 }
 
-// ===== SERVIÇOS =====
+// (Mantenha todo o código anterior de NAVEGAÇÃO, MODAIS, FORMS, AGENDAMENTOS e CLIENTES igual ao que te mandei antes, até chegar na parte de SERVIÇOS)
+
+// ===== SERVIÇOS (Atualizado) =====
 
 function toggleService(serviceCard) {
     serviceCard.classList.toggle('selected');
@@ -187,10 +189,6 @@ function initializeServiceForm() {
                     serviceForm.reset();
                     carregarServicos();
                 }
-            })
-            .catch(error => {
-                console.error('Erro na requisição:', error);
-                alert('Erro ao conectar ao servidor.');
             });
         });
     }
@@ -209,7 +207,7 @@ function initializeServiceForm() {
                 alert(data.message);
                 if(data.success) {
                     closeModal('edit-service');
-                    carregarServicos(); // Atualiza a lista na tela
+                    carregarServicos(); 
                 }
             });
         });
@@ -220,9 +218,12 @@ function carregarServicos() {
     const listaDiv = document.getElementById('lista-de-servicos');
     if (!listaDiv) return;
 
-    listaDiv.innerHTML = '<p>Carregando serviços...</p>';
+    listaDiv.innerHTML = '<p>Atualizando lista...</p>';
 
-    fetch('backend/listar_servicos.php')
+    // O TRUQUE ANTI-CACHE
+    const timestamp = new Date().getTime();
+
+    fetch('backend/listar_servicos.php?t=' + timestamp)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -239,7 +240,6 @@ function carregarServicos() {
                         currency: 'BRL'
                     }).format(servico.preco);
 
-                    // Cria o card com botões de ação
                     const servicoHTML = `
                         <div class="service-card" style="position: relative;">
                             <h4><i class="fas fa-cut"></i> ${servico.nome_servico}</h4>
@@ -266,11 +266,34 @@ function carregarServicos() {
             } else {
                 listaDiv.innerHTML = `<p style="color: red;">${data.message}</p>`;
             }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            listaDiv.innerHTML = '<p style="color: red;">Erro ao carregar.</p>';
         });
+}
+
+function abrirModalEditarServico(id, nome, preco, duracao) {
+    document.getElementById('edit-servico-id').value = id;
+    document.getElementById('edit-servico-nome').value = nome;
+    document.getElementById('edit-servico-preco').value = preco;
+    document.getElementById('edit-servico-duracao').value = duracao;
+    showModal('edit-service');
+}
+
+function excluirServico(id) {
+    if(confirm("Tem certeza que deseja excluir este serviço?")) {
+        const formData = new FormData();
+        formData.append('id', id);
+
+        fetch('backend/excluir_servico.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if(data.success) {
+                carregarServicos(); 
+            }
+        });
+    }
 }
 
 // ===== CALENDÁRIO =====
