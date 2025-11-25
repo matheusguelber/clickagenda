@@ -2149,3 +2149,129 @@ input:checked + .slider:before {
         right: -60px; /* Ajuste para telas pequenas */
     }
 }
+
+/* ==========================================================================
+   MELHORIAS DE LAYOUT - AGENDAMENTOS E CLIENTES
+   ========================================================================== */
+
+/* --- Estilização Geral de Inputs (Select, Date, Text) --- */
+.filters-bar select,
+.filters-bar input[type="date"],
+.search-bar input {
+    padding: 0.8rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+    outline: none;
+}
+
+/* Efeito de Foco (Borda Dourada) */
+.filters-bar select:focus,
+.filters-bar input[type="date"]:focus,
+.search-bar input:focus {
+    border-color: var(--secondary);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* --- Barra de Filtros (Agendamentos) --- */
+.filters-bar {
+    display: flex;
+    gap: 10px;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; /* Quebra linha no celular */
+    align-items: center;
+}
+
+.filters-bar select {
+    flex: 1;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+.filters-bar input[type="date"] {
+    flex: 1;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+/* Botão de Limpar Filtros */
+.filters-bar .btn-secondary {
+    border: 1px solid #ddd;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.8rem 1.2rem;
+    height: 100%; /* Mesma altura dos inputs */
+}
+
+.filters-bar .btn-secondary:hover {
+    background-color: #eee;
+    color: #333;
+    border-color: #ccc;
+}
+
+/* --- Barra de Busca (Clientes) --- */
+.search-bar {
+    margin-bottom: 1.5rem;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    color: var(--secondary); /* Lupa Dourada */
+    font-size: 1.1rem;
+    pointer-events: none; /* Permite clicar através do ícone */
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding-left: 45px; /* Espaço para o ícone */
+    height: 50px;
+    border-radius: 25px; /* Arredondado estilo App */
+    border: 1px solid #e0e0e0;
+    font-size: 1rem;
+}
+
+/* --- Mensagens de "Vazio" --- */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #e0e0e0;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filters-bar .btn-secondary {
+        justify-content: center;
+    }
+}
