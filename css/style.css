@@ -1786,3 +1786,230 @@ body {
 }
 
 }
+/* ==========================================================================
+   ESTILOS FINAIS - CONFIGURAÇÕES, LINK E HORÁRIOS (Cole no final do arquivo)
+   ========================================================================== */
+
+/* --- 1. ESTRUTURA DOS CARDS --- */
+.settings-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+    margin-bottom: 2.5rem;
+    display: block;
+    position: relative;
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.card-header-row h3 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- 2. ESTILO DO LINK DE AGENDAMENTO --- */
+.link-input-group {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.link-input-group input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.8rem;
+    font-family: 'Courier New', monospace;
+    color: #555;
+    outline: none;
+    width: 100%;
+}
+
+.link-input-group button {
+    margin: 0;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    flex-shrink: 0;
+}
+
+.link-actions {
+    background: #fff9e6;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px dashed #d4af37;
+    text-align: center;
+}
+
+.link-actions p {
+    margin-bottom: 1rem;
+    color: #8a6d0b;
+}
+
+/* --- 3. ESTILO DA GRADE DE HORÁRIOS (O que estava faltando) --- */
+.schedule-grid {
+    display: grid;
+    /* 4 colunas: Dia, Switch, Início, Fim */
+    grid-template-columns: 1.5fr 1fr 1fr 1fr; 
+    gap: 1.5rem 1rem;
+    align-items: center;
+}
+
+.schedule-header {
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 0.5rem;
+}
+
+.schedule-row {
+    display: contents; /* Faz os itens respeitarem o grid pai */
+}
+
+.day-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+}
+
+.day-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-width: 60px;
+}
+
+/* Inputs de Hora */
+.schedule-row input[type="time"] {
+    padding: 0.6rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    width: 100%;
+    color: #333;
+    background: #fff;
+    transition: all 0.3s;
+}
+
+.schedule-row input[type="time"]:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    outline: none;
+}
+
+.schedule-row input[type="time"]:disabled {
+    background-color: #f9f9f9;
+    color: #ccc;
+    cursor: not-allowed;
+    border-color: #eee;
+}
+
+/* --- 4. ESTILO DOS SWITCHES (BOTÕES DE LIGAR) --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e0e0e0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: var(--secondary);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--secondary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* --- 5. RESPONSIVIDADE --- */
+@media (max-width: 768px) {
+    /* Cards */
+    .card-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .card-header-row button { width: 100%; }
+    
+    /* Link */
+    .link-input-group { flex-direction: column; }
+    .link-input-group input { 
+        text-align: center; margin-bottom: 0.5rem; border-bottom: 1px solid #eee; 
+    }
+    .link-input-group button { width: 100%; }
+
+    /* Horários */
+    .schedule-grid {
+        grid-template-columns: 1fr 1fr; /* Vira 2 colunas no celular */
+        gap: 1rem;
+    }
+    .schedule-header { display: none; }
+    .day-label {
+        grid-column: 1 / -1; /* Ocupa linha toda */
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+        color: var(--primary);
+    }
+    .schedule-row:first-of-type .day-label { border-top: none; margin-top: 0; }
+    .day-status { grid-column: 1 / -1; margin-bottom: 0.5rem; }
+}

@@ -2,7 +2,7 @@
 header('Content-Type: application/json; charset=utf-8');
 
 $host = 'localhost';
-$dbname = 'agendamento_barbeiro';
+$dbname = 'clickagenda';
 $username = 'root';
 $password = '';
 

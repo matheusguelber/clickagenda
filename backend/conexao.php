@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = 'agendamento_barbeiro';
+$db   = 'clickagenda';
 $user = 'root';
 $pass = ''; // coloque a senha do seu MySQL, se houver
 
