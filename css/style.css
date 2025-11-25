@@ -2013,3 +2013,139 @@ input:checked + .slider:before {
     .schedule-row:first-of-type .day-label { border-top: none; margin-top: 0; }
     .day-status { grid-column: 1 / -1; margin-bottom: 0.5rem; }
 }
+
+/* ===== DROPDOWN DE NOTIFICAÇÕES (ESTILO YOUTUBE) ===== */
+
+.notification-dropdown {
+    position: absolute;
+    top: 50px; /* Logo abaixo da navbar */
+    right: 0;
+    width: 360px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border: 1px solid #e0e0e0;
+    z-index: 2000;
+    display: none; /* Escondido por padrão */
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-header h4 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.dropdown-header i {
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #333;
+    text-decoration: none; /* Remove sublinhado de link */
+}
+
+.notif-item:hover {
+    background: #f9f9f9;
+}
+
+.notif-icon {
+    width: 40px;
+    height: 40px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notif-content {
+    flex: 1;
+}
+
+.notif-content strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+    color: var(--primary);
+}
+
+.notif-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.notif-time {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 0.3rem;
+    display: block;
+}
+
+.notif-empty {
+    padding: 2rem;
+    text-align: center;
+    color: #999;
+}
+
+.dropdown-footer {
+    padding: 0.8rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.dropdown-footer a {
+    color: var(--secondary);
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.dropdown-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Animação Suave */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+    .notification-dropdown {
+        width: 300px;
+        right: -60px; /* Ajuste para telas pequenas */
+    }
+}
