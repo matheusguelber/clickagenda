@@ -2274,4 +2274,102 @@ input:checked + .slider:before {
     .filters-bar .btn-secondary {
         justify-content: center;
     }
+
+    /* ===== MODAL DE NOVO AGENDAMENTO ===== */
+#new-appointment-modal .modal-content {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#new-appointment-modal .modal-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
+    color: white;
+    padding: 1.5rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 12px 12px 0 0;
+}
+
+#new-appointment-modal .modal-header h2 {
+    color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#new-appointment-modal .modal-header h2 i {
+    color: var(--secondary);
+}
+
+#new-appointment-modal .modal-header .close-modal {
+    color: white;
+    opacity: 0.8;
+}
+
+#new-appointment-modal .modal-header .close-modal:hover {
+    opacity: 1;
+}
+
+#new-appointment-modal .form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+#new-appointment-modal .form-group label i {
+    color: var(--secondary);
+    width: 18px;
+    text-align: center;
+}
+
+#new-appointment-modal select,
+#new-appointment-modal input[type="date"],
+#new-appointment-modal input[type="time"],
+#new-appointment-modal textarea {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#new-appointment-modal select:focus,
+#new-appointment-modal input:focus,
+#new-appointment-modal textarea:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+#new-appointment-modal textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+#new-appointment-modal .btn-primary {
+    margin-top: 1rem;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    #new-appointment-modal .modal-content {
+        max-width: 95%;
+        padding: 1.5rem;
+    }
+    
+    #new-appointment-modal .form-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
 }

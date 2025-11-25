@@ -146,8 +146,155 @@ function initializeForms() {
     if (appointmentForm) {
         appointmentForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            criarAgendamentoManual();
         });
     }
+}
+
+// Função para abrir o modal e carregar dados
+function abrirModalNovoAgendamento() {
+    carregarClientesParaAgendamento();
+    carregarServicosParaAgendamento();
+    
+    // Define data mínima como hoje
+    const inputData = document.querySelector('#appointment-form input[name="data"]');
+    if (inputData) {
+        const hoje = new Date().toISOString().split('T')[0];
+        inputData.setAttribute('min', hoje);
+        inputData.value = hoje;
+    }
+    
+    showModal('new-appointment');
+}
+
+// Carrega clientes do banco de dados
+function carregarClientesParaAgendamento() {
+    const selectCliente = document.querySelector('#appointment-form select[name="cliente"]');
+    if (!selectCliente) return;
+    
+    selectCliente.innerHTML = '<option value="">Carregando clientes...</option>';
+    
+    fetch('backend/listar_clientes_para_agendamento.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.clientes) {
+                if (data.clientes.length === 0) {
+                    selectCliente.innerHTML = '<option value="">Nenhum cliente cadastrado ainda</option>';
+                    return;
+                }
+                
+                selectCliente.innerHTML = '<option value="">Selecione o cliente</option>';
+                
+                data.clientes.forEach(cliente => {
+                    const option = document.createElement('option');
+                    option.value = `${cliente.cliente_nome}|${cliente.cliente_telefone}`;
+                    option.textContent = `${cliente.cliente_nome} - ${cliente.cliente_telefone}`;
+                    selectCliente.appendChild(option);
+                });
+                
+                // Adiciona opção para novo cliente
+                const optionNovo = document.createElement('option');
+                optionNovo.value = 'novo';
+                optionNovo.textContent = '+ Adicionar Novo Cliente';
+                optionNovo.style.fontWeight = 'bold';
+                optionNovo.style.color = '#d4af37';
+                selectCliente.appendChild(optionNovo);
+            } else {
+                selectCliente.innerHTML = '<option value="">Erro ao carregar clientes</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            selectCliente.innerHTML = '<option value="">Erro ao carregar clientes</option>';
+        });
+}
+
+// Carrega serviços do banco de dados
+function carregarServicosParaAgendamento() {
+    const selectServico = document.querySelector('#appointment-form select[name="servico_id"]');
+    if (!selectServico) return;
+    
+    selectServico.innerHTML = '<option value="">Carregando serviços...</option>';
+    
+    fetch('backend/listar_servicos.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.servicos) {
+                if (data.servicos.length === 0) {
+                    selectServico.innerHTML = '<option value="">Nenhum serviço cadastrado</option>';
+                    const mensagem = document.createElement('p');
+                    mensagem.style.color = '#e74c3c';
+                    mensagem.style.fontSize = '0.9rem';
+                    mensagem.style.marginTop = '0.5rem';
+                    mensagem.innerHTML = '⚠️ Cadastre seus serviços primeiro na aba "Serviços"';
+                    selectServico.parentElement.appendChild(mensagem);
+                    return;
+                }
+                
+                selectServico.innerHTML = '<option value="">Selecione o serviço</option>';
+                
+                data.servicos.forEach(servico => {
+                    const option = document.createElement('option');
+                    option.value = servico.id;
+                    const preco = parseFloat(servico.preco).toFixed(2).replace('.', ',');
+                    option.textContent = `${servico.nome_servico} - R$ ${preco} (${servico.duracao_minutos} min)`;
+                    selectServico.appendChild(option);
+                });
+            } else {
+                selectServico.innerHTML = '<option value="">Erro ao carregar serviços</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            selectServico.innerHTML = '<option value="">Erro ao carregar serviços</option>';
+        });
+}
+
+// Cria agendamento manual
+function criarAgendamentoManual() {
+    const form = document.getElementById('appointment-form');
+    const formData = new FormData(form);
+    
+    const cliente = formData.get('cliente');
+    
+    // Se selecionou "novo cliente", abre campos adicionais
+    if (cliente === 'novo') {
+        alert('Funcionalidade de cadastro rápido em desenvolvimento.\n\nPor enquanto, o cliente precisa fazer o primeiro agendamento pelo link público.');
+        return;
+    }
+    
+    if (!cliente) {
+        alert('Selecione um cliente.');
+        return;
+    }
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+    
+    fetch('backend/criar_agendamento_manual.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.success) {
+            closeModal('new-appointment');
+            form.reset();
+            carregarTodosAgendamentos();
+            carregarProximosAgendamentos();
+            carregarEstatisticas();
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao criar agendamento. Tente novamente.');
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Confirmar Agendamento';
+    });
 }
 
 // ===== AGENDAMENTOS =====
