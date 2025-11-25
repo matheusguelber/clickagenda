@@ -194,6 +194,26 @@ function initializeServiceForm() {
             });
         });
     }
+    const editForm = document.getElementById('form-editar-servico');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('backend/editar_servico.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if(data.success) {
+                    closeModal('edit-service');
+                    carregarServicos(); // Atualiza a lista na tela
+                }
+            });
+        });
+    }
 }
 
 function carregarServicos() {
@@ -219,11 +239,25 @@ function carregarServicos() {
                         currency: 'BRL'
                     }).format(servico.preco);
 
+                    // Cria o card com botões de ação
                     const servicoHTML = `
-                        <div class="service-card">
+                        <div class="service-card" style="position: relative;">
                             <h4><i class="fas fa-cut"></i> ${servico.nome_servico}</h4>
                             <div class="service-price">${precoFormatado}</div>
-                            <p>Duração: ${servico.duracao_minutos} min</p>
+                            <p style="margin-bottom: 10px;">Duração: ${servico.duracao_minutos} min</p>
+                            
+                            <div style="border-top: 1px solid #eee; padding-top: 10px; display: flex; gap: 10px; justify-content: flex-end;">
+                                <button class="btn-icon btn-edit" 
+                                    onclick="abrirModalEditarServico(${servico.id}, '${servico.nome_servico}', ${servico.preco}, ${servico.duracao_minutos})" 
+                                    title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" 
+                                    onclick="excluirServico(${servico.id})" 
+                                    title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                     listaDiv.innerHTML += servicoHTML;
@@ -234,8 +268,8 @@ function carregarServicos() {
             }
         })
         .catch(error => {
-            console.error('Erro ao carregar serviços:', error);
-            listaDiv.innerHTML = '<p style="color: red;">Erro ao conectar ao servidor.</p>';
+            console.error('Erro:', error);
+            listaDiv.innerHTML = '<p style="color: red;">Erro ao carregar.</p>';
         });
 }
 
@@ -1031,6 +1065,38 @@ function verPendentes() {
     if(filtro) {
         filtro.value = 'pendente';
         carregarTodosAgendamentos();
+    }
+}
+
+// ===== EDIÇÃO E EXCLUSÃO DE SERVIÇOS =====
+
+function abrirModalEditarServico(id, nome, preco, duracao) {
+    // Preenche os campos do modal
+    document.getElementById('edit-servico-id').value = id;
+    document.getElementById('edit-servico-nome').value = nome;
+    document.getElementById('edit-servico-preco').value = preco;
+    document.getElementById('edit-servico-duracao').value = duracao;
+    
+    // Abre o modal
+    showModal('edit-service');
+}
+
+function excluirServico(id) {
+    if(confirm("Tem certeza que deseja excluir este serviço?")) {
+        const formData = new FormData();
+        formData.append('id', id);
+
+        fetch('backend/excluir_servico.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if(data.success) {
+                carregarServicos(); // Recarrega a lista
+            }
+        });
     }
 }
 
