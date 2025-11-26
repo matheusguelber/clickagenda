@@ -34,11 +34,119 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE agendamentos SET status = 'cancelado' WHERE id = ?");
         $stmt->execute([$agendamento_id]);
         
-        echo json_encode(['success' => true, 'message' => 'Agendamento cancelado com sucesso!']);
+        // Prepara resposta
+        $response = [
+            'success' => true,
+            'message' => 'Agendamento cancelado com sucesso!',
+            'whatsapp_sent' => false
+        ];
+        
+        // Envia WhatsApp de cancelamento
+        $resultado = enviarWhatsAppCancelamento($agendamento_id, $pdo);
+        
+        if ($resultado['whatsapp_sent']) {
+            $response['message'] .= ' ✅ Cliente notificado via WhatsApp.';
+            $response['whatsapp_sent'] = true;
+        } else if (isset($resultado['whatsapp_error'])) {
+            $response['message'] .= ' ⚠️ (WhatsApp indisponível)';
+            $response['whatsapp_error'] = $resultado['whatsapp_error'];
+        }
+        
+        echo json_encode($response);
         
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Erro no banco: ' . $e->getMessage()]);
+    }
+}
+
+/**
+ * Envia mensagem WhatsApp informando cancelamento
+ */
+function enviarWhatsAppCancelamento($agendamento_id, $pdo) {
+    try {
+        // Busca informações do agendamento
+        $stmt = $pdo->prepare("
+            SELECT 
+                a.cliente_nome,
+                a.cliente_telefone,
+                a.data,
+                a.hora,
+                s.nome_servico,
+                s.preco,
+                u.nome as barbeiro_nome,
+                u.telefone as barbeiro_telefone
+            FROM agendamentos a
+            JOIN servicos s ON a.servico_id = s.id
+            JOIN usuarios u ON a.barbeiro_id = u.id
+            WHERE a.id = ?
+        ");
+        $stmt->execute([$agendamento_id]);
+        $agendamento = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$agendamento) {
+            return ['whatsapp_sent' => false, 'whatsapp_error' => 'Agendamento não encontrado'];
+        }
+
+        // Formata datas
+        $data_formatada = date('d/m/Y', strtotime($agendamento['data']));
+        $hora_formatada = date('H:i', strtotime($agendamento['hora']));
+
+        // Monta a mensagem de cancelamento
+        $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋\n\n";
+        $mensagem .= "Seu agendamento foi *CANCELADO* ❌\n\n";
+        $mensagem .= "*Barbearia:* {$agendamento['barbeiro_nome']}\n";
+        $mensagem .= "*Serviço:* {$agendamento['nome_servico']}\n";
+        $mensagem .= "*📅 Data:* {$data_formatada}\n";
+        $mensagem .= "*⏰ Horário:* {$hora_formatada}\n\n";
+        $mensagem .= "Se deseja reagendar, acesse nosso link de agendamento ou nos chame no WhatsApp. 📞\n";
+        $mensagem .= "Tel: {$agendamento['barbeiro_telefone']}";
+
+        // Envia via Node.js server
+        return enviarViaNodeServer($agendamento['cliente_telefone'], $mensagem);
+
+    } catch (Exception $e) {
+        return ['whatsapp_sent' => false, 'whatsapp_error' => $e->getMessage()];
+    }
+}
+
+/**
+ * Envia mensagem via Node.js WhatsApp Server
+ */
+function enviarViaNodeServer($telefone, $mensagem) {
+    $nodeServer = 'http://localhost:3000';
+    
+    $dados = [
+        'telefone' => $telefone,
+        'mensagem' => $mensagem
+    ];
+
+    $ch = curl_init($nodeServer . '/send');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dados));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $erro = curl_error($ch);
+    curl_close($ch);
+
+    if ($erro) {
+        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Erro de conexão'];
+    }
+
+    if ($httpCode !== 200) {
+        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Servidor WhatsApp indisponível'];
+    }
+
+    $resultado = json_decode($response, true);
+    
+    if (isset($resultado['success']) && $resultado['success']) {
+        return ['whatsapp_sent' => true];
+    } else {
+        return ['whatsapp_sent' => false, 'whatsapp_error' => $resultado['message'] ?? 'Erro desconhecido'];
     }
 }
 ?>

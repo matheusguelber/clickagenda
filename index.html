@@ -387,14 +387,77 @@
                     </div>
 
                     <div id="settings-section" class="hidden">
-                        <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">Configurações da Conta</h2>
-                        <div class="settings-card">
-                            <div class="card-header-row">
-                                <h3><i class="fas fa-user-cog"></i> Meus Dados</h3>
-                            </div>
-                            <p style="color: #666;">Aqui você poderá editar suas informações pessoais e alterar sua senha em breve.</p>
-                        </div>
-                    </div>
+    <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">Configurações da Conta</h2>
+    
+    <!-- WhatsApp Automático -->
+    <div class="settings-card">
+        <div class="card-header-row">
+            <h3><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Automático</h3>
+            <div id="whatsapp-status-indicator" style="display: flex; align-items: center; gap: 8px;">
+                <span class="status-dot" style="width: 12px; height: 12px; border-radius: 50%; background: #ccc;"></span>
+                <span class="status-text" style="color: #666; font-size: 0.9rem;">Desconectado</span>
+            </div>
+        </div>
+
+        <div class="whatsapp-info-box" style="display: flex; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left: 4px solid #25D366; border-radius: 8px; margin-bottom: 1.5rem;">
+            <i class="fas fa-info-circle" style="font-size: 1.5rem; color: #25D366; margin-top: 0.25rem;"></i>
+            <div>
+                <strong style="display: block; color: #2e7d32; margin-bottom: 0.5rem;">Como funciona?</strong>
+                <p style="color: #1b5e20; font-size: 0.85rem; line-height: 1.5; margin: 0;">
+                    Conecte seu WhatsApp escaneando o QR Code abaixo. Após conectar, as confirmações de agendamento serão enviadas <strong>automaticamente</strong> para seus clientes, sem precisar clicar em nada!
+                </p>
+            </div>
+        </div>
+
+        <div id="whatsapp-qr-container" style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 12px; margin-bottom: 1.5rem;">
+            <div id="qr-code-display" style="display: none;">
+                <p style="color: #666; margin-bottom: 1rem; font-weight: 600;">
+                    <i class="fas fa-mobile-alt"></i> Abra o WhatsApp no celular e escaneie o código
+                </p>
+                <img id="qr-code-image" src="" alt="QR Code" style="max-width: 280px; border: 4px solid #25D366; border-radius: 12px; padding: 10px; background: white;">
+                <p style="color: #999; font-size: 0.85rem; margin-top: 1rem;">
+                    WhatsApp → Aparelhos conectados → Conectar aparelho
+                </p>
+            </div>
+            
+            <div id="whatsapp-connecting" style="display: none; color: #666;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #25D366; margin-bottom: 1rem;"></i>
+                <p>Aguardando conexão...</p>
+            </div>
+            
+            <div id="whatsapp-connected" style="display: none; color: #25D366;">
+                <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p style="font-weight: 600; font-size: 1.1rem; margin: 0;">WhatsApp Conectado com Sucesso!</p>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">As mensagens serão enviadas automaticamente</p>
+            </div>
+            
+            <div id="whatsapp-disconnected">
+                <i class="fab fa-whatsapp" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                <p style="color: #666; margin-bottom: 1.5rem;">WhatsApp não está conectado</p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button id="btn-connect-whatsapp" class="btn btn-primary" onclick="conectarWhatsApp()">
+                <i class="fab fa-whatsapp"></i> Conectar WhatsApp
+            </button>
+            <button id="btn-disconnect-whatsapp" class="btn btn-secondary" onclick="desconectarWhatsApp()" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Desconectar
+            </button>
+            <button class="btn btn-secondary" onclick="testarMensagemWhatsApp()">
+                <i class="fas fa-paper-plane"></i> Testar Mensagem
+            </button>
+        </div>
+    </div>
+
+    <!-- Meus Dados -->
+    <div class="settings-card">
+        <div class="card-header-row">
+            <h3><i class="fas fa-user-cog"></i> Meus Dados</h3>
+        </div>
+        <p style="color: #666;">Aqui você poderá editar suas informações pessoais e alterar sua senha em breve.</p>
+    </div>
+</div>
 
                 </main>
             </div>
