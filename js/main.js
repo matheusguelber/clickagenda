@@ -1506,19 +1506,118 @@ function testarMensagemWhatsApp() {
 
 // ===== INICIALIZAÇÃO =====
 
+// ==================================================
+// INICIALIZAÇÃO E CORREÇÃO DO F5
+// ==================================================
+
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. Inicializa tudo o que já existia no seu código
     initializeForms();
     initializeLoginForms();
     initializeCalendar();
     initializeHamburgerMenu(); 
     initializeServiceForm();
     
-    // Verifica login e notificações ao carregar
+    // 2. Verifica autenticação
+    const userId = localStorage.getItem('user_id');
     atualizarBotaoAuth();
-    const settingsSection = document.getElementById('settings-section');
-    if (settingsSection && !settingsSection.classList.contains('hidden')) {
-        iniciarMonitoramentoWhatsApp();
+
+    if (userId) {
+        // --- AQUI ESTÁ A CORREÇÃO DO F5 ---
+        // Se estiver logado, verifica o final do link (#dashboard, #clients) para abrir a tela certa
+        checkUrlHash(); 
+        
+        // Se for barbeiro, ativa o sino de notificações
+        if (localStorage.getItem('user_tipo') === 'barbeiro') {
+            const bell = document.getElementById('notification-bell');
+            if (bell) bell.style.display = 'block'; // ou 'flex'
+            // iniciarSistemaNotificacao(); // (Descomente se a função já existir no seu código)
+        }
+    } else {
+        // Se NÃO estiver logado, força a tela inicial limpa
+        window.location.hash = '';
+        showSectionInternal('home');
     }
 
     console.log('ClickAgenda inicializado com sucesso!');
 });
+
+// ==================================================
+// FUNÇÕES DE NAVEGAÇÃO (COPIE ISSO LOGO ABAIXO)
+// ==================================================
+
+// Ouve quando a URL muda (ex: quando você clica em voltar no navegador)
+window.addEventListener('hashchange', checkUrlHash);
+
+function checkUrlHash() {
+    // Pega o nome da seção da URL (tira o #)
+    const hash = window.location.hash.replace('#', '');
+    const userId = localStorage.getItem('user_id');
+
+    if (!userId) return; // Se não logado, ignora
+
+    // Roteador simples: define qual seção interna abrir
+    if (hash === 'dashboard' || hash === '' || hash === 'overview') {
+        showSectionInternal('overview');
+    } else if (hash === 'appointments') {
+        showSectionInternal('appointments');
+    } else if (hash === 'clients') {
+        showSectionInternal('clients');
+    } else if (hash === 'services') {
+        showSectionInternal('services');
+    } else if (hash === 'my-link') {
+        showSectionInternal('my-link');
+    } else if (hash === 'settings') {
+        showSectionInternal('settings');
+    }
+}
+
+// Função usada pelos botões do menu (onclick="showSection('clients')")
+function showSection(sectionName) {
+    window.location.hash = sectionName; // Muda a URL -> O 'hashchange' acima detecta e troca a tela
+}
+
+// Função que realmente esconde/mostra as divs
+function showSectionInternal(sectionId) {
+    // Se for 'home', esconde dashboard e mostra o site
+    if (sectionId === 'home') {
+        document.querySelector('.hero').classList.remove('hidden');
+        document.querySelector('.features').classList.remove('hidden');
+        document.getElementById('dashboard-barbeiro').classList.add('hidden');
+        return;
+    }
+
+    // Se for dashboard, esconde o site e mostra o painel
+    document.querySelector('.hero').classList.add('hidden');
+    document.querySelector('.features').classList.add('hidden');
+    document.getElementById('dashboard-barbeiro').classList.remove('hidden');
+
+    // Atualiza a cor do botão no menu lateral
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+        // Tenta achar o botão correspondente para marcar como ativo
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(sectionId)) {
+            item.classList.add('active');
+        }
+    });
+
+    // Esconde todas as seções internas
+    const sections = ['overview', 'appointments', 'clients', 'services', 'my-link', 'settings'];
+    sections.forEach(s => {
+        const el = document.getElementById(s + '-section');
+        if (el) el.classList.add('hidden');
+    });
+
+    // Mostra a seção alvo
+    const target = document.getElementById(sectionId + '-section');
+    if (target) {
+        target.classList.remove('hidden');
+    }
+
+    // Carrega dados específicos (chame suas funções de carregar dados aqui)
+    if (sectionId === 'overview') carregarDadosDashboard();
+    if (sectionId === 'appointments') carregarTodosAgendamentos();
+    if (sectionId === 'clients') carregarClientes();
+    if (sectionId === 'services') carregarServicos();
+    if (sectionId === 'my-link') carregarLinkAgendamento();
+}
