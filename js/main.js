@@ -1254,19 +1254,42 @@ function carregarConfiguracoesHorario() {
 // SISTEMA DE NOTIFICAÇÕES E WHATSAPP
 // ==================================================
 
-let ultimoTotalPendentes = 0; // Memória do total anterior
+// Variável global para controlar se o número aumentou
+let ultimoTotalPendentes = 0;
+
+// 1. TRUQUE PARA DESTRAVAR ÁUDIO NO IPHONE/ANDROID
+// O som só toca se o usuário já tiver clicado na tela pelo menos uma vez.
+function unlockAudio() {
+    const audio = document.getElementById('notification-sound');
+    if (audio) {
+        // Toca e pausa imediatamente só para o navegador liberar o recurso
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(() => {}); // Ignora erros se já estiver tocando
+    }
+    // Remove os ouvintes para não ficar rodando a cada clique
+    document.removeEventListener('click', unlockAudio);
+    document.removeEventListener('touchstart', unlockAudio);
+}
+
+// Adiciona os ouvintes no documento todo
+document.addEventListener('click', unlockAudio);
+document.addEventListener('touchstart', unlockAudio);
+
 
 function iniciarSistemaNotificacao() {
     // Só roda se for barbeiro logado
     if (localStorage.getItem('user_id') && localStorage.getItem('user_tipo') === 'barbeiro') {
         const bell = document.getElementById('notification-bell');
-        if(bell) bell.style.display = 'flex'; // Flex para alinhar badge e ícone
+        // Usamos 'block' ou deixamos o CSS controlar via classe, 'flex' as vezes quebra no mobile dependendo do CSS pai
+        if(bell) bell.style.display = 'block'; 
         
         verificarNotificacoes();
         setInterval(verificarNotificacoes, 10000); // 10 segundos
     } else {
-        // Esconde se não estiver logado (segurança extra)
-        document.getElementById('notification-bell').style.display = 'none';
+        const bell = document.getElementById('notification-bell');
+        if(bell) bell.style.display = 'none';
     }
 }
 
@@ -1282,35 +1305,50 @@ function verificarNotificacoes() {
         const bellIcon = document.querySelector('#notification-bell i');
         const audio = document.getElementById('notification-sound');
         
+        // Atualiza a bolinha vermelha
         if (totalAtual > 0) {
-            badge.style.display = 'flex'; // Garante que aparece
-            badge.innerText = totalAtual;
-            bellIcon.classList.add('fa-shake');
+            if(badge) {
+                badge.style.display = 'block';
+                badge.innerText = totalAtual > 9 ? '9+' : totalAtual;
+            }
+            if(bellIcon) bellIcon.classList.add('fa-shake');
         } else {
-            badge.style.display = 'none';
-            bellIcon.classList.remove('fa-shake');
+            if(badge) badge.style.display = 'none';
+            if(bellIcon) bellIcon.classList.remove('fa-shake');
         }
 
-        // TOCA O SOM SE O NÚMERO AUMENTOU
+        // LÓGICA DE ALERTA (SOM + VIBRAÇÃO)
+        // Só toca se o número de notificações AUMENTOU
         if (totalAtual > ultimoTotalPendentes) {
+            
+            // 1. Toca o Som
             if(audio) {
                 audio.currentTime = 0;
-                audio.play().catch(e => console.log("Som bloqueado (falta interação)"));
+                // O .catch evita erro vermelho no console se o áudio ainda não foi destravado
+                audio.play().catch(e => console.log("Som bloqueado (aguardando toque na tela)"));
+            }
+
+            // 2. Vibra o celular (Funciona em Android)
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]); // Vibra: 200ms, pausa, 200ms
             }
         }
 
         ultimoTotalPendentes = totalAtual;
     })
-    .catch(err => console.log("Erro polling"));
+    .catch(err => console.log("Erro polling notificações"));
 }
 
 function verPendentes() {
     showSection('appointments');
-    const filtro = document.getElementById('filter-status');
-    if(filtro) {
-        filtro.value = 'pendente';
-        carregarTodosAgendamentos();
-    }
+    // Pequeno delay para garantir que a div da lista carregou antes de filtrar
+    setTimeout(() => {
+        const filtro = document.getElementById('filter-status');
+        if(filtro) {
+            filtro.value = 'pendente';
+            carregarTodosAgendamentos();
+        }
+    }, 100);
 }
 
 // ===== EDIÇÃO E EXCLUSÃO DE SERVIÇOS =====

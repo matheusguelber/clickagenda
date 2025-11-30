@@ -2369,6 +2369,24 @@ input:checked + .slider:before {
     #new-appointment-modal .form-row {
         grid-template-columns: 1fr !important;
     }
+
+    /* CORREÇÃO DO SINO NO MOBILE */
+    .notification-wrapper {
+        display: block !important;
+        margin-right: 15px; /* Espaço entre o sino e o hamburger */
+    }
+
+    .notification-dropdown {
+        position: fixed !important; /* Fixa na tela do celular */
+        top: 70px !important; /* Logo abaixo da barra */
+        left: 5% !important; /* Centralizado com margem */
+        width: 90% !important; /* Ocupa quase toda a largura */
+        max-height: 60vh; /* Altura máxima para não vazar */
+        overflow-y: auto; /* Rolagem se tiver muita notificação */
+        right: auto !important;
+        z-index: 9999 !important; /* Fica acima de tudo */
+        box-shadow: 0 100vh 0 100vh rgba(0,0,0,0.5); /* Escurece o fundo atrás */
+    }
 }
 
 
