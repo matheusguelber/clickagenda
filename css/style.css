@@ -2369,25 +2369,421 @@ input:checked + .slider:before {
     #new-appointment-modal .form-row {
         grid-template-columns: 1fr !important;
     }
+    
+    /* Navbar e Topo */
+    .nav-content {
+        padding: 0 10px; /* Um pouco mais de espaço nas bordas */
+    }
 
-    /* CORREÇÃO DO SINO NO MOBILE */
+    /* Garante que o Sino e o Hambúrguer fiquem lado a lado */
+    .nav-content > div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* Espaço entre sino e menu */
+    }
+
     .notification-wrapper {
+        margin: 0 !important; /* Remove margem extra */
         display: block !important;
-        margin-right: 15px; /* Espaço entre o sino e o hamburger */
     }
 
+    /* Menu Hambúrguer */
+    .hamburger-menu { display: block !important; }
+    
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px; /* Ajuste da altura da navbar */
+        left: 0;
+        width: 100%;
+        background-color: #1a1a2e;
+        flex-direction: column;
+        padding: 1rem;
+        z-index: 1000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .nav-links.active { display: flex !important; }
+    .nav-links a { 
+        padding: 15px; 
+        text-align: center; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); 
+        width: 100%;
+    }
+    .nav-links button { width: 100%; margin-top: 15px; }
+
+    /* --- CORREÇÃO DA DASHBOARD --- */
+    .dashboard-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+    }
+
+    /* Sidebar (Menu Horizontal) */
+    .sidebar {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding: 10px !important;
+        gap: 10px !important;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 60px;
+        z-index: 900;
+        /* Esconde a barra de rolagem mas permite rolar */
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .sidebar-item {
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 8px 15px !important;
+        border: 1px solid #eee;
+        border-radius: 20px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .sidebar-item.active {
+        background: #1a1a2e !important;
+        color: #d4af37 !important;
+        border-color: #1a1a2e !important;
+    }
+
+    /* --- CORREÇÃO DO CALENDÁRIO (Para não espremer) --- */
+    .calendar-grid {
+        display: flex !important; /* Muda de Grid para Flex */
+        overflow-x: auto !important; /* Permite rolagem lateral */
+        gap: 10px !important;
+        padding-bottom: 10px; /* Espaço para scroll */
+    }
+
+    .calendar-day {
+        min-width: 60px !important; /* Largura fixa mínima */
+        height: 70px !important;
+        flex: 0 0 auto !important; /* Impede encolhimento */
+    }
+
+    /* Cards de Estatísticas empilhados */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    .stat-number { font-size: 2rem !important; }
+
+    /* Dropdown de Notificação */
     .notification-dropdown {
-        position: fixed !important; /* Fixa na tela do celular */
-        top: 70px !important; /* Logo abaixo da barra */
-        left: 5% !important; /* Centralizado com margem */
-        width: 90% !important; /* Ocupa quase toda a largura */
-        max-height: 60vh; /* Altura máxima para não vazar */
-        overflow-y: auto; /* Rolagem se tiver muita notificação */
+        position: fixed !important;
+        top: 65px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 95% !important;
         right: auto !important;
-        z-index: 9999 !important; /* Fica acima de tudo */
-        box-shadow: 0 100vh 0 100vh rgba(0,0,0,0.5); /* Escurece o fundo atrás */
+        max-height: 70vh;
     }
 }
 
+/* ==========================================================================
+   ESTILOS DO MENU DE PERFIL E CORREÇÃO NAV (Adicionar ao final)
+   ========================================================================== */
+
+/* Ajuste para jogar o menu para a direita no PC */
+.nav-content {
+    justify-content: space-between;
+}
+
+/* --- Avatar do Usuário --- */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4a261 100%); /* Dourado */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+}
+
+.user-avatar:hover {
+    transform: scale(1.05);
+}
+
+/* --- Dropdown de Perfil --- */
+.profile-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 200px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    border: 1px solid #eee;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 2000;
+}
+
+.profile-dropdown.active {
+    display: flex;
+}
+
+.profile-header {
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.profile-header strong {
+    display: block;
+    color: #1a1a2e;
+    font-size: 0.95rem;
+}
+
+.profile-header small {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.profile-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-menu li a {
+    display: block;
+    padding: 12px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-menu li a:hover {
+    background: #f5f5f5;
+}
+
+.profile-menu li.divider {
+    height: 1px;
+    background: #eee;
+    margin: 0;
+}
+
+/* --- Ajuste Mobile para o User Nav --- */
+@media (max-width: 768px) {
+    /* Garante que o container do usuário fique alinhado na direita */
+    #user-nav {
+        margin-left: auto; 
+    }
+    
+    /* Dropdown de perfil não vazar a tela */
+    .profile-dropdown {
+        right: 10px;
+    }
+}
 
 }
+/* ==================================================
+   CORREÇÃO FINAL: MENU PERFIL "CARD" (Igual Mobile)
+   ================================================== */
+
+/* 1. O Avatar (Bolinha com as iniciais) */
+.profile-wrapper {
+    position: relative;
+    margin-left: 15px;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    background: #d4af37; /* Dourado */
+    color: #1a1a2e;      /* Azul Escuro */
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: all 0.2s;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+/* 2. O Menu Dropdown (A caixa branca que abre) */
+.profile-dropdown {
+    position: absolute;
+    top: 60px;  /* Empurra para baixo do avatar */
+    right: 0;   /* Alinha à direita */
+    width: 240px;
+    background: white !important; /* Fundo BRANCO Sólido */
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2); /* Sombra forte estilo App */
+    border: 1px solid #eee;
+    z-index: 10000;
+    
+    /* Configuração Flex para organizar itens */
+    display: none; 
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Quando estiver ativo, aparece */
+.profile-dropdown.active {
+    display: flex !important;
+}
+
+/* 3. Cabeçalho do Menu (Nome e Cargo) */
+.profile-info {
+    background: #f8f9fa;
+    padding: 20px 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-info strong {
+    display: block;
+    font-size: 1.1rem;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+}
+
+.profile-info span {
+    font-size: 0.85rem;
+    color: #666;
+    background: #eee;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* 4. Lista de Links (Remove as bolinhas feias) */
+.profile-links {
+    list-style: none !important; /* Tira bolinhas */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.profile-links li {
+    margin: 0;
+    padding: 0;
+}
+
+.profile-links li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #fbfbfb;
+    transition: background 0.2s;
+}
+
+.profile-links li a:hover {
+    background: #fff9e6; /* Fundo amarelinho ao passar mouse */
+    color: #d4af37;
+}
+
+.profile-links li a i {
+    width: 20px;
+    text-align: center;
+    color: #999;
+}
+
+.profile-links li a:hover i {
+    color: #d4af37;
+}
+
+/* Botão Sair Vermelho */
+.logout-btn {
+    color: #e74c3c !important;
+}
+.logout-btn:hover {
+    background: #ffebeb !important;
+    color: #c0392b !important;
+}
+.logout-btn i {
+    color: #e74c3c !important;
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: SINO E BOLINHA VERMELHA (Badge)
+   ================================================== */
+
+/* Container do Sino */
+.notification-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+/* Ícone do Sino */
+.notification-bell-icon {
+    position: relative; /* Importante para a bolinha se basear nele */
+    padding: 5px;
+    color: white;
+    font-size: 1.4rem; /* Tamanho do ícone */
+    transition: transform 0.2s;
+}
+
+.notification-bell-icon:hover {
+    transform: scale(1.1); /* Efeito de zoom leve ao passar o mouse */
+}
+
+/* A Bolinha Vermelha (O "Vermelhinho") */
+#notification-badge {
+    position: absolute;
+    top: 0;           /* Alinha no topo do ícone */
+    right: 0;         /* Alinha na direita do ícone */
+    
+    background-color: #e74c3c; /* Vermelho vivo */
+    color: white;
+    
+    font-size: 0.65rem; /* Fonte pequena */
+    font-weight: bold;
+    
+    /* Tamanho e forma da bolinha */
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    
+    /* Centraliza o número dentro da bolinha */
+    display: flex; /* (Controlado pelo JS: none/flex) */
+    align-items: center;
+    justify-content: center;
+    
+    /* Borda escura para destacar do fundo */
+    border: 2px solid #1a1a2e; 
+    
+    /* Faz a bolinha "flutuar" um pouco pra fora */
+    transform: translate(25%, -25%); 
+    z-index: 10;
+}
+
+/* Correção para o Dropdown não quebrar no celular */
+.notification-dropdown {
+    top: 50px !important; /* Distância do topo */
+}
+

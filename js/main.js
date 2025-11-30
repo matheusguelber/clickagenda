@@ -715,32 +715,89 @@ function solicitarRecuperacaoSenha() {
 }
 
 function atualizarBotaoAuth() {
-    const btnAuth = document.getElementById('btn-auth');
     const userId = localStorage.getItem('user_id');
-    const userName = localStorage.getItem('user_nome');
-    const bell = document.getElementById('notification-bell');
+    const nome = localStorage.getItem('user_nome');
     
-    if (!btnAuth) return;
-    
+    const guestNav = document.getElementById('guest-nav');
+    const userNav = document.getElementById('user-nav');
+    const userInitials = document.getElementById('user-initials');
+    const profileName = document.getElementById('profile-name');
+
     if (userId) {
-        btnAuth.innerHTML = `<i class="fas fa-sign-out-alt"></i> Sair`;
-        if (userName) {
-            btnAuth.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]} | Sair`;
-        }
-        btnAuth.onclick = fazerLogout;
+        // LOGADO
+        if(guestNav) guestNav.style.display = 'none';
+        if(userNav) userNav.style.display = 'flex'; // Flex garante que fiquem lado a lado
         
-        // Mostra o sino se for barbeiro
-        if (localStorage.getItem('user_tipo') === 'barbeiro' && bell) {
-            bell.style.display = 'flex'; 
-            iniciarSistemaNotificacao();
+        // Coloca Iniciais e Nome
+        if (nome) {
+            const initials = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            if(userInitials) userInitials.textContent = initials;
+            if(profileName) profileName.textContent = nome;
         }
     } else {
-        btnAuth.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-        btnAuth.onclick = handleAuthButton;
-        // Esconde o sino se não estiver logado
-        if (bell) bell.style.display = 'none';
+        // DESLOGADO
+        if(guestNav) guestNav.style.display = 'flex';
+        if(userNav) userNav.style.display = 'none';
     }
 }
+
+// Abre/Fecha menu de perfil
+function toggleProfileDropdown() {
+    const dd = document.getElementById('profile-dropdown');
+    if(dd) dd.classList.toggle('active');
+}
+
+// Função de Logout
+function fazerLogout() {
+    if (confirm('Sair do sistema?')) {
+        localStorage.clear();
+        window.location.hash = '';
+        location.reload();
+    }
+}
+
+// Fecha ao clicar fora
+window.addEventListener('click', function(e) {
+    const pWrapper = document.querySelector('.profile-wrapper');
+    const pDd = document.getElementById('profile-dropdown');
+    
+    // Se o clique não foi no avatar nem no menu, fecha
+    if (pDd && pWrapper && !pWrapper.contains(e.target)) {
+        pDd.classList.remove('active');
+    }
+});
+
+// Abre/Fecha menu de perfil
+function toggleProfileDropdown() {
+    const dd = document.getElementById('profile-dropdown');
+    if(dd) dd.classList.toggle('active');
+}
+
+// Função de Logout (Atualizada para usar a nova lógica)
+function fazerLogout() {
+    if (confirm('Deseja realmente sair?')) {
+        localStorage.clear();
+        window.location.hash = '';
+        location.reload(); // Recarrega para limpar tudo
+    }
+}
+
+// Fecha dropdowns se clicar fora
+window.addEventListener('click', function(e) {
+    // Fecha Perfil
+    const profileWrapper = document.querySelector('.profile-wrapper');
+    const profileDd = document.getElementById('profile-dropdown');
+    if (profileDd && profileWrapper && !profileWrapper.contains(e.target)) {
+        profileDd.classList.remove('active');
+    }
+    
+    // Fecha Notificações (Já existia, mas reforçando)
+    const notifWrapper = document.getElementById('notification-bell');
+    const notifDd = document.getElementById('notification-dropdown');
+    if (notifDd && notifWrapper && !notifWrapper.contains(e.target)) {
+        notifDd.classList.remove('active');
+    }
+});
 
 function handleAuthButton() {
     const userId = localStorage.getItem('user_id');
@@ -1251,7 +1308,7 @@ function carregarConfiguracoesHorario() {
 }
 
 // ==================================================
-// SISTEMA DE NOTIFICAÇÕES E WHATSAPP
+// SISTEMA DE NOTIFICAÇÕES (MOBILE OPTIMIZED)
 // ==================================================
 
 // Variável global para controlar se o número aumentou
