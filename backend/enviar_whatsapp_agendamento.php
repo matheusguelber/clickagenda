@@ -1,4 +1,9 @@
 <?php
+// ========================================
+// enviar_whatsapp_agendamento.php
+// COMPLETO E ATUALIZADO - Multi-Sessão
+// ========================================
+
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexao.php';
 
@@ -24,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             SELECT 
                 a.id,
+                a.barbeiro_id,
                 a.cliente_nome,
                 a.cliente_telefone,
                 a.data,
@@ -31,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 a.status,
                 s.nome_servico,
                 s.preco,
-                u.nome as barbeiro_nome
+                u.nome as barbeiro_nome,
+                u.telefone as barbeiro_telefone
             FROM agendamentos a
             JOIN servicos s ON a.servico_id = s.id
             JOIN usuarios u ON a.barbeiro_id = u.id
@@ -52,14 +59,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 3. Monta a mensagem conforme a ação
         if ($acao === 'confirmado') {
-            $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋💈\n\n";
+            $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋✂️\n\n";
             $mensagem .= "Seu agendamento foi *CONFIRMADO* ✅\n\n";
             $mensagem .= "*Barbearia:* {$agendamento['barbeiro_nome']}\n";
             $mensagem .= "*Serviço:* {$agendamento['nome_servico']}\n";
             $mensagem .= "*📅 Data:* {$data_formatada}\n";
             $mensagem .= "*⏰ Horário:* {$hora_formatada}\n";
             $mensagem .= "*💰 Valor:* R$ {$preco_formatado}\n\n";
-            $mensagem .= "Estamos te aguardando! Qualquer dúvida, nos chame no WhatsApp. 😊";
+            $mensagem .= "Estamos te aguardando! Qualquer dúvida, nos chame no WhatsApp. 🙂\n";
+            
+            if (!empty($agendamento['barbeiro_telefone'])) {
+                $mensagem .= "📞 {$agendamento['barbeiro_telefone']}";
+            }
         } else {
             // CANCELADO
             $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋\n\n";
@@ -68,11 +79,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensagem .= "*Serviço:* {$agendamento['nome_servico']}\n";
             $mensagem .= "*📅 Data:* {$data_formatada}\n";
             $mensagem .= "*⏰ Horário:* {$hora_formatada}\n\n";
-            $mensagem .= "Se deseja reagendar, acesse nosso link de agendamento ou nos chame no WhatsApp. 📞";
+            $mensagem .= "Se deseja reagendar, acesse nosso link de agendamento ou nos chame no WhatsApp. 🙂\n";
+            
+            if (!empty($agendamento['barbeiro_telefone'])) {
+                $mensagem .= "📞 {$agendamento['barbeiro_telefone']}";
+            }
         }
 
-        // 4. Envia via WhatsApp (Node.js server)
-        $resultado = enviarWhatsAppViaNode($agendamento['cliente_telefone'], $mensagem);
+        // 4. Envia via WhatsApp (usando a sessão do barbeiro)
+        $barbeiro_id = $agendamento['barbeiro_id'];
+        $resultado = enviarWhatsAppViaNode($barbeiro_id, $agendamento['cliente_telefone'], $mensagem);
 
         if ($resultado['success']) {
             echo json_encode([
@@ -97,19 +113,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 /**
- * Envia mensagem via Node.js WhatsApp Server
+ * Envia mensagem via Node.js WhatsApp Server (Multi-Sessão)
+ * 
+ * @param int $barbeiro_id ID do barbeiro (para usar sua sessão WhatsApp)
+ * @param string $telefone Telefone do destinatário
+ * @param string $mensagem Texto da mensagem
+ * @return array ['success' => bool, 'message' => string]
  */
-function enviarWhatsAppViaNode($telefone, $mensagem) {
-    $nodeServer = 'http://localhost:3000';
+function enviarWhatsAppViaNode($barbeiro_id, $telefone, $mensagem) {
+    // 🔥 IP da VM WhatsApp
+    $nodeServer = 'http://168.138.133.246:3000';
     
     $dados = [
         'telefone' => $telefone,
         'mensagem' => $mensagem
     ];
 
-    $ch = curl_init($nodeServer . '/send');
+    // 🔥 ATUALIZADO: Endpoint com ID do barbeiro
+    $ch = curl_init($nodeServer . "/send/{$barbeiro_id}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dados));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

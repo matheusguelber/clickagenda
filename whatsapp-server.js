@@ -1,4 +1,4 @@
-// whatsapp-server.js - whatsapp-web.js (VersÃ£o Corrigida)
+// whatsapp-server.js - Versão Otimizada e Estável
 const express = require('express');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const cors = require('cors');
@@ -15,6 +15,8 @@ let qrCodeData = null;
 let isConnected = false;
 let connectionStatus = 'disconnected';
 let initializationInProgress = false;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 999; // Infinito praticamente
 
 const SESSION_PATH = path.join(__dirname, '.wwebjs_auth');
 
@@ -36,30 +38,41 @@ function createWhatsAppClient() {
 
 async function connectToWhatsApp() {
     try {
-        // Evita inicializaÃ§Ãµes simultÃ¢neas
+        // Evita inicializações simultâneas
         if (initializationInProgress) {
-            console.log('â³ InicializaÃ§Ã£o jÃ¡ em progresso...');
+            console.log('? Inicialização já em progresso...');
             return;
         }
 
         initializationInProgress = true;
+        reconnectAttempts++;
 
+        if (reconnectAttempts > MAX_RECONNECT_ATTEMPTS) {
+            console.log('? Máximo de tentativas de reconexão atingido. Aguarde 5 minutos.');
+            initializationInProgress = false;
+            reconnectAttempts = 0;
+            return;
+        }
+
+        // Destroi cliente anterior se existir
         if (client) {
             try {
                 await client.destroy();
                 client = null;
+                // Aguarda 2 segundos antes de criar novo cliente
+                await new Promise(resolve => setTimeout(resolve, 2000));
             } catch (e) {
-                console.log('âš ï¸  Erro ao destruir cliente anterior:', e.message);
+                console.log('?? Erro ao destruir cliente anterior:', e.message);
                 client = null;
             }
         }
 
-        console.log('ðŸ”„ Criando nova conexÃ£o WhatsApp...');
+        console.log('?? Criando nova conexão WhatsApp...');
         client = createWhatsAppClient();
 
         client.on('qr', async (qr) => {
             try {
-                console.log('ðŸ”± QR Code gerado! Escaneie no seu celular.');
+                console.log('?? QR Code gerado! Escaneie no seu celular.');
                 qrCodeData = await qrcode.toDataURL(qr);
                 connectionStatus = 'qr_ready';
             } catch (error) {
@@ -72,15 +85,16 @@ async function connectToWhatsApp() {
             connectionStatus = 'connected';
             qrCodeData = null;
             initializationInProgress = false;
-            console.log('âœ… WhatsApp conectado com sucesso!');
+            reconnectAttempts = 0; // Reseta contador ao conectar
+            console.log('? WhatsApp conectado com sucesso!');
         });
 
         client.on('authenticated', () => {
-            console.log('âœ… Autenticado com sucesso!');
+            console.log('? Autenticado com sucesso!');
         });
 
         client.on('auth_failure', (msg) => {
-            console.error('âŒ Erro de autenticaÃ§Ã£o:', msg);
+            console.error('? Erro de autenticação:', msg);
             isConnected = false;
             connectionStatus = 'disconnected';
             qrCodeData = null;
@@ -92,40 +106,40 @@ async function connectToWhatsApp() {
             connectionStatus = 'disconnected';
             qrCodeData = null;
             initializationInProgress = false;
-            console.log('âŒ Desconectado:', reason);
+            console.log('? Desconectado:', reason);
 
-            // Tenta reconectar apÃ³s 10 segundos
+            // Tenta reconectar após 10 segundos
             setTimeout(() => {
                 if (!isConnected) {
-                    console.log('ðŸ”„ Tentando reconectar...');
+                    console.log('?? Tentando reconectar...');
                     connectToWhatsApp();
                 }
             }, 10000);
         });
 
         client.on('error', (error) => {
-            console.error('âŒ Erro WhatsApp:', error.message);
-            isConnected = false;
+            console.error('? Erro WhatsApp:', error.message);
+            // Não desconecta automaticamente em caso de erro
         });
 
         // Inicia o cliente
         await client.initialize();
 
     } catch (error) {
-        console.error('âŒ Erro ao conectar WhatsApp:', error.message);
+        console.error('? Erro ao conectar WhatsApp:', error.message);
         connectionStatus = 'disconnected';
         isConnected = false;
         qrCodeData = null;
         initializationInProgress = false;
 
-        // Tenta reconectar apÃ³s 5 segundos
+        // Tenta reconectar após 5 segundos
         setTimeout(() => {
             connectToWhatsApp();
         }, 5000);
     }
 }
 
-// Rota: Status da conexÃ£o
+// Rota: Status da conexão
 app.get('/status', (req, res) => {
     res.json({
         connected: isConnected,
@@ -134,22 +148,23 @@ app.get('/status', (req, res) => {
     });
 });
 
-// Rota: Iniciar conexÃ£o
+// Rota: Iniciar conexão
 app.post('/connect', async (req, res) => {
     try {
         if (isConnected) {
-            return res.json({ success: true, message: 'JÃ¡ estÃ¡ conectado!' });
+            return res.json({ success: true, message: 'Já está conectado!' });
         }
 
         if (initializationInProgress) {
             return res.json({ 
                 success: true, 
-                message: 'ConexÃ£o em progresso... Aguarde o QR Code.' 
+                message: 'Conexão em progresso... Aguarde o QR Code.' 
             });
         }
         
+        reconnectAttempts = 0; // Reseta contador ao conectar manualmente
         connectionStatus = 'connecting';
-        await connectToWhatsApp();
+        connectToWhatsApp();
         
         res.json({ 
             success: true, 
@@ -174,6 +189,7 @@ app.post('/disconnect', async (req, res) => {
             connectionStatus = 'disconnected';
             qrCodeData = null;
             initializationInProgress = false;
+            reconnectAttempts = 0;
         }
         
         res.json({ success: true, message: 'Desconectado com sucesso!' });
@@ -189,7 +205,7 @@ app.post('/send', async (req, res) => {
         if (!isConnected || !client) {
             return res.json({ 
                 success: false, 
-                message: 'WhatsApp nÃ£o estÃ¡ conectado!' 
+                message: 'WhatsApp não está conectado!' 
             });
         }
         
@@ -198,11 +214,11 @@ app.post('/send', async (req, res) => {
         if (!telefone || !mensagem) {
             return res.json({ 
                 success: false, 
-                message: 'Telefone e mensagem sÃ£o obrigatÃ³rios' 
+                message: 'Telefone e mensagem são obrigatórios' 
             });
         }
         
-        // Formata nÃºmero
+        // Formata número
         let numeroLimpo = telefone.replace(/\D/g, '');
         if (!numeroLimpo.startsWith('55')) {
             numeroLimpo = '55' + numeroLimpo;
@@ -211,7 +227,7 @@ app.post('/send', async (req, res) => {
         
         await client.sendMessage(chatId, mensagem);
         
-        console.log(`âœ… Mensagem enviada para ${telefone}`);
+        console.log(`? Mensagem enviada para ${telefone}`);
         res.json({ 
             success: true, 
             message: 'Mensagem enviada com sucesso!' 
@@ -227,11 +243,11 @@ app.post('/send', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`ðŸš€ Servidor WhatsApp rodando na porta ${PORT}`);
-    console.log(`ðŸ“¡ Acesse: http://localhost:${PORT}/status`);
-    console.log('ðŸ’¡ Clique em "Conectar WhatsApp" para gerar o QR Code');
-    console.log('â³ Inicializando WhatsApp...\n');
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`?? Servidor WhatsApp rodando na porta ${PORT}`);
+    console.log(`?? Acesse: http://localhost:${PORT}/status`);
+    console.log('?? Clique em "Conectar WhatsApp" para gerar o QR Code');
+    console.log('? Inicializando WhatsApp...\n');
     
     // Conecta automaticamente ao iniciar (opcional)
     connectToWhatsApp();
