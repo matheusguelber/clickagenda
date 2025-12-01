@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 25/11/2025 às 22:23
+-- Tempo de geração: 01/12/2025 às 03:52
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -49,17 +49,17 @@ INSERT INTO `agendamentos` (`id`, `cliente_id`, `barbeiro_id`, `servico_id`, `cl
 (1, NULL, 1, 1, 'matheus', '19994521928', '2026-01-01', '14:30:00', 'por favor irei querer uma garrafa de aguaaaaa', 'cancelado', '2025-11-12 20:58:52'),
 (2, NULL, 1, 1, 'geovana souza', '119934928', '2025-12-09', '09:00:00', '', 'confirmado', '2025-11-14 00:45:36'),
 (3, NULL, 1, 1, 'matheus', '19994521928', '2026-01-01', '09:00:00', '', 'confirmado', '2025-11-14 01:22:46'),
-(4, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '19974146041', '2025-11-24', '09:00:00', '', 'cancelado', '2025-11-17 19:23:26'),
-(5, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '19974146041', '2025-11-24', '09:30:00', '', 'cancelado', '2025-11-17 19:24:04'),
-(6, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '19974146041', '2025-11-24', '09:45:00', '', 'cancelado', '2025-11-17 19:27:41'),
-(7, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '19974146041', '2025-11-24', '08:00:00', '', 'cancelado', '2025-11-17 19:41:53'),
-(8, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '19974146041', '2025-12-01', '08:00:00', '', 'cancelado', '2025-11-25 00:46:01'),
-(9, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-11-26', '08:30:00', '', 'cancelado', '2025-11-25 02:41:58'),
-(10, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-11-26', '11:30:00', '', 'cancelado', '2025-11-25 03:05:29'),
-(11, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-11-28', '08:00:00', 'Nada', 'cancelado', '2025-11-25 18:49:09'),
-(12, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-11-29', '09:00:00', '', 'cancelado', '2025-11-25 18:49:50'),
-(13, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-11-29', '09:30:00', '', 'cancelado', '2025-11-25 19:07:46'),
-(14, NULL, 4, 2, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-11-29', '10:00:00', '', 'confirmado', '2025-11-25 19:18:14');
+(15, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-11-29', '09:30:00', '', 'cancelado', '2025-11-25 23:14:54'),
+(16, NULL, 4, 3, 'Nayara', '(19) 97414-6041', '2025-12-03', '08:00:00', '', 'cancelado', '2025-11-30 02:07:16'),
+(17, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-12-01', '08:00:00', '', 'cancelado', '2025-11-30 02:08:33'),
+(18, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-12-31', '08:30:00', '', 'cancelado', '2025-11-30 02:09:13'),
+(19, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-12-31', '09:30:00', '', 'cancelado', '2025-11-30 02:10:41'),
+(20, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-12-03', '08:00:00', '', 'cancelado', '2025-11-30 03:16:47'),
+(21, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-12-01', '08:00:00', '', 'cancelado', '2025-12-01 00:08:21'),
+(22, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-12-08', '11:00:00', '', 'cancelado', '2025-12-01 00:13:03'),
+(23, NULL, 4, 3, 'Felipe', '(19) 97414-6041', '2025-12-31', '09:00:00', '', 'cancelado', '2025-12-01 00:15:38'),
+(24, NULL, 4, 3, 'Nayara Victória Santos Souza Campos', '(19) 97414-6041', '2025-12-03', '08:00:00', '', 'cancelado', '2025-12-01 00:19:15'),
+(25, NULL, 4, 3, 'Felipe', '(19) 97414-6041', '2025-12-01', '08:00:00', '', 'cancelado', '2025-12-01 00:25:34');
 
 -- --------------------------------------------------------
 
@@ -117,7 +117,7 @@ CREATE TABLE `servicos` (
 
 INSERT INTO `servicos` (`id`, `barbeiro_id`, `nome_servico`, `preco`, `duracao_minutos`, `criado_em`) VALUES
 (1, 1, 'teste', 35.00, 25, '2025-11-12 20:25:47'),
-(2, 4, 'Corte degradê', 45.00, 30, '2025-11-17 19:22:17');
+(3, 4, 'Corte', 50.00, 30, '2025-11-25 22:48:10');
 
 -- --------------------------------------------------------
 
@@ -160,18 +160,19 @@ CREATE TABLE `usuarios` (
   `criado_em` timestamp NOT NULL DEFAULT current_timestamp(),
   `inicio_expediente` time DEFAULT '09:00:00',
   `fim_expediente` time DEFAULT '18:00:00',
-  `dias_trabalho` varchar(50) DEFAULT '1,2,3,4,5'
+  `dias_trabalho` varchar(50) DEFAULT '1,2,3,4,5',
+  `foto_perfil` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `nome`, `email`, `slug`, `senha`, `telefone`, `tipo`, `criado_em`, `inicio_expediente`, `fim_expediente`, `dias_trabalho`) VALUES
-(1, 'seujoao', 'joaosilva@gmail.com', 'joao-silva', '$2y$10$OSdm4r3WAnspQpuQGDotkO7ERaQ2ivAQzeL2gzQi6DFR3qfhKQc0.', '(11) 99452-1928', 'barbeiro', '2025-11-12 19:49:35', '09:00:00', '18:00:00', '1,2,3,4,5'),
-(2, 'delio souza', 'delio@gmail.com', 'delio-souza', '$2y$10$7JcmAmeBUcD3HuGIJkDXoOqRYLdRhJPkjvXCl0OgjzCtzThCVtQeK', '(11) 9999-9999', 'barbeiro', '2025-11-12 20:11:12', '09:00:00', '18:00:00', '1,2,3,4,5'),
-(3, 'matheus lk', 'matheusrubens08@gmail.com', 'matheus-lk', '$2y$10$0N2ju2BR/DcAZNg3i7Inn.RuHL5Xwxoo/Gq7K9fZ2LEJnKcdS.KD.', '(19) 99506-0330', 'barbeiro', '2025-11-14 23:44:34', '09:00:00', '18:00:00', '1,2,3,4,5'),
-(4, 'Barbearia da Nay', 'Nayaravictoria9@gmail.com', 'barbearia-da-nay', '$2y$10$6dkdqzV2h5fEqmbh/KFsnuOcwvGTY3SRywOt5jA21/OkJVIRONQTC', '(19) 97414-6041', 'barbeiro', '2025-11-17 18:22:07', '12:00:00', '18:00:00', '2,3,4,5');
+INSERT INTO `usuarios` (`id`, `nome`, `email`, `slug`, `senha`, `telefone`, `tipo`, `criado_em`, `inicio_expediente`, `fim_expediente`, `dias_trabalho`, `foto_perfil`) VALUES
+(1, 'seujoao', 'joaosilva@gmail.com', 'joao-silva', '$2y$10$OSdm4r3WAnspQpuQGDotkO7ERaQ2ivAQzeL2gzQi6DFR3qfhKQc0.', '(11) 99452-1928', 'barbeiro', '2025-11-12 19:49:35', '09:00:00', '18:00:00', '1,2,3,4,5', NULL),
+(2, 'delio souza', 'delio@gmail.com', 'delio-souza', '$2y$10$7JcmAmeBUcD3HuGIJkDXoOqRYLdRhJPkjvXCl0OgjzCtzThCVtQeK', '(11) 9999-9999', 'barbeiro', '2025-11-12 20:11:12', '09:00:00', '18:00:00', '1,2,3,4,5', NULL),
+(3, 'matheus lk', 'matheusrubens08@gmail.com', 'matheus-lk', '$2y$10$0N2ju2BR/DcAZNg3i7Inn.RuHL5Xwxoo/Gq7K9fZ2LEJnKcdS.KD.', '(19) 99506-0330', 'barbeiro', '2025-11-14 23:44:34', '09:00:00', '18:00:00', '1,2,3,4,5', NULL),
+(4, 'Barbearia da Nay', 'Nayaravictoria9@gmail.com', 'barbearia-da-nay', '$2y$10$xcVW0qNUu/OqvKrA9clK/eIDVjrvzmj/izlALhIr4g/lfSkjocYhm', '(19) 97414-6041', 'barbeiro', '2025-11-17 18:22:07', '12:00:00', '18:00:00', '2,3,4,5', NULL);
 
 --
 -- Índices para tabelas despejadas
@@ -226,7 +227,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de tabela `agendamentos`
 --
 ALTER TABLE `agendamentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de tabela `configuracao_horarios`
@@ -238,7 +239,7 @@ ALTER TABLE `configuracao_horarios`
 -- AUTO_INCREMENT de tabela `servicos`
 --
 ALTER TABLE `servicos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de tabela `tokens_recuperacao`
