@@ -22,7 +22,7 @@
                 <div id="user-nav" style="display: none;">
                     
                     <div class="notification-wrapper" id="notification-bell">
-                        <div class="notification-bell-icon" onclick="toggleNotificationDropdown()">
+                        <div class="notification-bell-icon" onclick="toggleNotificationDropdown(event)">
                             <i class="fas fa-bell"></i>
                             <span id="notification-badge">0</span>
                         </div>
@@ -32,7 +32,7 @@
                                 <small onclick="verPendentes()">Ver pendentes</small>
                             </div>
                             <div class="notif-list" id="notif-list-content">
-                                <div class="notif-empty">Nada novo.</div>
+                                <div class="notif-empty">Carregando...</div>
                             </div>
                         </div>
                     </div>

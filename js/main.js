@@ -285,6 +285,7 @@ function criarAgendamentoManual() {
             carregarTodosAgendamentos();
             carregarProximosAgendamentos();
             carregarEstatisticas();
+            verificarNotificacoes();
         }
     })
     .catch(error => {
@@ -1359,41 +1360,54 @@ function verificarNotificacoes() {
     .then(data => {
         const totalAtual = parseInt(data.total);
         const badge = document.getElementById('notification-badge');
-        const bellIcon = document.querySelector('#notification-bell i');
+        const bellIcon = document.querySelector('#notification-bell i'); // Seleciona o ícone dentro da div
         const audio = document.getElementById('notification-sound');
         
         // Atualiza a bolinha vermelha
         if (totalAtual > 0) {
             if(badge) {
-                badge.style.display = 'block';
+                badge.style.display = 'flex'; // Flex centraliza o número
                 badge.innerText = totalAtual > 9 ? '9+' : totalAtual;
             }
+            // Adiciona animação de balançar se tiver ícone
             if(bellIcon) bellIcon.classList.add('fa-shake');
         } else {
             if(badge) badge.style.display = 'none';
             if(bellIcon) bellIcon.classList.remove('fa-shake');
         }
 
-        // LÓGICA DE ALERTA (SOM + VIBRAÇÃO)
-        // Só toca se o número de notificações AUMENTOU
+        // LÓGICA DE TOCAR O SOM
+        // Se o número aumentou (ex: de 0 pra 1, ou de 1 pra 2)
         if (totalAtual > ultimoTotalPendentes) {
+            console.log(`🔔 Nova notificação detectada! (Total: ${totalAtual})`);
             
-            // 1. Toca o Som
             if(audio) {
-                audio.currentTime = 0;
-                // O .catch evita erro vermelho no console se o áudio ainda não foi destravado
-                audio.play().catch(e => console.log("Som bloqueado (aguardando toque na tela)"));
+                audio.volume = 1.0; // Garante volume máximo
+                audio.currentTime = 0; // Rebobina
+                
+                // Tenta tocar (promessa para tratar erro de bloqueio)
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        console.log("🔊 Som tocou com sucesso.");
+                    })
+                    .catch(error => {
+                        console.warn("🔇 O navegador bloqueou o som. O usuário precisa interagir com a página primeiro.");
+                    });
+                }
             }
 
-            // 2. Vibra o celular (Funciona em Android)
+            // Vibra o celular (Android) - Padrão: Vibra, Pausa, Vibra
             if (navigator.vibrate) {
-                navigator.vibrate([200, 100, 200]); // Vibra: 200ms, pausa, 200ms
+                try { navigator.vibrate([200, 100, 200]); } catch(e){}
             }
         }
 
+        // Atualiza a memória
         ultimoTotalPendentes = totalAtual;
     })
-    .catch(err => console.log("Erro polling notificações"));
+    .catch(err => console.log("Erro polling notificações", err));
 }
 
 function verPendentes() {
@@ -1597,6 +1611,99 @@ function testarMensagemWhatsApp() {
         console.error(err);
     });
 }
+
+// ==================================================
+// LÓGICA DE NOTIFICAÇÕES (Estilo YouTube)
+// ==================================================
+
+// 1. Alternar (Abrir/Fechar) o Painel
+function toggleNotificationDropdown(event) {
+    if (event) {
+        event.stopPropagation(); // Impede que o clique feche o menu instantaneamente
+        event.preventDefault();
+    }
+
+    const dropdown = document.getElementById('notification-dropdown');
+    if (!dropdown) return;
+
+    // Alterna classe 'active'
+    dropdown.classList.toggle('active');
+
+    // Se abriu, carrega a lista atualizada
+    if (dropdown.classList.contains('active')) {
+        carregarListaNotificacoes();
+        
+        // Fecha o menu de perfil se estiver aberto (para não sobrepor)
+        const profileDd = document.getElementById('profile-dropdown');
+        if(profileDd) profileDd.classList.remove('active');
+    }
+}
+
+// 2. Buscar dados e montar o HTML
+function carregarListaNotificacoes() {
+    const listContent = document.getElementById('notif-list-content');
+    if (!listContent) return;
+
+    // Loading state
+    listContent.innerHTML = '<div style="padding:20px; text-align:center; color:#666;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+
+    fetch('backend/listar_notificacoes.php')
+        .then(res => res.json())
+        .then(data => {
+            listContent.innerHTML = ''; // Limpa loading
+
+            if (data.success && data.notificacoes.length > 0) {
+                data.notificacoes.forEach(notif => {
+                    const item = document.createElement('div');
+                    item.className = 'notif-item';
+                    
+                    // Ao clicar no item, vai para a agenda
+                    item.onclick = function() {
+                        verPendentes();
+                        document.getElementById('notification-dropdown').classList.remove('active');
+                    };
+
+                    item.innerHTML = `
+                        <div class="notif-icon-circle">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="notif-content">
+                            <span class="notif-title">${notif.cliente_nome}</span>
+                            <span class="notif-subtitle">Solicitou: <strong>${notif.nome_servico}</strong></span>
+                            <span class="notif-time">
+                                <i class="far fa-clock"></i> ${notif.data_formatada} às ${notif.hora_formatada}
+                            </span>
+                        </div>
+                    `;
+                    listContent.appendChild(item);
+                });
+            } else {
+                listContent.innerHTML = `
+                    <div class="notif-empty">
+                        <i class="far fa-bell-slash" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>Tudo limpo! Nenhuma notificação.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            listContent.innerHTML = '<div class="notif-empty">Erro ao carregar.</div>';
+        });
+}
+
+// 3. Fechar ao clicar fora (Listener Global)
+window.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('notification-dropdown');
+    const bell = document.getElementById('notification-bell');
+
+    if (dropdown && bell) {
+        // Se o clique NÃO foi no dropdown E NÃO foi no sino
+        if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+            dropdown.classList.remove('active');
+        }
+    }
+});
 
 
 // ===== INICIALIZAÇÃO =====
