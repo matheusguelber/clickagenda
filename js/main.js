@@ -593,60 +593,59 @@ function initializeLoginForms() {
         });
     }
 
-    // Login Submit
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Tenta destravar o √°udio no clique do login
-            const audio = document.getElementById('notification-sound');
-            if(audio) {
-                audio.play().then(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                }).catch(err => console.log("√Åudio desbloqueado ou erro"));
+    
+// Login Submit
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = this.querySelector('button[type="submit"]');
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+        btn.disabled = true;
+        
+        const formData = new FormData(this);
+        
+        fetch('backend/login.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // ? SALVA TUDO NO LOCALSTORAGE
+                localStorage.setItem('user_id', data.user_id);
+                localStorage.setItem('user_nome', data.nome);
+                localStorage.setItem('user_tipo', data.tipo);
+                localStorage.setItem('user_slug', data.slug || '');
+                localStorage.setItem('user_foto', data.foto || ''); // Foto pode ser null
+                
+                alert(data.message);
+                closeModal('login');
+                
+                // ? ATUALIZA A INTERFACE
+                atualizarBotaoAuth();
+                showDashboard();
+                
+                // ? RECARREGA PARA APLICAR MUDAN«AS
+                setTimeout(() => location.reload(), 500);
+            } else {
+                alert(data.message);
             }
-
-            const formData = new FormData(this);
-            
-            fetch('backend/login.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    closeModal('login');
-                    
-                    localStorage.setItem('user_tipo', data.tipo);
-                    localStorage.setItem('user_id', data.user_id || '');
-                    localStorage.setItem('user_slug', data.slug || '');
-                    localStorage.setItem('user_nome', data.nome || '');
-                    
-                    atualizarBotaoAuth();
-                    document.querySelector('.hero').classList.add('hidden');
-                    document.querySelector('.features').classList.add('hidden');
-
-                    if (data.tipo === 'barbeiro') {
-                        document.getElementById('dashboard-barbeiro').classList.remove('hidden');
-                        carregarDadosDashboard();
-                        // Inicia o sistema de notifica√ß√£o
-                        iniciarSistemaNotificacao();
-                    } else { 
-                        alert("Dashboard de cliente ainda n√£o implementado.");
-                    }
-                } else {
-                    alert('Erro: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Erro ao conectar ao servidor.');
-            });
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Erro de conex„o com o servidor.');
+        })
+        .finally(() => {
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
         });
-    }
+    });
+}
+
+
 
     // Register Submit
     const registerForm = document.getElementById('register-form');
@@ -714,31 +713,94 @@ function solicitarRecuperacaoSenha() {
     .catch(error => alert('Erro ao conectar ao servidor.'));
 }
 
+
 function atualizarBotaoAuth() {
-    const btnAuth = document.getElementById('btn-auth');
     const userId = localStorage.getItem('user_id');
-    const userName = localStorage.getItem('user_nome');
+    const nome = localStorage.getItem('user_nome');
+    const foto = localStorage.getItem('user_foto');
+    
+    // Elementos do SISTEMA NOVO (com avatar)
+    const guestNav = document.getElementById('guest-nav');
+    const userNav = document.getElementById('user-nav');
+    const userInitials = document.getElementById('user-initials');
+    const profileName = document.getElementById('profile-name');
+    const userAvatar = document.querySelector('.user-avatar');
     const bell = document.getElementById('notification-bell');
-    
-    if (!btnAuth) return;
-    
+
+    // Elemento do SISTEMA ANTIGO (bot„o simples) - mantÈm compatibilidade
+    const btnAuth = document.getElementById('btn-auth');
+
     if (userId) {
-        btnAuth.innerHTML = `<i class="fas fa-sign-out-alt"></i> Sair`;
-        if (userName) {
-            btnAuth.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]} | Sair`;
-        }
-        btnAuth.onclick = fazerLogout;
+        // ========================================
+        // USU¡RIO LOGADO
+        // ========================================
         
-        // Mostra o sino se for barbeiro
-        if (localStorage.getItem('user_tipo') === 'barbeiro' && bell) {
-            bell.style.display = 'flex'; 
-            iniciarSistemaNotificacao();
+        // SISTEMA NOVO: Esconde guest-nav e mostra user-nav
+        if (guestNav) guestNav.style.display = 'none';
+        if (userNav) userNav.style.display = 'flex';
+        
+        // Atualiza nome e iniciais
+        if (nome) {
+            const initials = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            if (userInitials) userInitials.textContent = initials;
+            if (profileName) profileName.textContent = nome;
         }
+        
+        // Atualiza foto de perfil
+        if (userAvatar) {
+            if (foto && foto !== 'null' && foto !== '' && foto !== 'undefined') {
+                // Tem foto: mostra a imagem
+                userAvatar.style.backgroundImage = `url('${foto}')`;
+                userAvatar.style.backgroundSize = 'cover';
+                userAvatar.style.backgroundPosition = 'center';
+                if (userInitials) userInitials.style.display = 'none'; // Esconde iniciais
+            } else {
+                // Sem foto: mostra iniciais
+                userAvatar.style.backgroundImage = 'none';
+                if (userInitials) userInitials.style.display = 'flex'; // Mostra iniciais
+            }
+        }
+        
+        // Mostra sino de notificaÁıes se for barbeiro
+        if (localStorage.getItem('user_tipo') === 'barbeiro') {
+            if (bell) {
+                bell.style.display = 'block';
+                // Inicia monitoramento (se a funÁ„o existir)
+                if (typeof iniciarSistemaNotificacao === 'function') {
+                    iniciarSistemaNotificacao();
+                }
+            }
+        } else {
+            if (bell) bell.style.display = 'none';
+        }
+        
+        // SISTEMA ANTIGO: Atualiza bot„o (compatibilidade)
+        if (btnAuth) {
+            btnAuth.innerHTML = `<i class="fas fa-user"></i> ${nome.split(' ')[0]} | Sair`;
+            btnAuth.onclick = fazerLogout;
+        }
+        
+        console.log('? Usu·rio autenticado:', nome);
+        
     } else {
-        btnAuth.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-        btnAuth.onclick = handleAuthButton;
-        // Esconde o sino se n√£o estiver logado
+        // ========================================
+        // USU¡RIO DESLOGADO
+        // ========================================
+        
+        // SISTEMA NOVO: Mostra guest-nav e esconde user-nav
+        if (guestNav) guestNav.style.display = 'flex';
+        if (userNav) userNav.style.display = 'none';
+        
+        // Esconde sino
         if (bell) bell.style.display = 'none';
+        
+        // SISTEMA ANTIGO: Atualiza bot„o (compatibilidade)
+        if (btnAuth) {
+            btnAuth.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            btnAuth.onclick = showLogin;
+        }
+        
+        console.log('? Usu·rio n„o autenticado');
     }
 }
 

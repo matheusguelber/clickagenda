@@ -1,1 +1,27 @@
-*.exe
+# Backups e arquivos temporários
+*.backup
+*.save
+*.save.*
+*~
+
+# Node
+node_modules/
+whatsapp-server/node_modules/
+npm-debug.log*
+
+# Sessões WhatsApp
+whatsapp-server/.wwebjs_auth/
+whatsapp-server/.wwebjs_cache/
+
+# Logs
+*.log
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
