@@ -14,25 +14,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        // Busca o usuário pelo email
         $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->execute([$email]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Verifica senha
         if ($usuario && password_verify($senha, $usuario['senha'])) {
             
+            // Salva na sessão
             $_SESSION['user_id'] = $usuario['id'];
             $_SESSION['user_tipo'] = $usuario['tipo'];
             $_SESSION['user_nome'] = $usuario['nome'];
             $_SESSION['user_slug'] = $usuario['slug'];
+            $_SESSION['user_foto'] = $usuario['foto_perfil']; // Salva foto na sessão
 
+            // Retorna JSON para o JavaScript
             echo json_encode([
                  'success' => true, 
                  'message' => 'Login realizado com sucesso!',
-                 'tipo' => $usuario['tipo'],
-                 'slug' => $usuario['slug'],
-                 'user_id' => $usuario['id'],
-                 'nome' => $usuario['nome']
-]);
+                 'tipo' => $usuario['tipo'],        // CORRIGIDO: $usuario
+                 'slug' => $usuario['slug'],        // CORRIGIDO: $usuario
+                 'user_id' => $usuario['id'],       // CORRIGIDO: $usuario
+                 'nome' => $usuario['nome'],        // CORRIGIDO: $usuario
+                 'foto' => $usuario['foto_perfil']  // CORRIGIDO: $usuario
+            ]);
 
         } else {
             echo json_encode(['success' => false, 'message' => 'E-mail ou senha incorretos.']);

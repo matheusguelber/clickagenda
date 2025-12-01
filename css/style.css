@@ -840,39 +840,101 @@ body {
 }
 
 /* Input com Ícone */
+/* ==================================================
+   CORREÇÃO DEFINITIVA: FORMULÁRIOS (Login/Cadastro)
+   ================================================== */
+
+/* 1. O Container (A caixa invisível que segura tudo) */
 .input-with-icon {
-    position: relative;
-    display: flex;
-    align-items: center;
+    position: relative !important; /* Essencial para segurar os ícones */
+    display: block !important;     /* Remove flexbox para evitar conflitos */
+    width: 100% !important;
 }
 
-.input-with-icon i {
-    position: absolute;
-    left: 1rem;
-    color: var(--text-light);
-    pointer-events: none;
-    z-index: 1;
-}
-
+/* 2. O Campo de Digitação (Input) */
 .input-with-icon input {
-    padding-left: 3rem;
-    width: 100%;
+    width: 100% !important;
+    height: 50px !important;       /* Altura fixa para alinhar bem */
+    padding-left: 45px !important; /* Espaço para o ícone da esquerda (Cadeado) */
+    padding-right: 50px !important;/* Espaço para o ícone da direita (Olho) */
+    border: 1px solid #ddd;
+    border-radius: 50px;           /* Borda redonda */
+    outline: none;
+    background: #fff;
+    font-size: 1rem;
+    box-sizing: border-box !important; /* Garante que o padding não estoure a largura */
+    transition: border-color 0.3s;
 }
 
+.input-with-icon input:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* 3. O Ícone da Esquerda (Cadeado, Email, etc) */
+.input-with-icon > i:first-child {
+    position: absolute !important;
+    left: 15px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente exato */
+    color: #d4af37; /* Dourado */
+    z-index: 5;
+    pointer-events: none; /* O clique passa através dele */
+    font-size: 1.1rem;
+}
+
+/* 4. O Botão do Olho (Direita) */
 .toggle-password {
-    position: absolute;
-    right: 1rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-light);
+    position: absolute !important;
+    right: 15px !important; /* Cola na direita, DENTRO da caixa */
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente exato */
+    
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    
+    padding: 5px !important; /* Área de clique */
+    z-index: 10 !important;  /* Fica acima de tudo */
+    
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    
+    color: #aaa; /* Cinza padrão */
     transition: color 0.3s;
-    z-index: 10;
-    padding: 0.5rem;
 }
 
 .toggle-password:hover {
-    color: var(--secondary);
+    color: #d4af37; /* Dourado ao passar o mouse */
+}
+
+/* Ícone dentro do botão */
+.toggle-password i {
+    font-size: 1.1rem !important;
+}
+
+/* 5. Links dos Modais (Tirar o azul feio) */
+.modal-footer p, 
+.modal-footer a, 
+.checkbox-text a,
+.forgot-link {
+    color: #666 !important;
+    font-size: 0.9rem;
+}
+
+.modal-footer a, 
+.checkbox-text a,
+.forgot-link {
+    color: #d4af37 !important; /* Link Dourado */
+    text-decoration: none !important;
+    font-weight: 600;
+}
+
+.modal-footer a:hover, 
+.checkbox-text a:hover,
+.forgot-link:hover {
+    text-decoration: underline !important;
 }
 
 /* Opções do Formulário */
@@ -1089,33 +1151,59 @@ body {
 }
 
 /* Caixa de Informação da Barbearia */
+/* ==================================================
+   ESTILO CARD "COMO FUNCIONA" (IGUAL IMAGEM)
+   ================================================== */
+
 .barbershop-info-box {
+    /* Layout Flex para colocar ícone ao lado do texto */
     display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border-left: 4px solid var(--secondary);
-    border-radius: 8px;
+    align-items: flex-start; /* Alinha no topo */
+    gap: 15px; /* Espaço entre o ícone e o texto */
+    
+    /* Visual da Caixa */
+    background: #eef9fe; /* Azul bem clarinho (igual da imagem) */
+    padding: 1.5rem;
+    border-radius: 12px;
+    
+    /* A barra dourada lateral */
+    border-left: 6px solid #d4af37; 
+    
     margin-bottom: 1.5rem;
+    text-align: left; /* Garante texto alinhado à esquerda */
 }
 
+/* A Bolinha Dourada do Ícone */
 .barbershop-info-box i {
-    font-size: 1.5rem;
-    color: var(--secondary);
-    margin-top: 0.25rem;
+    min-width: 32px;
+    height: 32px;
+    background-color: #d4af37; /* Fundo Dourado */
+    color: white;              /* Letra "i" branca */
+    border-radius: 50%;        /* Deixa redondo */
+    
+    /* Centraliza o "i" na bolinha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: 1.1rem;
+    margin-top: 2px; /* Ajuste fino para alinhar com o título */
 }
 
+/* O Título "Como funciona?" */
 .barbershop-info-box strong {
     display: block;
-    color: var(--primary);
+    color: #1a1a2e; /* Cor escura */
+    font-size: 1.1rem;
     margin-bottom: 0.5rem;
-    font-size: 0.95rem;
+    font-weight: 700;
 }
 
+/* O Texto explicativo */
 .barbershop-info-box p {
-    color: var(--text);
-    font-size: 0.85rem;
-    line-height: 1.5;
+    color: #444; /* Cinza escuro para leitura */
+    font-size: 0.95rem;
+    line-height: 1.5; /* Espaçamento entre linhas para leitura fácil */
     margin: 0;
 }
 
@@ -2908,4 +2996,318 @@ input:checked + .slider:before {
         width: 95%; /* Quase tela toda */
         right: auto;
     }
+}
+
+/* Preview da foto de perfil nas configurações */
+.profile-image-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #f0f2f5;
+    border: 3px solid #d4af37; /* Borda dourada */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* A imagem em si, para preencher o círculo */
+.profile-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* As iniciais, caso não tenha foto */
+#settings-profile-initials {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #999;
+}
+
+/* Botão de Remover Foto */
+.btn-remove {
+    background-color: transparent;
+    color: #e74c3c; /* Vermelho */
+    border: 2px solid #e74c3c;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: FORMULÁRIOS E OLHO DA SENHA
+   ================================================== */
+
+/* 1. O Container (A caixa que segura tudo) */
+.input-with-icon {
+    position: relative !important; /* Essencial: define os limites */
+    display: block !important;     /* Essencial: evita comportamentos estranhos de flex */
+    width: 100% !important;
+}
+
+/* 2. O Input (Onde você digita) */
+.input-with-icon input {
+    width: 100% !important;
+    height: 45px !important;       /* Altura padrão confortável */
+    padding-left: 40px !important; /* Espaço para o cadeado na esquerda */
+    padding-right: 45px !important;/* Espaço para o olho na direita */
+    box-sizing: border-box !important; /* Garante que o padding não aumente a largura */
+    border-radius: 8px !important;
+    border: 1px solid #ccc !important;
+}
+
+/* 3. O Ícone da Esquerda (Cadeado/Email) */
+.input-with-icon > i {
+    position: absolute !important;
+    left: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente */
+    color: #d4af37 !important; /* Dourado */
+    z-index: 2;
+    pointer-events: none; /* O clique atravessa ele */
+}
+
+/* 4. O Botão do Olho (Direita) */
+.toggle-password {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    right: 5px !important; /* Cola na direita, com leve margem */
+    margin: auto !important; /* Ajuda na centralização */
+    
+    width: 40px !important; /* Largura fixa para área de clique */
+    height: 40px !important; /* Altura fixa */
+    
+    background: transparent !important; /* Remove fundo cinza padrão */
+    border: none !important; /* Remove bordas padrão */
+    padding: 0 !important;
+    
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    cursor: pointer !important;
+    z-index: 10 !important; /* Fica por cima de tudo */
+    color: #aaa !important;
+}
+
+.toggle-password:hover {
+    color: #d4af37 !important;
+}
+
+/* 5. Correção dos Links Azuis Feios (Login/Cadastro) */
+.form-footer a, 
+.forgot-link, 
+.checkbox-text a {
+    color: #d4af37 !important; /* Dourado */
+    text-decoration: none !important;
+    font-weight: 600;
+}
+
+.form-footer a:hover, 
+.forgot-link:hover {
+    text-decoration: underline !important;
+    color: #b3932a !important;
+}
+
+/* ==================================================
+   CORREÇÃO DE EMERGÊNCIA: INPUTS EM MOBILE/TABLET
+   ================================================== */
+
+@media (max-width: 1024px) {
+
+    /* 1. Força o container a ser um bloco relativo */
+    .input-with-icon {
+        position: relative !important;
+        display: block !important; /* Garante que não seja flex */
+        width: 100% !important;
+        height: auto !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* 2. Força o input a ter espaço para o olho */
+    .input-with-icon input {
+        width: 100% !important;
+        height: 50px !important;       /* Altura fixa ajuda no alinhamento */
+        padding-left: 45px !important; /* Ícone esquerdo */
+        padding-right: 50px !important;/* Ícone direito (olho) */
+        box-sizing: border-box !important; /* O padding fica dentro da largura */
+    }
+
+    /* 3. Posiciona o Olho de forma absoluta e agressiva */
+    .toggle-password {
+        position: absolute !important;
+        
+        /* Técnica de centralização vertical robusta para mobile */
+        top: 0 !important;
+        bottom: 0 !important;
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+        
+        right: 5px !important; /* Cola na direita */
+        left: auto !important; /* Garante que não cole na esquerda */
+        
+        width: 45px !important; /* Área de toque grande */
+        height: 45px !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        background: transparent !important;
+        border: none !important;
+        z-index: 999 !important; /* Fica acima de tudo */
+        transform: none !important; /* Remove transforms que podem bugar no mobile */
+    }
+
+    /* 4. Garante que o ícone da esquerda (Cadeado) também fique certo */
+    .input-with-icon > i {
+        position: absolute !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+        left: 15px !important;
+        height: 20px !important; /* Altura fixa para o ícone */
+        transform: none !important;
+    }
+    
+    /* 5. Remove margens estranhas que o celular possa adicionar */
+    .form-group {
+        display: block !important;
+        position: relative !important;
+    }
+}
+
+/* ==================================================
+   AJUSTE DE ESPAÇAMENTO: LOGIN
+   ================================================== */
+
+/* Aumenta o espaço entre o "Lembrar-me" e o botão "Entrar" */
+.form-options {
+    margin-bottom: 2rem !important; /* Aumentei bastante para desgrudar */
+    padding-bottom: 0.5rem; /* Um pouco de respiro extra */
+}
+
+/* Garante que o botão tenha um espaço em cima também */
+.auth-form button[type="submit"] {
+    margin-top: 10px !important;
+}
+
+/* ==================================================
+   CORREÇÃO: CHECKBOX AO LADO DO TEXTO
+   ================================================== */
+
+/* ==================================================
+   CORREÇÃO FINAL: CHECKBOX CENTRALIZADO
+   ================================================== */
+
+.checkbox-container {
+    display: flex !important;
+    align-items: center !important; /* Alinha o centro vertical */
+    justify-content: flex-start !important;
+    margin-bottom: 1.5rem !important;
+    cursor: pointer;
+    line-height: 1.1 !important; /* Reduz a altura da linha do texto */
+}
+
+.checkbox-container input[type="checkbox"] {
+    /* Zera qualquer margem que o navegador esteja colocando */
+    margin: 0 !important; 
+    padding: 0 !important;
+    
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0 !important;
+    
+    /* Pequeno ajuste para subir ou descer o quadrado manualmente */
+    position: relative !important;
+    top: -1px !important; /* Sobe 1 pixel para compensar o olho humano */
+    
+    cursor: pointer;
+    accent-color: #d4af37;
+}
+
+.checkbox-text {
+    margin-left: 10px !important; /* Espaço entre o quadrado e o texto */
+    font-size: 0.9rem !important;
+    color: #555;
+    display: inline-block !important;
+}
+
+.checkbox-text a {
+    color: #d4af37 !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ==================================================
+   CORREÇÃO VISUAL: CARD "COMO FUNCIONA"
+   ================================================== */
+
+.barbershop-info-box {
+    /* Visual da Caixa */
+    background-color: #eef9fe !important; /* Azul bem clarinho */
+    border-left: 5px solid #d4af37 !important; /* Barra Dourada grossa */
+    border-radius: 8px !important;
+    padding: 1.2rem 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    
+    /* Layout Flex para alinhar ícone e texto */
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
+    text-align: left !important;
+}
+
+/* Estilização do Ícone (A bolinha dourada) */
+.barbershop-info-box i {
+    /* Tamanho e forma da bolinha */
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 50% !important;
+    
+    /* Cores */
+    background-color: #d4af37 !important; /* Fundo Dourado */
+    color: white !important;              /* Letra "i" branca */
+    
+    /* Centralizar o ícone dentro da bolinha */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    font-size: 0.9rem !important;
+    flex-shrink: 0 !important; /* Impede que a bolinha amasse */
+    margin-top: 3px !important; /* Alinha com a primeira linha do texto */
+    
+    /* Remove estilos padrão do FontAwesome que possam atrapalhar */
+    padding: 0 !important;
+}
+
+/* Título */
+.barbershop-info-box strong {
+    display: block !important;
+    color: #1a1a2e !important; /* Azul escuro */
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 5px !important;
+}
+
+/* Texto */
+.barbershop-info-box p {
+    color: #444 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
 }

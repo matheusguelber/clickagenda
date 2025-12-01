@@ -595,56 +595,64 @@ function initializeLoginForms() {
     }
 
     // Login Submit
+    // Login Submit (COM DIAGNÓSTICO DE ERRO)
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Tenta destravar o áudio no clique do login
-            const audio = document.getElementById('notification-sound');
-            if(audio) {
-                audio.play().then(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                }).catch(err => console.log("Áudio desbloqueado ou erro"));
-            }
-
+            // Feedback visual no botão
+            const btn = this.querySelector('button[type="submit"]');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            btn.disabled = true;
+            
             const formData = new FormData(this);
             
             fetch('backend/login.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    closeModal('login');
-                    
-                    localStorage.setItem('user_tipo', data.tipo);
-                    localStorage.setItem('user_id', data.user_id || '');
-                    localStorage.setItem('user_slug', data.slug || '');
-                    localStorage.setItem('user_nome', data.nome || '');
-                    
-                    atualizarBotaoAuth();
-                    document.querySelector('.hero').classList.add('hidden');
-                    document.querySelector('.features').classList.add('hidden');
+            .then(response => response.text()) // 1. Pega como TEXTO primeiro (para ver o erro)
+            .then(text => {
+                console.log("Resposta crua do PHP:", text); // Mostra no Console (F12)
 
-                    if (data.tipo === 'barbeiro') {
-                        document.getElementById('dashboard-barbeiro').classList.remove('hidden');
-                        carregarDadosDashboard();
-                        // Inicia o sistema de notificação
-                        iniciarSistemaNotificacao();
-                    } else { 
-                        alert("Dashboard de cliente ainda não implementado.");
+                try {
+                    // 2. Tenta transformar em JSON
+                    const data = JSON.parse(text);
+                    
+                    if (data.success) {
+                        // Sucesso! Salva os dados
+                        localStorage.setItem('user_id', data.user_id);
+                        localStorage.setItem('user_nome', data.nome);
+                        localStorage.setItem('user_tipo', data.tipo);
+                        localStorage.setItem('user_slug', data.slug);
+                        localStorage.setItem('user_foto', data.foto || ''); // Salva a foto se tiver
+
+                        alert(data.message);
+                        closeModal('login');
+                        atualizarBotaoAuth();
+                        showDashboard();
+                        
+                        // Recarrega para aplicar as mudanças visuais
+                        setTimeout(() => location.reload(), 500);
+                    } else {
+                        alert(data.message); // Senha errada ou usuário não encontrado
                     }
-                } else {
-                    alert('Erro: ' + data.message);
+                } catch (erroJson) {
+                    // 3. SE DER ERRO AQUI, O PHP QUEBROU
+                    // Mostra o erro real na tela
+                    alert("ERRO FATAL NO PHP:\n----------------\n" + text.substring(0, 400));
                 }
             })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Erro ao conectar ao servidor.');
+            .catch(err => {
+                console.error(err);
+                alert('Erro de conexão com o servidor (404 ou Rede).');
+            })
+            .finally(() => {
+                // Restaura o botão
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
             });
         });
     }
@@ -1705,6 +1713,219 @@ window.addEventListener('click', function(e) {
     }
 });
 
+// ==================================================
+// GERENCIAMENTO DE PERFIL E SENHA
+// ==================================================
+
+// Carrega os dados do banco para preencher os inputs
+function carregarDadosPerfil() {
+    fetch('backend/obter_perfil.php')
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // 1. Preenche os campos de texto
+            document.getElementById('perfil-nome').value = data.dados.nome;
+            document.getElementById('perfil-email').value = data.dados.email;
+            document.getElementById('perfil-telefone').value = data.dados.telefone || '';
+
+            // 2. Lógica das Iniciais
+            const nome = data.dados.nome;
+            let iniciais = "US"; // Padrão se der erro
+            
+            if (nome) {
+                // Pega as duas primeiras letras e deixa maiúsculo
+                iniciais = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            }
+
+            // 3. Atualiza a Bolinha Grande
+            const previewContainer = document.getElementById('settings-profile-preview');
+            const fotoSalva = localStorage.getItem('user_foto');
+            
+            // Se tiver foto, mostra a foto. Se não, mostra as iniciais.
+            if (fotoSalva && fotoSalva !== 'null' && fotoSalva !== '') {
+                 previewContainer.innerHTML = `<img src="${fotoSalva}" alt="Foto">`;
+            } else {
+                // AQUI ESTÁ A MÁGICA: Força o HTML das iniciais com a cor certa
+                previewContainer.innerHTML = `<span id="settings-profile-initials" style="font-size: 2.5rem; font-weight: bold; color: #1a1a2e;">${iniciais}</span>`;
+                
+                // Garante que o fundo fique dourado (igual ao de cima)
+                previewContainer.style.backgroundColor = "#d4af37";
+            }
+        }
+    });
+}
+
+// Listener para Salvar Perfil
+const formPerfil = document.getElementById('form-perfil');
+if (formPerfil) {
+    formPerfil.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(this);
+        
+        fetch('backend/atualizar_perfil.php', { method: 'POST', body: fd })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                // Atualiza o nome no menu e no localStorage
+                localStorage.setItem('user_nome', fd.get('nome'));
+                atualizarBotaoAuth(); 
+            }
+        });
+    });
+}
+
+// Listener para Alterar Senha
+const formSenha = document.getElementById('form-senha');
+if (formSenha) {
+    formSenha.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(this);
+        
+        fetch('backend/alterar_senha.php', { method: 'POST', body: fd })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                formSenha.reset();
+            }
+        });
+    });
+}
+
+// ==================================================
+// UPLOAD DE FOTO DE PERFIL
+// ==================================================
+
+const fotoInput = document.getElementById('upload-foto-input');
+
+if (fotoInput) {
+    fotoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // 1. Validações básicas no frontend
+        const extensoesValidas = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!extensoesValidas.includes(file.type)) {
+            alert('Por favor, selecione uma imagem JPG ou PNG.');
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) { // 2MB
+            alert('A imagem é muito grande. O máximo é 2MB.');
+            return;
+        }
+
+        // 2. Mostra Feedback Visual (Carregando...)
+        const statusText = document.getElementById('upload-status-text');
+        const btn = fotoInput.nextElementSibling; // O botão "Alterar Foto"
+        const textoOriginalBtn = btn.innerHTML;
+        
+        statusText.textContent = 'Enviando... Aguarde.';
+        statusText.style.color = 'var(--primary)';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        btn.disabled = true;
+
+        // 3. Prepara e envia o formulário
+        const formData = new FormData();
+        formData.append('foto_perfil', file);
+
+        fetch('backend/upload_foto_perfil.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // SUCESSO
+                statusText.textContent = '✅ Foto atualizada com sucesso!';
+                statusText.style.color = '#27ae60';
+                
+                // Salva no localStorage para carregar rápido depois
+                localStorage.setItem('user_foto', data.caminho);
+                
+                // Atualiza a foto em todos os lugares
+                atualizarFotoEmTodaPagina(data.caminho);
+
+            } else {
+                // ERRO DO BACKEND
+                statusText.textContent = '❌ Erro: ' + data.message;
+                statusText.style.color = '#e74c3c';
+                alert(data.message);
+            }
+        })
+        .catch(err => {
+            // ERRO DE REDE
+            console.error(err);
+            statusText.textContent = '❌ Erro de conexão ao enviar.';
+            statusText.style.color = '#e74c3c';
+        })
+        .finally(() => {
+            // Restaura o botão
+            btn.innerHTML = textoOriginalBtn;
+            btn.disabled = false;
+            fotoInput.value = ''; // Limpa o input para poder selecionar a mesma foto se quiser
+        });
+    });
+}
+
+// Função auxiliar para atualizar a imagem no Header e nas Configurações
+function atualizarFotoEmTodaPagina(caminhoFoto) {
+    // 1. Atualiza no Header (Lá em cima, na barra de navegação)
+    const headerAvatar = document.querySelector('.user-avatar');
+    if (headerAvatar) {
+        if (caminhoFoto) {
+            // Se tem foto, coloca ela como imagem de fundo
+            headerAvatar.style.backgroundImage = `url('${caminhoFoto}')`;
+            headerAvatar.style.backgroundSize = 'cover';
+            headerAvatar.style.backgroundPosition = 'center';
+            headerAvatar.textContent = ''; // Esconde as iniciais
+        } else {
+            // Se não tem foto, reseta para mostrar as iniciais
+            headerAvatar.style.backgroundImage = 'none';
+            // O texto das iniciais é recolocado pela função atualizarBotaoAuth
+        }
+    }
+
+    // 2. Atualiza na Tela de Configurações (O preview grande)
+    const previewContainer = document.getElementById('settings-profile-preview');
+    if (previewContainer) {
+        if (caminhoFoto) {
+            previewContainer.innerHTML = `<img src="${caminhoFoto}" alt="Foto de Perfil">`;
+        } else {
+            const nome = localStorage.getItem('user_nome') || 'U S';
+            const iniciais = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            previewContainer.innerHTML = `<span id="settings-profile-initials">${iniciais}</span>`;
+        }
+    }
+}
+
+function removerFotoPerfil() {
+    if (!confirm("Tem certeza que deseja remover sua foto de perfil?")) return;
+
+    const btnRemove = document.querySelector('.btn-remove');
+    const originalHtml = btnRemove.innerHTML;
+    btnRemove.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    fetch('backend/remover_foto_perfil.php', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Limpa do LocalStorage
+            localStorage.removeItem('user_foto');
+            
+            // Atualiza a tela (passando null, ele gera as iniciais)
+            atualizarFotoEmTodaPagina(null);
+            
+            alert('Foto removida!');
+        } else {
+            alert('Erro: ' + data.message);
+        }
+    })
+    .catch(err => console.error(err))
+    .finally(() => {
+        btnRemove.innerHTML = originalHtml;
+    });
+}
 
 // ===== INICIALIZAÇÃO =====
 
@@ -1816,10 +2037,17 @@ function showSectionInternal(sectionId) {
         target.classList.remove('hidden');
     }
 
-    // Carrega dados específicos (chame suas funções de carregar dados aqui)
-    if (sectionId === 'overview') carregarDadosDashboard();
+if (sectionId === 'overview') carregarDadosDashboard();
     if (sectionId === 'appointments') carregarTodosAgendamentos();
     if (sectionId === 'clients') carregarClientes();
     if (sectionId === 'services') carregarServicos();
     if (sectionId === 'my-link') carregarLinkAgendamento();
+    
+    // ADICIONE ISSO:
+    if (sectionId === 'settings') {
+        // Carrega horários (se existir a função)
+        if(typeof carregarConfiguracoesHorario === 'function') carregarConfiguracoesHorario();
+        // Carrega dados do perfil
+        carregarDadosPerfil();
+    }
 }

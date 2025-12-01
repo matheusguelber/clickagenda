@@ -399,6 +399,22 @@
 
                     <div id="settings-section" class="hidden">
     <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">Configurações da Conta</h2>
+
+    <div class="settings-card" style="background: #f0f8ff; border: 1px solid #cceeff;">
+    <div class="card-header-row">
+        <h3 style="color: #0056b3;"><i class="fas fa-headset"></i> Precisa de Ajuda?</h3>
+    </div>
+    <p style="color: #444; margin-bottom: 1rem;">
+        Encontrou algum problema ou tem alguma dúvida? Nossa equipe de suporte está pronta para te ajudar.
+    </p>
+    <a href="mailto:suporteclickagenda@gmail.com" class="btn" style="background: #0056b3; color: white;">
+        <i class="fas fa-envelope"></i> Contatar Suporte
+    </a>
+    <p style="font-size: 0.85rem; color: #666; margin-top: 10px;">
+        E-mail: <strong>suporteclickagenda@gmail.com</strong>
+    </p>
+</div>
+
     
     <!-- WhatsApp Automático -->
     <div class="settings-card">
@@ -461,18 +477,102 @@
         </div>
     </div>
 
-    <!-- Meus Dados -->
     <div class="settings-card">
-        <div class="card-header-row">
-            <h3><i class="fas fa-user-cog"></i> Meus Dados</h3>
+    <div class="card-header-row">
+        <h3><i class="fas fa-camera"></i> Foto de Perfil</h3>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; align-items: center; padding: 1rem 0;">
+        <div class="profile-image-preview" id="settings-profile-preview">
+            <span id="settings-profile-initials">US</span>
         </div>
-        <p style="color: #666;">Aqui você poderá editar suas informações pessoais e alterar sua senha em breve.</p>
+        
+        <div style="margin-top: 1.5rem; text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+    <input type="file" id="upload-foto-input" accept="image/png, image/jpeg" style="display: none;">
+    
+    <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-upload" onclick="document.getElementById('upload-foto-input').click()">
+            <i class="fas fa-upload"></i> Escolher Foto
+        </button>
+
+        <button type="button" class="btn btn-remove" onclick="removerFotoPerfil()">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+    
+    <p id="upload-status-text" style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+        JPG ou PNG, máx. 2MB
+    </p>
+</div>
     </div>
 </div>
 
-                </main>
+    <form id="form-perfil" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee;">
+        <div class="form-group">
+            <label>Nome da Barbearia / Profissional</label>
+            <div class="input-with-icon">
+                <i class="fas fa-user"></i>
+                <input type="text" name="nome" id="perfil-nome" required>
             </div>
         </div>
+        
+        <div class="form-group">
+            <label>E-mail de Acesso</label>
+            <div class="input-with-icon">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" id="perfil-email" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Telefone / WhatsApp</label>
+            <div class="input-with-icon">
+                <i class="fas fa-phone"></i>
+                <input type="tel" name="telefone" id="perfil-telefone" onkeyup="this.value=phoneMask(this.value)">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Salvar Alterações
+        </button>
+    </form>
+
+    <h4 style="margin-bottom: 1rem; color: var(--primary);">Alterar Senha</h4>
+    <form id="form-senha">
+        <div class="form-group">
+            <label>Senha Atual</label>
+            <div class="input-with-icon">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="senha_atual" id="senha-atual" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('senha-atual')">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label>Nova Senha</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-key"></i>
+                    <input type="password" name="nova_senha" id="nova-senha" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Confirmar</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-check"></i>
+                    <input type="password" name="confirmar_senha" id="conf-senha" required>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-secondary">
+            <i class="fas fa-lock"></i> Atualizar Senha
+        </button>
+    </form>
+</div>
+
     </section>
 
    <div class="modal" id="new-appointment-modal">
@@ -669,19 +769,19 @@
                 </div>
 
                 <div class="barbershop-info-box">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
+                    <i class="fas fa-info"></i> <div>
                         <strong>Como funciona?</strong>
                         <p>Após o cadastro, você terá acesso ao painel administrativo onde poderá configurar seus serviços, horários e gerar seu link personalizado de agendamento para compartilhar com seus clientes.</p>
                     </div>
                 </div>
 
-                <div class="form-group">
+                    <div class="form-group">
                     <label class="checkbox-container">
                         <input type="checkbox" required>
                         <span class="checkbox-text">
-                            Aceito os <a href="#" onclick="return false;">Termos de Uso</a> e 
-                            <a href="#" onclick="return false;">Política de Privacidade</a>
+                            Aceito os 
+                            <a href="#" onclick="showModal('terms'); return false;">Termos de Uso</a> e 
+                            <a href="#" onclick="showModal('privacy'); return false;">Política de Privacidade</a>
                         </span>
                     </label>
                 </div>
@@ -735,6 +835,61 @@
             <p>Desenvolvido por: Nayara Victória, Matheus Rubens, Mirela Rosa, Reydner, Luigi Greco, Alini Nunes, Leticia</p>
         </div>
     </footer>
+
+    <div class="modal" id="terms-modal" style="z-index: 2002;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>Termos de Uso</h2>
+            <button class="close-modal" onclick="closeModal('terms')">&times;</button>
+        </div>
+        <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px; line-height: 1.6; color: #555;">
+            <p><strong>1. Introdução</strong><br>
+            Bem-vindo ao ClickAgenda. Ao utilizar nossa plataforma, você concorda com os termos descritos abaixo.</p>
+
+            <p><strong>2. Gestão da Agenda</strong><br>
+            O profissional (você) é o único responsável por manter seus horários e disponibilidade atualizados na plataforma. O ClickAgenda não se responsabiliza por conflitos de agenda decorrentes de falha na atualização dos horários.</p>
+
+            <p><strong>3. Responsabilidades</strong><br>
+            O ClickAgenda é uma plataforma de intermediação. A qualidade e execução dos serviços são de inteira responsabilidade do profissional (barbeiro) selecionado.</p>
+            
+            <p><strong>4. Cancelamentos</strong><br>
+            O uso indevido da plataforma, como agendamentos falsos ou não comparecimento recorrente, poderá resultar na suspensão da conta.</p>
+        </div>
+        <div style="margin-top: 1.5rem; text-align: right;">
+            <button class="btn btn-primary" onclick="closeModal('terms')">Entendi</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="privacy-modal" style="z-index: 2002;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>Política de Privacidade</h2>
+            <button class="close-modal" onclick="closeModal('privacy')">&times;</button>
+        </div>
+        <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px; line-height: 1.6; color: #555;">
+            <p><strong>1. Coleta de Dados</strong><br>
+            Coletamos apenas os dados necessários para o agendamento: Nome, E-mail e Telefone.</p>
+
+            <p><strong>2. Uso das Informações</strong><br>
+            Seus dados são utilizados exclusivamente para:</p>
+            <ul style="margin-left: 20px; margin-bottom: 10px;">
+                <li>Confirmar sua identidade nos agendamentos;</li>
+                <li>Enviar lembretes e notificações via WhatsApp;</li>
+                <li>Manter histórico de serviços.</li>
+            </ul>
+
+            <p><strong>3. Compartilhamento</strong><br>
+            Não vendemos nem compartilhamos seus dados com terceiros para fins de marketing. Seus dados são visíveis apenas para o estabelecimento onde você agendou.</p>
+            
+            <p><strong>4. Segurança</strong><br>
+            Utilizamos criptografia para proteger suas senhas e dados sensíveis.</p>
+        </div>
+        <div style="margin-top: 1.5rem; text-align: right;">
+            <button class="btn btn-primary" onclick="closeModal('privacy')">Li e Concordo</button>
+        </div>
+    </div>
+</div>
 
     <script src="js/main.js"></script>
 </body>
