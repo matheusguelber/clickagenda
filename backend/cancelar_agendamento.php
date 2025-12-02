@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         
         // Envia WhatsApp de cancelamento
-        $resultado = enviarWhatsAppCancelamento($agendamento_id, $pdo);
+        $resultado = enviarWhatsAppCancelamento($agendamento_id, $barbeiro_id, $pdo);
         
         if ($resultado['whatsapp_sent']) {
             $response['message'] .= ' ✅ Cliente notificado via WhatsApp.';
@@ -62,8 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 /**
  * Envia mensagem WhatsApp informando cancelamento
+ * 🔥 ATUALIZADO: Multi-sessão com barbeiro_id
  */
-function enviarWhatsAppCancelamento($agendamento_id, $pdo) {
+function enviarWhatsAppCancelamento($agendamento_id, $barbeiro_id, $pdo) {
     try {
         // Busca informações do agendamento
         $stmt = $pdo->prepare("
@@ -100,10 +101,13 @@ function enviarWhatsAppCancelamento($agendamento_id, $pdo) {
         $mensagem .= "*📅 Data:* {$data_formatada}\n";
         $mensagem .= "*⏰ Horário:* {$hora_formatada}\n\n";
         $mensagem .= "Se deseja reagendar, acesse nosso link de agendamento ou nos chame no WhatsApp. 📞\n";
-        $mensagem .= "Tel: {$agendamento['barbeiro_telefone']}";
+        
+        if (!empty($agendamento['barbeiro_telefone'])) {
+            $mensagem .= "Tel: {$agendamento['barbeiro_telefone']}";
+        }
 
-        // Envia via Node.js server
-        return enviarViaNodeServer($agendamento['cliente_telefone'], $mensagem);
+        // 🔥 ENVIA COM BARBEIRO_ID
+        return enviarViaNodeServer($barbeiro_id, $agendamento['cliente_telefone'], $mensagem);
 
     } catch (Exception $e) {
         return ['whatsapp_sent' => false, 'whatsapp_error' => $e->getMessage()];
@@ -111,19 +115,23 @@ function enviarWhatsAppCancelamento($agendamento_id, $pdo) {
 }
 
 /**
- * Envia mensagem via Node.js WhatsApp Server
+ * Envia mensagem via Node.js WhatsApp Server (Multi-Sessão)
+ * 🔥 ATUALIZADO: IP da VM + barbeiro_id na URL
  */
-function enviarViaNodeServer($telefone, $mensagem) {
-    $nodeServer = 'http://localhost:3000';
+function enviarViaNodeServer($barbeiro_id, $telefone, $mensagem) {
+    // 🔥 IP CORRETO da VM WhatsApp
+    $nodeServer = 'http://168.138.133.246:3000';
     
     $dados = [
         'telefone' => $telefone,
         'mensagem' => $mensagem
     ];
 
-    $ch = curl_init($nodeServer . '/send');
+    // 🔥 ENDPOINT COM ID DO BARBEIRO
+    $ch = curl_init($nodeServer . "/send/{$barbeiro_id}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dados));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
@@ -134,11 +142,11 @@ function enviarViaNodeServer($telefone, $mensagem) {
     curl_close($ch);
 
     if ($erro) {
-        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Erro de conexão'];
+        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Erro de conexão: ' . $erro];
     }
 
     if ($httpCode !== 200) {
-        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Servidor WhatsApp indisponível'];
+        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Servidor retornou: ' . $httpCode];
     }
 
     $resultado = json_decode($response, true);
