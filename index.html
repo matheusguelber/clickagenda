@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClickAgenda - Plataforma de Agendamento para Barbearias</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -1024,12 +1025,15 @@
         </div>
     </div>
 </div>
-
+    <div id="toast-container"></div>
+    <div id="confirm-modal" class="confirm-modal"></div>
+    
+    <script src="js/toast.js"></script>
     <script src="js/main.js"></script>
+    
 
 <!-- ========================================
-     MODAL DE ESCOLHA: QR CODE OU CÓDIGO
-     Adicionar no index.html, antes do </body>
+     MODAL DE ESCOLHA: QR CODE OU CÓDIGo
      ======================================== -->
 
 <!-- Modal Principal de Escolha -->
@@ -1063,13 +1067,19 @@
                 </p>
             </div>
 
-            <!-- Card Código -->
-            <div class="method-card" onclick="escolherMetodo('code')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9;">
-                <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <!-- Card Código (DESABILITADO) -->
+            <div class="method-card method-card-disabled" onclick="escolherMetodo('code')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9; opacity: 0.6; position: relative;">
+                
+                <!-- Badge "Em breve" -->
+                <div style="position: absolute; top: 10px; right: 10px; background: #f39c12; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">
+                    EM BREVE
+                </div>
+                
+                <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #999 0%, #666 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-key" style="font-size: 1.8rem; color: white;"></i>
                 </div>
-                <h4 style="color: #333; margin-bottom: 0.5rem; font-size: 1rem;">Código</h4>
-                <p style="font-size: 0.85rem; color: #666; margin: 0; line-height: 1.4;">
+                <h4 style="color: #666; margin-bottom: 0.5rem; font-size: 1rem;">Código</h4>
+                <p style="font-size: 0.85rem; color: #999; margin: 0; line-height: 1.4;">
                     Digite o<br>código no app
                 </p>
             </div>
@@ -1303,6 +1313,8 @@
         </form>
     </div>
 </div>
+
+
 
 </body>
 </html>

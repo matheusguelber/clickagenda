@@ -319,7 +319,7 @@ function criarAgendamentoManual() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert("✅ " + data.message);
+            showSuccess(data.message);
             closeModal('new-appointment');
             form.reset();
             document.getElementById('novos-campos-cliente').style.display = 'none'; // Esconde de novo
@@ -332,12 +332,12 @@ function criarAgendamentoManual() {
             if(clienteValue === 'novo') carregarClientesParaAgendamento();
             
         } else {
-            alert("❌ Erro: " + data.message);
+            showError(data.message);
         }
     })
     .catch(error => {
         console.error(error);
-        alert('Erro de conexão.');
+        showError('Erro de conexão.');
     })
     .finally(() => {
         submitBtn.disabled = false;
@@ -379,10 +379,12 @@ function initializeServiceForm() {
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
                 if (data.success) {
+                    showSuccess(data.message);
                     serviceForm.reset();
                     carregarServicos();
+                } else {
+                    showError(data.message);
                 }
             });
         });
@@ -399,10 +401,12 @@ function initializeServiceForm() {
             })
             .then(res => res.json())
             .then(data => {
-                alert(data.message);
                 if(data.success) {
+                    showSuccess(data.message);
                     closeModal('edit-service');
                     carregarServicos(); 
+                } else {
+                    showError(data.message);
                 }
             });
         });
@@ -473,22 +477,30 @@ function abrirModalEditarServico(id, nome, preco, duracao) {
 }
 
 function excluirServico(id) {
-    if(confirm("Tem certeza que deseja excluir este serviço?")) {
-        const formData = new FormData();
-        formData.append('id', id);
+    showConfirm(
+        "Tem certeza que deseja excluir este serviço?",
+        "Confirmar Exclusão",
+        { danger: true, confirmText: 'Sim, excluir', cancelText: 'Cancelar' }
+    ).then(confirmed => {
+        if (confirmed) {
+            const formData = new FormData();
+            formData.append('id', id);
 
-        fetch('backend/excluir_servico.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
-            if(data.success) {
-                carregarServicos(); 
-            }
-        });
-    }
+            fetch('backend/excluir_servico.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    showSuccess(data.message);
+                    carregarServicos(); 
+                } else {
+                    showError(data.message);
+                }
+            });
+        }
+    });
 }
 
 // ===== CALENDÁRIO =====
@@ -676,15 +688,15 @@ function initializeLoginForms() {
                         localStorage.setItem('user_slug', data.slug);
                         localStorage.setItem('user_foto', data.foto || ''); // Salva a foto se tiver
 
-                        alert(data.message);
+                        showSuccess('Login realizado com sucesso!');
                         closeModal('login');
                         atualizarBotaoAuth();
                         showDashboard();
                         
                         // Recarrega para aplicar as mudanças visuais
-                        setTimeout(() => location.reload(), 500);
+                        setTimeout(() => location.reload(), 1500);
                     } else {
-                        alert(data.message); // Senha errada ou usuário não encontrado
+                        showError(data.message); // Senha errada ou usuário não encontrado
                     }
                 } catch (erroJson) {
                     // 3. SE DER ERRO AQUI, O PHP QUEBROU
@@ -727,15 +739,15 @@ function initializeLoginForms() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message + "\n\nAgora, faça o login para continuar.");
-                    switchToLogin();
+                    showSuccess(data.message + ' Agora faça o login para continuar.');
+                    setTimeout(() => switchToLogin(), 2000);
                 } else {
-                    alert('Erro: ' + data.message);
+                    showError(data.message);
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                alert('Erro ao conectar ao servidor.');
+                showError('Erro ao conectar ao servidor.');
             });
         });
     }
@@ -766,8 +778,14 @@ function solicitarRecuperacaoSenha() {
         body: formData
     })
     .then(response => response.json())
-    .then(data => alert(data.message))
-    .catch(error => alert('Erro ao conectar ao servidor.'));
+    .then(data => {
+        if (data.success) {
+            showSuccess(data.message);
+        } else {
+            showError(data.message);
+        }
+    })
+    .catch(error => showError('Erro ao conectar ao servidor.'));
 }
 
 function atualizarBotaoAuth() {
@@ -803,15 +821,6 @@ function toggleProfileDropdown() {
     if(dd) dd.classList.toggle('active');
 }
 
-// Função de Logout
-function fazerLogout() {
-    if (confirm('Sair do sistema?')) {
-        localStorage.clear();
-        window.location.hash = '';
-        location.reload();
-    }
-}
-
 // Fecha ao clicar fora
 window.addEventListener('click', function(e) {
     const pWrapper = document.querySelector('.profile-wrapper');
@@ -831,11 +840,13 @@ function toggleProfileDropdown() {
 
 // Função de Logout (Atualizada para usar a nova lógica)
 function fazerLogout() {
-    if (confirm('Deseja realmente sair?')) {
-        localStorage.clear();
-        window.location.hash = '';
-        location.reload(); // Recarrega para limpar tudo
-    }
+    showConfirm('Deseja realmente sair?', 'Confirmar Logout').then(confirmed => {
+        if (confirmed) {
+            localStorage.clear();
+            window.location.hash = '';
+            location.reload(); // Recarrega para limpar tudo
+        }
+    });
 }
 
 // Fecha dropdowns se clicar fora
@@ -859,17 +870,6 @@ function handleAuthButton() {
     const userId = localStorage.getItem('user_id');
     if (userId) fazerLogout();
     else showLogin();
-}
-
-function fazerLogout() {
-    if (confirm('Tem certeza que deseja sair?')) {
-        localStorage.clear();
-        document.getElementById('dashboard-barbeiro').classList.add('hidden');
-        document.querySelector('.hero').classList.remove('hidden');
-        document.querySelector('.features').classList.remove('hidden');
-        atualizarBotaoAuth();
-        alert('Você saiu com sucesso!');
-    }
 }
 
 // ===== DASHBOARD: ESTATÍSTICAS E AGENDAMENTOS =====
@@ -1019,23 +1019,34 @@ function carregarTodosAgendamentos() {
 }
 
 function cancelarAgendamento(agendamentoId) {
-    if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+    showConfirm(
+        'Tem certeza que deseja cancelar este agendamento?',
+        'Confirmar Cancelamento',
+        { danger: true, confirmText: 'Sim, cancelar', cancelText: 'Não' }
+    ).then(confirmed => {
+        if (!confirmed) return;
     
-    const formData = new FormData();
-    formData.append('agendamento_id', agendamentoId);
+        const formData = new FormData();
+        formData.append('agendamento_id', agendamentoId);
     
-    fetch('backend/cancelar_agendamento.php', { method: 'POST', body: formData })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) {
-            carregarTodosAgendamentos();
-            carregarEstatisticas();
-            carregarProximosAgendamentos();
-            verificarNotificacoes();
-        }
-    })
-    .catch(error => alert('Erro ao cancelar agendamento.'));
+        fetch('backend/cancelar_agendamento.php', { method: 'POST', body: formData })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+                carregarTodosAgendamentos();
+                carregarEstatisticas();
+                carregarProximosAgendamentos();
+                verificarNotificacoes();
+            } else {
+                showError(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showError('Erro ao cancelar agendamento.');
+        });
+    });
 }
 
 function confirmarAgendamento(agendamentoId, telefone, nome, data, hora) {
@@ -1051,11 +1062,11 @@ function confirmarAgendamento(agendamentoId, telefone, nome, data, hora) {
         if (resp.success) {
             // Mensagem de sucesso com info do WhatsApp
             if (resp.whatsapp_sent) {
-                alert("✅ Agendamento Confirmado!\n\n📱 Mensagem enviada via WhatsApp para o cliente.");
+                showSuccess("Agendamento Confirmado! Mensagem enviada via WhatsApp para o cliente.");
             } else if (resp.whatsapp_error) {
-                alert("✅ Agendamento Confirmado!\n\n⚠️ " + resp.message);
+                showSuccess("Agendamento Confirmado! " + resp.message);
             } else {
-                alert("✅ " + resp.message);
+                showSuccess(resp.message);
             }
             
             // Recarrega os dados
@@ -1064,84 +1075,16 @@ function confirmarAgendamento(agendamentoId, telefone, nome, data, hora) {
             carregarProximosAgendamentos();
             verificarNotificacoes();
         } else {
-            alert("❌ Erro: " + resp.message);
+            showError(resp.message);
         }
     })
     .catch(error => {
         console.error('Erro:', error);
-        alert('Erro ao confirmar agendamento.');
+        showError('Erro ao confirmar agendamento.');
     });
 }
 
-function cancelarAgendamento(agendamentoId) {
-    if (!confirm('Tem certeza que deseja cancelar este agendamento?\n\nO cliente será notificado via WhatsApp.')) return;
-    
-    const formData = new FormData();
-    formData.append('agendamento_id', agendamentoId);
-    
-    fetch('backend/cancelar_agendamento.php', { method: 'POST', body: formData })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Busca o agendamento para enviar WhatsApp de cancelamento
-            fetch('backend/obter_agendamentos.php')
-            .then(res => res.json())
-            .then(agendamentos => {
-                // Aqui você pode chamar a função de envio de WhatsApp de cancelamento
-                if (data.whatsapp_sent) {
-                    alert("✅ Agendamento Cancelado!\n\n📱 Cliente notificado via WhatsApp.");
-                } else {
-                    alert("✅ " + data.message);
-                }
-                carregarTodosAgendamentos();
-                carregarEstatisticas();
-                carregarProximosAgendamentos();
-                verificarNotificacoes();
-            });
-        } else {
-            alert("❌ Erro: " + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao cancelar agendamento.');
-    });
-}
 
-function cancelarAgendamento(agendamentoId) {
-    if (!confirm('Tem certeza que deseja cancelar este agendamento?\n\nO cliente será notificado via WhatsApp.')) return;
-    
-    const formData = new FormData();
-    formData.append('agendamento_id', agendamentoId);
-    
-    fetch('backend/cancelar_agendamento.php', { method: 'POST', body: formData })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Busca o agendamento para enviar WhatsApp de cancelamento
-            fetch('backend/obter_agendamentos.php')
-            .then(res => res.json())
-            .then(agendamentos => {
-                // Aqui você pode chamar a função de envio de WhatsApp de cancelamento
-                if (data.whatsapp_sent) {
-                    alert("✅ Agendamento Cancelado!\n\n📱 Cliente notificado via WhatsApp.");
-                } else {
-                    alert("✅ " + data.message);
-                }
-                carregarTodosAgendamentos();
-                carregarEstatisticas();
-                carregarProximosAgendamentos();
-                verificarNotificacoes();
-            });
-        } else {
-            alert("❌ Erro: " + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao cancelar agendamento.');
-    });
-}
 
 function limparFiltros() {
     document.getElementById('filter-status').value = 'todos';
@@ -1202,11 +1145,13 @@ function initializeEditForm() {
             fetch('backend/salvar_edicao_agendamento.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
-                alert(data.message);
                 if (data.success) {
+                    showSuccess(data.message);
                     closeModal('edit-appointment');
                     carregarTodosAgendamentos();
                     carregarProximosAgendamentos();
+                } else {
+                    showError(data.message);
                 }
             });
         });
@@ -1395,8 +1340,14 @@ function salvarConfiguracoesHorario() {
         body: 'horarios=' + encodeURIComponent(JSON.stringify(horarios))
     })
     .then(res => res.json())
-    .then(data => alert(data.message))
-    .catch(err => alert('Erro ao salvar.'));
+    .then(data => {
+        if (data.success) {
+            showSuccess(data.message);
+        } else {
+            showError(data.message);
+        }
+    })
+    .catch(err => showError('Erro ao salvar.'));
 }
 
 function carregarConfiguracoesHorario() {
@@ -1561,9 +1512,11 @@ function excluirServico(id) {
         })
         .then(res => res.json())
         .then(data => {
-            alert(data.message);
             if(data.success) {
+                showSuccess(data.message);
                 carregarServicos(); // Recarrega a lista
+            } else {
+                showError(data.message);
             }
         });
     }
@@ -1844,14 +1797,14 @@ function conectarWhatsApp() {
             
         } else {
             console.error('❌ Erro ao conectar:', data.message);
-            alert('Erro ao conectar: ' + data.message);
+            showError('Erro ao conectar: ' + data.message);
             isConnecting = false;
             verificarStatusWhatsApp();
         }
     })
     .catch(err => {
         console.error('❌ Erro de rede:', err);
-        alert('Erro ao conectar. Verifique se o servidor WhatsApp está rodando.');
+        showError('Erro ao conectar. Verifique se o servidor WhatsApp está rodando.');
         isConnecting = false;
         verificarStatusWhatsApp();
     })
@@ -1863,48 +1816,66 @@ function conectarWhatsApp() {
 
 // ===== 5. DESCONECTAR =====
 function desconectarWhatsApp() {
-    if (!confirm('Deseja realmente desconectar o WhatsApp?')) return;
-    
-    const barbeiroId = localStorage.getItem('user_id');
-    const formData = new FormData();
-    formData.append('action', 'disconnect');
-    formData.append('barbeiro_id', barbeiroId);    
-    fetch('backend/whatsapp_config.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        isConnecting = false;
-        verificarStatusWhatsApp();
-        setPollingSpeed('slow');
+    showConfirm(
+        'Deseja realmente desconectar o WhatsApp?',
+        'Confirmar Desconexão',
+        { danger: true, confirmText: 'Sim, desconectar', cancelText: 'Não' }
+    ).then(confirmed => {
+        if (!confirmed) return;
+        
+        const barbeiroId = localStorage.getItem('user_id');
+        const formData = new FormData();
+        formData.append('action', 'disconnect');
+        formData.append('barbeiro_id', barbeiroId);    
+        fetch('backend/whatsapp_config.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+            } else {
+                showError(data.message);
+            }
+            isConnecting = false;
+            verificarStatusWhatsApp();
+            setPollingSpeed('slow');
+        });
     });
 }
 
 // ===== 6. RESETAR =====
 function resetarWhatsApp() {
-    if (!confirm('Isso irá limpar a sessão do WhatsApp.\n\nVocê precisará escanear o QR Code novamente.\n\nContinuar?')) {
-        return;
-    }
-    
-    const barbeiroId = localStorage.getItem('user_id');
-    const formData = new FormData();
-    formData.append('action', 'reset');
-    formData.append('barbeiro_id', barbeiroId);
-    fetch('backend/whatsapp_config.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        isConnecting = false;
-        verificarStatusWhatsApp();
-    })
-    .catch(err => {
-        alert('Erro ao resetar sessão');
-        console.error(err);
+    showConfirm(
+        'Isso irá limpar a sessão do WhatsApp. Você precisará escanear o QR Code novamente.',
+        'Resetar Sessão WhatsApp',
+        { danger: true, confirmText: 'Sim, resetar', cancelText: 'Cancelar' }
+    ).then(confirmed => {
+        if (!confirmed) return;
+        
+        const barbeiroId = localStorage.getItem('user_id');
+        const formData = new FormData();
+        formData.append('action', 'reset');
+        formData.append('barbeiro_id', barbeiroId);
+        fetch('backend/whatsapp_config.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+            } else {
+                showError(data.message);
+            }
+            isConnecting = false;
+            verificarStatusWhatsApp();
+        })
+        .catch(err => {
+            console.error(err);
+            showError('Erro ao resetar sessão');
+        });
     });
 }
 
@@ -1936,14 +1907,14 @@ function testarMensagemWhatsApp() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert('✅ Mensagem de teste enviada com sucesso!');
+            showSuccess('Mensagem de teste enviada com sucesso!');
         } else {
-            alert('❌ Erro: ' + data.message);
+            showError(data.message);
         }
     })
     .catch(err => {
-        alert('Erro ao enviar mensagem de teste');
         console.error(err);
+        showError('Erro ao enviar mensagem de teste');
     });
 }
 
@@ -2129,11 +2100,13 @@ if (formPerfil) {
         fetch('backend/atualizar_perfil.php', { method: 'POST', body: fd })
         .then(res => res.json())
         .then(data => {
-            alert(data.message);
             if (data.success) {
+                showSuccess(data.message);
                 // Atualiza o nome no menu e no localStorage
                 localStorage.setItem('user_nome', fd.get('nome'));
                 atualizarBotaoAuth(); 
+            } else {
+                showError(data.message);
             }
         });
     });
@@ -2149,9 +2122,11 @@ if (formSenha) {
         fetch('backend/alterar_senha.php', { method: 'POST', body: fd })
         .then(res => res.json())
         .then(data => {
-            alert(data.message);
             if (data.success) {
+                showSuccess(data.message);
                 formSenha.reset();
+            } else {
+                showError(data.message);
             }
         });
     });
@@ -2214,7 +2189,7 @@ if (fotoInput) {
                 // ERRO DO BACKEND
                 statusText.textContent = '❌ Erro: ' + data.message;
                 statusText.style.color = '#e74c3c';
-                alert(data.message);
+                showError(data.message);
             }
         })
         .catch(err => {
@@ -2280,9 +2255,9 @@ function removerFotoPerfil() {
             // Atualiza a tela (passando null, ele gera as iniciais)
             atualizarFotoEmTodaPagina(null);
             
-            alert('Foto removida!');
+            showSuccess('Foto removida com sucesso!');
         } else {
-            alert('Erro: ' + data.message);
+            showError(data.message);
         }
     })
     .catch(err => console.error(err))
@@ -2526,12 +2501,16 @@ function escolherMetodo(metodo) {
         showModal('whatsapp-qr');
         conectarWhatsAppMetodo('qr');
     } else if (metodo === 'code') {
-        // Abre modal do Código
-        showModal('whatsapp-code');
-        // Volta para o primeiro passo
-        document.getElementById('code-step-phone').style.display = 'block';
-        document.getElementById('code-step-display').style.display = 'none';
-        document.getElementById('phone-code-input').value = '';
+        // 🚧 MÉTODO EM DESENVOLVIMENTO
+        showWarning(
+            'Esta funcionalidade está em desenvolvimento e estará disponível em breve!',
+            '🚧 Em Desenvolvimento'
+        );
+
+        // Reabre o modal de escolha após 2 segundos para que o usuário possa escolher QR
+        setTimeout(() => {
+            showModal('whatsapp-method');
+        }, 2000);
     }
 }
 
@@ -2594,7 +2573,7 @@ function monitorarQRCode() {
                 // Conectado!
                 clearInterval(qrMonitorInterval);
                 closeModal('whatsapp-qr');
-                alert('✅ WhatsApp conectado com sucesso!');
+                showSuccess('WhatsApp conectado com sucesso!');
                 verificarStatusWhatsApp();
                 setPollingSpeed('slow');
             }
@@ -2696,7 +2675,7 @@ function monitorarCodigo() {
                 // Conectado!
                 clearInterval(codeMonitorInterval);
                 closeModal('whatsapp-code');
-                alert('✅ WhatsApp conectado com sucesso!');
+                showSuccess('WhatsApp conectado com sucesso!');
                 verificarStatusWhatsApp();
                 setPollingSpeed('slow');
             }
