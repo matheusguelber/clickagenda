@@ -1462,15 +1462,23 @@ function excluirServico(id) {
     }
 }
 
-// ==================================================
-// SISTEMA DE WHATSAPP AUTOMÁTICO
-// ==================================================
 
+// ========================================
+// WHATSAPP - FUNÇÕES PARA RECUPERAR
+// ========================================
+
+// ===== 1. VARIÁVEIS GLOBAIS =====
 let whatsappStatusInterval = null;
+let pollingSpeed = 'slow';
+let isConnecting = false;
 
+// ===== 2. MONITORAMENTO =====
 function iniciarMonitoramentoWhatsApp() {
-    whatsappStatusInterval = setInterval(verificarStatusWhatsApp, 3000);
+    console.log("🔌 Iniciando monitoramento WhatsApp...");
     verificarStatusWhatsApp();
+    
+    if (whatsappStatusInterval) clearInterval(whatsappStatusInterval);
+    whatsappStatusInterval = setInterval(verificarStatusWhatsApp, 10000);
 }
 
 function pararMonitoramentoWhatsApp() {
@@ -1480,11 +1488,31 @@ function pararMonitoramentoWhatsApp() {
     }
 }
 
+function setPollingSpeed(speed) {
+    pollingSpeed = speed;
+    
+    if (whatsappStatusInterval) {
+        clearInterval(whatsappStatusInterval);
+    }
+    
+    const interval = speed === 'fast' ? 3000 : 10000;
+    whatsappStatusInterval = setInterval(verificarStatusWhatsApp, interval);
+    console.log(`⏱️ Polling ajustado para: ${interval}ms`);
+}
+
+// ===== 3. VERIFICAR STATUS =====
 function verificarStatusWhatsApp() {
-    fetch('backend/whatsapp_config.php?action=status')
+    const barbeiroId = localStorage.getItem('user_id');
+    if (!barbeiroId) return;
+    
+    fetch(`backend/whatsapp_config.php?action=status&barbeiro_id=${barbeiroId}`)
     .then(res => res.json())
     .then(data => {
+        console.log('📊 Status WhatsApp:', data);
+        
         const indicator = document.getElementById('whatsapp-status-indicator');
+        if (!indicator) return;
+        
         const dot = indicator.querySelector('.status-dot');
         const text = indicator.querySelector('.status-text');
         
@@ -1493,81 +1521,247 @@ function verificarStatusWhatsApp() {
         const connected = document.getElementById('whatsapp-connected');
         const disconnected = document.getElementById('whatsapp-disconnected');
         
-        const btnConnect = document.getElementById('btn-connect-whatsapp');
-        const btnDisconnect = document.getElementById('btn-disconnect-whatsapp');
-        
-        qrDisplay.style.display = 'none';
-        connecting.style.display = 'none';
-        connected.style.display = 'none';
-        disconnected.style.display = 'none';
+        [qrDisplay, connecting, connected, disconnected].forEach(el => {
+            if (el) el.style.display = 'none';
+        });
         
         if (data.connected) {
+            console.log('✅ WhatsApp conectado!');
             dot.style.background = '#25D366';
             text.textContent = 'Conectado';
             text.style.color = '#25D366';
-            connected.style.display = 'block';
-            btnConnect.style.display = 'none';
-            btnDisconnect.style.display = 'inline-flex';
+            if (connected) connected.style.display = 'block';
+            
+            document.getElementById('btn-connect-whatsapp').style.display = 'none';
+            document.getElementById('btn-disconnect-whatsapp').style.display = 'inline-flex';
+            
+            isConnecting = false;
+            
+            if (pollingSpeed === 'fast') {
+                setPollingSpeed('slow');
+            }
             
         } else if (data.status === 'qr_ready' && data.qrCode) {
+            console.log('📱 QR Code disponível!');
             dot.style.background = '#FFA500';
-            text.textContent = 'Aguardando escaneamento';
+            text.textContent = 'Escaneie o QR Code';
             text.style.color = '#FFA500';
-            qrDisplay.style.display = 'block';
-            document.getElementById('qr-code-image').src = data.qrCode;
-            btnConnect.style.display = 'none';
-            btnDisconnect.style.display = 'inline-flex';
+            if (connecting) connecting.style.display = 'none';
             
-        } else if (data.status === 'connecting' || data.status === 'reconnecting') {
+            if (qrDisplay) {
+                qrDisplay.style.display = 'block';
+                const qrImg = document.getElementById('qr-code-image');
+                if (qrImg) {
+                    qrImg.src = data.qrCode;
+                }
+            }
+            
+            document.getElementById('btn-connect-whatsapp').style.display = 'none';
+            document.getElementById('btn-disconnect-whatsapp').style.display = 'inline-flex';
+            
+            isConnecting = false;
+            
+            if (pollingSpeed !== 'fast') {
+                setPollingSpeed('fast');
+            }
+            
+        } else if (data.status === 'connecting' || data.status === 'authenticated') {
+            console.log('⏳ Conectando WhatsApp...');
             dot.style.background = '#FFA500';
             text.textContent = 'Conectando...';
             text.style.color = '#FFA500';
-            connecting.style.display = 'block';
-            btnConnect.style.display = 'none';
-            btnDisconnect.style.display = 'inline-flex';
+            
+            if (connecting) connecting.style.display = 'block';
+            
+            document.getElementById('btn-connect-whatsapp').style.display = 'none';
+            document.getElementById('btn-disconnect-whatsapp').style.display = 'inline-flex';
+            
+            if (pollingSpeed !== 'fast') {
+                setPollingSpeed('fast');
+            }
+            
+        } else if (data.status === 'timeout') {
+            console.log('⏰ Timeout - QR Code expirado');
+            dot.style.background = '#e74c3c';
+            text.textContent = 'QR Code Expirado';
+            text.style.color = '#e74c3c';
+            
+            if (disconnected) {
+                disconnected.style.display = 'block';
+                disconnected.innerHTML = `
+                    <i class="fas fa-clock" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                    <p style="color: #e74c3c; font-weight: bold;">Tempo Esgotado</p>
+                    <p style="color: #666; font-size: 0.9rem;">O QR Code expirou. Clique em "Conectar WhatsApp" novamente.</p>
+                `;
+            }
+            
+            [qrDisplay, connecting, connected].forEach(el => {
+                if (el) el.style.display = 'none';
+            });
+            
+            document.getElementById('btn-connect-whatsapp').style.display = 'inline-flex';
+            document.getElementById('btn-disconnect-whatsapp').style.display = 'none';
+            
+            isConnecting = false;
+            setPollingSpeed('slow');
+
+        } else if (data.status === 'no_session') {
+            console.log('🆕 Nenhuma sessão encontrada');
+            dot.style.background = '#999';
+            text.textContent = 'Não configurado';
+            text.style.color = '#666';
+            
+            if (disconnected) {
+                disconnected.style.display = 'block';
+                disconnected.innerHTML = `
+                    <i class="fab fa-whatsapp" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                    <p style="color: #666; margin-bottom: 0;">WhatsApp não está conectado</p>
+                    <p style="color: #999; font-size: 0.85rem; margin-top: 0.5rem;">Clique no botão abaixo para conectar</p>
+                `;
+            }
+            
+            document.getElementById('btn-connect-whatsapp').style.display = 'inline-flex';
+            document.getElementById('btn-disconnect-whatsapp').style.display = 'none';
+            
+            isConnecting = false;
             
         } else {
+            console.log('⚪ WhatsApp desconectado');
             dot.style.background = '#ccc';
             text.textContent = 'Desconectado';
             text.style.color = '#666';
-            disconnected.style.display = 'block';
-            btnConnect.style.display = 'inline-flex';
-            btnDisconnect.style.display = 'none';
+            
+            if (disconnected) disconnected.style.display = 'block';
+            
+            document.getElementById('btn-connect-whatsapp').style.display = 'inline-flex';
+            document.getElementById('btn-disconnect-whatsapp').style.display = 'none';
+            
+            isConnecting = false;
+            
+            if (pollingSpeed === 'fast') {
+                setPollingSpeed('slow');
+            }
         }
     })
     .catch(err => {
-        console.error('Erro ao verificar status WhatsApp:', err);
+        console.error('❌ Erro ao verificar status WhatsApp:', err);
+        
+        const disconnected = document.getElementById('whatsapp-disconnected');
+        if (disconnected) {
+            disconnected.style.display = 'block';
+            disconnected.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                <p style="color: #e74c3c; font-weight: bold;">Erro de Comunicação</p>
+                <p style="color: #666; font-size: 0.85rem;">Não foi possível conectar com o servidor WhatsApp.</p>
+            `;
+        }
+        
+        isConnecting = false;
     });
 }
 
+// ===== 4. CONECTAR =====
 function conectarWhatsApp() {
+    if (isConnecting) {
+        console.log('⏳ Já está conectando... aguarde');
+        return;
+    }    
+    isConnecting = true;
+    
+    const btnConnect = document.getElementById('btn-connect-whatsapp');
+    const originalText = btnConnect.innerHTML;
+    
+    btnConnect.disabled = true;
+    btnConnect.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+    
+    const connecting = document.getElementById('whatsapp-connecting');
+    const disconnected = document.getElementById('whatsapp-disconnected');
+    const qrDisplay = document.getElementById('qr-code-display');
+    
+    if (disconnected) disconnected.style.display = 'none';
+    if (qrDisplay) qrDisplay.style.display = 'none';
+    
+    if (connecting) {
+        connecting.style.display = 'block';
+        connecting.innerHTML = `
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #FFA500; margin-bottom: 1rem;"></i>
+            <p style="font-weight: bold; color: #333;">Iniciando conexão WhatsApp...</p>
+            <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Aguarde alguns segundos</p>
+        `;
+    }
+    
+    const dot = document.querySelector('#whatsapp-status-indicator .status-dot');
+    const text = document.querySelector('#whatsapp-status-indicator .status-text');
+    if (dot) dot.style.background = '#FFA500';
+    if (text) {
+        text.textContent = 'Iniciando...';
+        text.style.color = '#FFA500';
+    }
+    
+    const barbeiroId = localStorage.getItem('user_id');
+    if (!barbeiroId) {
+        alert('Erro: Faça login primeiro');
+        return;
+    }
+
     const formData = new FormData();
     formData.append('action', 'connect');
-    
+    formData.append('barbeiro_id', barbeiroId);
+
     fetch('backend/whatsapp_config.php', {
         method: 'POST',
         body: formData
     })
     .then(res => res.json())
     .then(data => {
+        console.log('📡 Resposta da conexão:', data);
+        
         if (data.success) {
-            iniciarMonitoramentoWhatsApp();
+            console.log('✅ Conexão iniciada com sucesso!');
+            
+            setPollingSpeed('fast');
+            
+            if (connecting) {
+                connecting.innerHTML = `
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #25D366; margin-bottom: 1rem;"></i>
+                    <p style="font-weight: bold; color: #25D366;">Gerando QR Code...</p>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Isso pode levar até 60 segundos</p>
+                `;
+            }
+            
+            setTimeout(verificarStatusWhatsApp, 1000);
+            setTimeout(verificarStatusWhatsApp, 3000);
+            setTimeout(verificarStatusWhatsApp, 6000);
+            setTimeout(verificarStatusWhatsApp, 10000);
+            setTimeout(verificarStatusWhatsApp, 15000);
+            
         } else {
+            console.error('❌ Erro ao conectar:', data.message);
             alert('Erro ao conectar: ' + data.message);
+            isConnecting = false;
+            verificarStatusWhatsApp();
         }
     })
     .catch(err => {
-        alert('Erro: Certifique-se de que o servidor Node.js está rodando!\n\nExecute: npm start');
-        console.error(err);
+        console.error('❌ Erro de rede:', err);
+        alert('Erro ao conectar. Verifique se o servidor WhatsApp está rodando.');
+        isConnecting = false;
+        verificarStatusWhatsApp();
+    })
+    .finally(() => {
+        btnConnect.disabled = false;
+        btnConnect.innerHTML = originalText;
     });
 }
 
+// ===== 5. DESCONECTAR =====
 function desconectarWhatsApp() {
     if (!confirm('Deseja realmente desconectar o WhatsApp?')) return;
     
+    const barbeiroId = localStorage.getItem('user_id');
     const formData = new FormData();
     formData.append('action', 'disconnect');
-    
+    formData.append('barbeiro_id', barbeiroId);    
     fetch('backend/whatsapp_config.php', {
         method: 'POST',
         body: formData
@@ -1575,26 +1769,39 @@ function desconectarWhatsApp() {
     .then(res => res.json())
     .then(data => {
         alert(data.message);
-        pararMonitoramentoWhatsApp();
+        isConnecting = false;
         verificarStatusWhatsApp();
+        setPollingSpeed('slow');
     });
 }
 
-function enviarWhatsAppAutomatico(telefone, nomeCliente, data, hora) {
-    const mensagem = `Olá *${nomeCliente}*! 👋💈\n\nPassando para confirmar seu horário na Barbearia da Nay.\n\n📅 *Data:* ${data}\n⏰ *Horário:* ${hora}\n\nEstá tudo certo! Te aguardo.`;
+// ===== 6. RESETAR =====
+function resetarWhatsApp() {
+    if (!confirm('Isso irá limpar a sessão do WhatsApp.\n\nVocê precisará escanear o QR Code novamente.\n\nContinuar?')) {
+        return;
+    }
     
+    const barbeiroId = localStorage.getItem('user_id');
     const formData = new FormData();
-    formData.append('action', 'send');
-    formData.append('telefone', telefone);
-    formData.append('mensagem', mensagem);
-    
-    return fetch('backend/whatsapp_config.php', {
+    formData.append('action', 'reset');
+    formData.append('barbeiro_id', barbeiroId);
+    fetch('backend/whatsapp_config.php', {
         method: 'POST',
         body: formData
     })
-    .then(res => res.json());
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        isConnecting = false;
+        verificarStatusWhatsApp();
+    })
+    .catch(err => {
+        alert('Erro ao resetar sessão');
+        console.error(err);
+    });
 }
 
+// ===== 7. TESTAR MENSAGEM =====
 function testarMensagemWhatsApp() {
     const telefone = prompt('Digite o número de WhatsApp para teste:\n(Ex: 19999999999)');
     if (!telefone) return;
@@ -1606,7 +1813,20 @@ function testarMensagemWhatsApp() {
     const dataFormatada = hoje.toLocaleDateString('pt-BR');
     const horaFormatada = hoje.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     
-    enviarWhatsAppAutomatico(telefone, nome, dataFormatada, horaFormatada)
+    const mensagem = `Olá *${nome}*! 👋\n\nEsta é uma mensagem de teste do ClickAgenda.\n\n📅 ${dataFormatada}\n⏰ ${horaFormatada}`;
+    
+    const barbeiroId = localStorage.getItem('user_id');
+    const formData = new FormData();
+    formData.append('action', 'send');
+    formData.append('barbeiro_id', barbeiroId);
+    formData.append('telefone', telefone);
+    formData.append('mensagem', mensagem);    
+    
+    fetch('backend/whatsapp_config.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
             alert('✅ Mensagem de teste enviada com sucesso!');
@@ -1619,6 +1839,43 @@ function testarMensagemWhatsApp() {
         console.error(err);
     });
 }
+
+// ===== 8. ENVIAR WHATSAPP AUTOMÁTICO =====
+function enviarWhatsAppAutomatico(telefone, nomeCliente, data, hora) {
+    const mensagem = `Olá *${nomeCliente}*! 👋💈\n\nPassando para confirmar seu horário na Barbearia da Nay.\n\n📅 *Data:* ${data}\n⏰ *Horário:* ${hora}\n\nEstá tudo certo! Te aguardo.`;
+    
+    const barbeiroId = localStorage.getItem('user_id');
+    const formData = new FormData();
+    formData.append('action', 'send');
+    formData.append('barbeiro_id', barbeiroId);
+    formData.append('telefone', telefone);
+    formData.append('mensagem', mensagem);
+    
+    return fetch('backend/whatsapp_config.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json());
+}
+
+// ===== 9. STYLE ANIMATION =====
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes loading {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(200%); }
+        100% { transform: translateX(-100%); }
+    }
+`;
+document.head.appendChild(style);
+
+// ===== 10. LISTENER VISIBILITY =====
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && pollingSpeed === 'fast') {
+        setPollingSpeed('slow');
+    }
+});
+
 
 // ==================================================
 // LÓGICA DE NOTIFICAÇÕES (Estilo YouTube)
