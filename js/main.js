@@ -285,6 +285,7 @@ function criarAgendamentoManual() {
             carregarTodosAgendamentos();
             carregarProximosAgendamentos();
             carregarEstatisticas();
+            verificarNotificacoes();
         }
     })
     .catch(error => {
@@ -593,59 +594,68 @@ function initializeLoginForms() {
         });
     }
 
-    
-// Login Submit
-const loginForm = document.getElementById('login-form');
-if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const btn = this.querySelector('button[type="submit"]');
-        const textoOriginal = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-        btn.disabled = true;
-        
-        const formData = new FormData(this);
-        
-        fetch('backend/login.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // ? SALVA TUDO NO LOCALSTORAGE
-                localStorage.setItem('user_id', data.user_id);
-                localStorage.setItem('user_nome', data.nome);
-                localStorage.setItem('user_tipo', data.tipo);
-                localStorage.setItem('user_slug', data.slug || '');
-                localStorage.setItem('user_foto', data.foto || ''); // Foto pode ser null
-                
-                alert(data.message);
-                closeModal('login');
-                
-                // ? ATUALIZA A INTERFACE
-                atualizarBotaoAuth();
-                showDashboard();
-                
-                // ? RECARREGA PARA APLICAR MUDAN�AS
-                setTimeout(() => location.reload(), 500);
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Erro de conex�o com o servidor.');
-        })
-        .finally(() => {
-            btn.innerHTML = textoOriginal;
-            btn.disabled = false;
+    // Login Submit
+    // Login Submit (COM DIAGNÓSTICO DE ERRO)
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Feedback visual no botão
+            const btn = this.querySelector('button[type="submit"]');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            btn.disabled = true;
+            
+            const formData = new FormData(this);
+            
+            fetch('backend/login.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text()) // 1. Pega como TEXTO primeiro (para ver o erro)
+            .then(text => {
+                console.log("Resposta crua do PHP:", text); // Mostra no Console (F12)
+
+                try {
+                    // 2. Tenta transformar em JSON
+                    const data = JSON.parse(text);
+                    
+                    if (data.success) {
+                        // Sucesso! Salva os dados
+                        localStorage.setItem('user_id', data.user_id);
+                        localStorage.setItem('user_nome', data.nome);
+                        localStorage.setItem('user_tipo', data.tipo);
+                        localStorage.setItem('user_slug', data.slug);
+                        localStorage.setItem('user_foto', data.foto || ''); // Salva a foto se tiver
+
+                        alert(data.message);
+                        closeModal('login');
+                        atualizarBotaoAuth();
+                        showDashboard();
+                        
+                        // Recarrega para aplicar as mudanças visuais
+                        setTimeout(() => location.reload(), 500);
+                    } else {
+                        alert(data.message); // Senha errada ou usuário não encontrado
+                    }
+                } catch (erroJson) {
+                    // 3. SE DER ERRO AQUI, O PHP QUEBROU
+                    // Mostra o erro real na tela
+                    alert("ERRO FATAL NO PHP:\n----------------\n" + text.substring(0, 400));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Erro de conexão com o servidor (404 ou Rede).');
+            })
+            .finally(() => {
+                // Restaura o botão
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            });
         });
-    });
-}
-
-
+    }
 
     // Register Submit
     const registerForm = document.getElementById('register-form');
@@ -713,96 +723,90 @@ function solicitarRecuperacaoSenha() {
     .catch(error => alert('Erro ao conectar ao servidor.'));
 }
 
-
 function atualizarBotaoAuth() {
     const userId = localStorage.getItem('user_id');
     const nome = localStorage.getItem('user_nome');
-    const foto = localStorage.getItem('user_foto');
     
-    // Elementos do SISTEMA NOVO (com avatar)
     const guestNav = document.getElementById('guest-nav');
     const userNav = document.getElementById('user-nav');
     const userInitials = document.getElementById('user-initials');
     const profileName = document.getElementById('profile-name');
-    const userAvatar = document.querySelector('.user-avatar');
-    const bell = document.getElementById('notification-bell');
-
-    // Elemento do SISTEMA ANTIGO (bot�o simples) - mant�m compatibilidade
-    const btnAuth = document.getElementById('btn-auth');
 
     if (userId) {
-        // ========================================
-        // USU�RIO LOGADO
-        // ========================================
+        // LOGADO
+        if(guestNav) guestNav.style.display = 'none';
+        if(userNav) userNav.style.display = 'flex'; // Flex garante que fiquem lado a lado
         
-        // SISTEMA NOVO: Esconde guest-nav e mostra user-nav
-        if (guestNav) guestNav.style.display = 'none';
-        if (userNav) userNav.style.display = 'flex';
-        
-        // Atualiza nome e iniciais
+        // Coloca Iniciais e Nome
         if (nome) {
             const initials = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-            if (userInitials) userInitials.textContent = initials;
-            if (profileName) profileName.textContent = nome;
+            if(userInitials) userInitials.textContent = initials;
+            if(profileName) profileName.textContent = nome;
         }
-        
-        // Atualiza foto de perfil
-        if (userAvatar) {
-            if (foto && foto !== 'null' && foto !== '' && foto !== 'undefined') {
-                // Tem foto: mostra a imagem
-                userAvatar.style.backgroundImage = `url('${foto}')`;
-                userAvatar.style.backgroundSize = 'cover';
-                userAvatar.style.backgroundPosition = 'center';
-                if (userInitials) userInitials.style.display = 'none'; // Esconde iniciais
-            } else {
-                // Sem foto: mostra iniciais
-                userAvatar.style.backgroundImage = 'none';
-                if (userInitials) userInitials.style.display = 'flex'; // Mostra iniciais
-            }
-        }
-        
-        // Mostra sino de notifica��es se for barbeiro
-        if (localStorage.getItem('user_tipo') === 'barbeiro') {
-            if (bell) {
-                bell.style.display = 'block';
-                // Inicia monitoramento (se a fun��o existir)
-                if (typeof iniciarSistemaNotificacao === 'function') {
-                    iniciarSistemaNotificacao();
-                }
-            }
-        } else {
-            if (bell) bell.style.display = 'none';
-        }
-        
-        // SISTEMA ANTIGO: Atualiza bot�o (compatibilidade)
-        if (btnAuth) {
-            btnAuth.innerHTML = `<i class="fas fa-user"></i> ${nome.split(' ')[0]} | Sair`;
-            btnAuth.onclick = fazerLogout;
-        }
-        
-        console.log('? Usu�rio autenticado:', nome);
-        
     } else {
-        // ========================================
-        // USU�RIO DESLOGADO
-        // ========================================
-        
-        // SISTEMA NOVO: Mostra guest-nav e esconde user-nav
-        if (guestNav) guestNav.style.display = 'flex';
-        if (userNav) userNav.style.display = 'none';
-        
-        // Esconde sino
-        if (bell) bell.style.display = 'none';
-        
-        // SISTEMA ANTIGO: Atualiza bot�o (compatibilidade)
-        if (btnAuth) {
-            btnAuth.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-            btnAuth.onclick = showLogin;
-        }
-        
-        console.log('? Usu�rio n�o autenticado');
+        // DESLOGADO
+        if(guestNav) guestNav.style.display = 'flex';
+        if(userNav) userNav.style.display = 'none';
     }
 }
+
+// Abre/Fecha menu de perfil
+function toggleProfileDropdown() {
+    const dd = document.getElementById('profile-dropdown');
+    if(dd) dd.classList.toggle('active');
+}
+
+// Função de Logout
+function fazerLogout() {
+    if (confirm('Sair do sistema?')) {
+        localStorage.clear();
+        window.location.hash = '';
+        location.reload();
+    }
+}
+
+// Fecha ao clicar fora
+window.addEventListener('click', function(e) {
+    const pWrapper = document.querySelector('.profile-wrapper');
+    const pDd = document.getElementById('profile-dropdown');
+    
+    // Se o clique não foi no avatar nem no menu, fecha
+    if (pDd && pWrapper && !pWrapper.contains(e.target)) {
+        pDd.classList.remove('active');
+    }
+});
+
+// Abre/Fecha menu de perfil
+function toggleProfileDropdown() {
+    const dd = document.getElementById('profile-dropdown');
+    if(dd) dd.classList.toggle('active');
+}
+
+// Função de Logout (Atualizada para usar a nova lógica)
+function fazerLogout() {
+    if (confirm('Deseja realmente sair?')) {
+        localStorage.clear();
+        window.location.hash = '';
+        location.reload(); // Recarrega para limpar tudo
+    }
+}
+
+// Fecha dropdowns se clicar fora
+window.addEventListener('click', function(e) {
+    // Fecha Perfil
+    const profileWrapper = document.querySelector('.profile-wrapper');
+    const profileDd = document.getElementById('profile-dropdown');
+    if (profileDd && profileWrapper && !profileWrapper.contains(e.target)) {
+        profileDd.classList.remove('active');
+    }
+    
+    // Fecha Notificações (Já existia, mas reforçando)
+    const notifWrapper = document.getElementById('notification-bell');
+    const notifDd = document.getElementById('notification-dropdown');
+    if (notifDd && notifWrapper && !notifWrapper.contains(e.target)) {
+        notifDd.classList.remove('active');
+    }
+});
 
 function handleAuthButton() {
     const userId = localStorage.getItem('user_id');
@@ -1313,22 +1317,45 @@ function carregarConfiguracoesHorario() {
 }
 
 // ==================================================
-// SISTEMA DE NOTIFICAÇÕES E WHATSAPP
+// SISTEMA DE NOTIFICAÇÕES (MOBILE OPTIMIZED)
 // ==================================================
 
-let ultimoTotalPendentes = 0; // Memória do total anterior
+// Variável global para controlar se o número aumentou
+let ultimoTotalPendentes = 0;
+
+// 1. TRUQUE PARA DESTRAVAR ÁUDIO NO IPHONE/ANDROID
+// O som só toca se o usuário já tiver clicado na tela pelo menos uma vez.
+function unlockAudio() {
+    const audio = document.getElementById('notification-sound');
+    if (audio) {
+        // Toca e pausa imediatamente só para o navegador liberar o recurso
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(() => {}); // Ignora erros se já estiver tocando
+    }
+    // Remove os ouvintes para não ficar rodando a cada clique
+    document.removeEventListener('click', unlockAudio);
+    document.removeEventListener('touchstart', unlockAudio);
+}
+
+// Adiciona os ouvintes no documento todo
+document.addEventListener('click', unlockAudio);
+document.addEventListener('touchstart', unlockAudio);
+
 
 function iniciarSistemaNotificacao() {
     // Só roda se for barbeiro logado
     if (localStorage.getItem('user_id') && localStorage.getItem('user_tipo') === 'barbeiro') {
         const bell = document.getElementById('notification-bell');
-        if(bell) bell.style.display = 'flex'; // Flex para alinhar badge e ícone
+        // Usamos 'block' ou deixamos o CSS controlar via classe, 'flex' as vezes quebra no mobile dependendo do CSS pai
+        if(bell) bell.style.display = 'block'; 
         
         verificarNotificacoes();
         setInterval(verificarNotificacoes, 10000); // 10 segundos
     } else {
-        // Esconde se não estiver logado (segurança extra)
-        document.getElementById('notification-bell').style.display = 'none';
+        const bell = document.getElementById('notification-bell');
+        if(bell) bell.style.display = 'none';
     }
 }
 
@@ -1341,38 +1368,66 @@ function verificarNotificacoes() {
     .then(data => {
         const totalAtual = parseInt(data.total);
         const badge = document.getElementById('notification-badge');
-        const bellIcon = document.querySelector('#notification-bell i');
+        const bellIcon = document.querySelector('#notification-bell i'); // Seleciona o ícone dentro da div
         const audio = document.getElementById('notification-sound');
         
+        // Atualiza a bolinha vermelha
         if (totalAtual > 0) {
-            badge.style.display = 'flex'; // Garante que aparece
-            badge.innerText = totalAtual;
-            bellIcon.classList.add('fa-shake');
+            if(badge) {
+                badge.style.display = 'flex'; // Flex centraliza o número
+                badge.innerText = totalAtual > 9 ? '9+' : totalAtual;
+            }
+            // Adiciona animação de balançar se tiver ícone
+            if(bellIcon) bellIcon.classList.add('fa-shake');
         } else {
-            badge.style.display = 'none';
-            bellIcon.classList.remove('fa-shake');
+            if(badge) badge.style.display = 'none';
+            if(bellIcon) bellIcon.classList.remove('fa-shake');
         }
 
-        // TOCA O SOM SE O NÚMERO AUMENTOU
+        // LÓGICA DE TOCAR O SOM
+        // Se o número aumentou (ex: de 0 pra 1, ou de 1 pra 2)
         if (totalAtual > ultimoTotalPendentes) {
+            console.log(`🔔 Nova notificação detectada! (Total: ${totalAtual})`);
+            
             if(audio) {
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log("Som bloqueado (falta interação)"));
+                audio.volume = 1.0; // Garante volume máximo
+                audio.currentTime = 0; // Rebobina
+                
+                // Tenta tocar (promessa para tratar erro de bloqueio)
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        console.log("🔊 Som tocou com sucesso.");
+                    })
+                    .catch(error => {
+                        console.warn("🔇 O navegador bloqueou o som. O usuário precisa interagir com a página primeiro.");
+                    });
+                }
+            }
+
+            // Vibra o celular (Android) - Padrão: Vibra, Pausa, Vibra
+            if (navigator.vibrate) {
+                try { navigator.vibrate([200, 100, 200]); } catch(e){}
             }
         }
 
+        // Atualiza a memória
         ultimoTotalPendentes = totalAtual;
     })
-    .catch(err => console.log("Erro polling"));
+    .catch(err => console.log("Erro polling notificações", err));
 }
 
 function verPendentes() {
     showSection('appointments');
-    const filtro = document.getElementById('filter-status');
-    if(filtro) {
-        filtro.value = 'pendente';
-        carregarTodosAgendamentos();
-    }
+    // Pequeno delay para garantir que a div da lista carregou antes de filtrar
+    setTimeout(() => {
+        const filtro = document.getElementById('filter-status');
+        if(filtro) {
+            filtro.value = 'pendente';
+            carregarTodosAgendamentos();
+        }
+    }, 100);
 }
 
 // ===== EDIÇÃO E EXCLUSÃO DE SERVIÇOS =====
@@ -1407,20 +1462,15 @@ function excluirServico(id) {
     }
 }
 
-// ========================================
-// WHATSAPP - COM FEEDBACK VISUAL MELHORADO
-// ========================================
+// ==================================================
+// SISTEMA DE WHATSAPP AUTOMÁTICO
+// ==================================================
 
 let whatsappStatusInterval = null;
-let pollingSpeed = 'slow';
-let isConnecting = false;
 
 function iniciarMonitoramentoWhatsApp() {
-    console.log("🔌 Iniciando monitoramento WhatsApp...");
+    whatsappStatusInterval = setInterval(verificarStatusWhatsApp, 3000);
     verificarStatusWhatsApp();
-    
-    if (whatsappStatusInterval) clearInterval(whatsappStatusInterval);
-    whatsappStatusInterval = setInterval(verificarStatusWhatsApp, 10000);
 }
 
 function pararMonitoramentoWhatsApp() {
@@ -1430,30 +1480,11 @@ function pararMonitoramentoWhatsApp() {
     }
 }
 
-function setPollingSpeed(speed) {
-    pollingSpeed = speed;
-    
-    if (whatsappStatusInterval) {
-        clearInterval(whatsappStatusInterval);
-    }
-    
-    const interval = speed === 'fast' ? 3000 : 10000;
-    whatsappStatusInterval = setInterval(verificarStatusWhatsApp, interval);
-    console.log(`⏱️ Polling ajustado para: ${interval}ms`);
-}
-
 function verificarStatusWhatsApp() {
-    const barbeiroId = localStorage.getItem('user_id');
-    if (!barbeiroId) return;
-    
-    fetch(`backend/whatsapp_config.php?action=status&barbeiro_id=${barbeiroId}`)
+    fetch('backend/whatsapp_config.php?action=status')
     .then(res => res.json())
     .then(data => {
-        console.log('📊 Status WhatsApp:', data);
-        
         const indicator = document.getElementById('whatsapp-status-indicator');
-        if (!indicator) return;
-        
         const dot = indicator.querySelector('.status-dot');
         const text = indicator.querySelector('.status-text');
         
@@ -1462,246 +1493,81 @@ function verificarStatusWhatsApp() {
         const connected = document.getElementById('whatsapp-connected');
         const disconnected = document.getElementById('whatsapp-disconnected');
         
-        [qrDisplay, connecting, connected, disconnected].forEach(el => {
-            if (el) el.style.display = 'none';
-        });
+        const btnConnect = document.getElementById('btn-connect-whatsapp');
+        const btnDisconnect = document.getElementById('btn-disconnect-whatsapp');
+        
+        qrDisplay.style.display = 'none';
+        connecting.style.display = 'none';
+        connected.style.display = 'none';
+        disconnected.style.display = 'none';
         
         if (data.connected) {
-            console.log('✅ WhatsApp conectado!');
             dot.style.background = '#25D366';
             text.textContent = 'Conectado';
             text.style.color = '#25D366';
-            if (connected) connected.style.display = 'block';
-            
-            document.getElementById('btn-connect-whatsapp').style.display = 'none';
-            document.getElementById('btn-disconnect-whatsapp').style.display = 'inline-flex';
-            
-            isConnecting = false;
-            
-            if (pollingSpeed === 'fast') {
-                setPollingSpeed('slow');
-            }
+            connected.style.display = 'block';
+            btnConnect.style.display = 'none';
+            btnDisconnect.style.display = 'inline-flex';
             
         } else if (data.status === 'qr_ready' && data.qrCode) {
-            console.log('📱 QR Code disponível!');
             dot.style.background = '#FFA500';
-            text.textContent = 'Escaneie o QR Code';
+            text.textContent = 'Aguardando escaneamento';
             text.style.color = '#FFA500';
-	    if (connecting) connecting.style.display = 'none';
-
+            qrDisplay.style.display = 'block';
+            document.getElementById('qr-code-image').src = data.qrCode;
+            btnConnect.style.display = 'none';
+            btnDisconnect.style.display = 'inline-flex';
             
-            if (qrDisplay) {
-                qrDisplay.style.display = 'block';
-                const qrImg = document.getElementById('qr-code-image');
-                if (qrImg) {
-                    qrImg.src = data.qrCode;
-                }
-            }
-            
-            document.getElementById('btn-connect-whatsapp').style.display = 'none';
-            document.getElementById('btn-disconnect-whatsapp').style.display = 'inline-flex';
-            
-            isConnecting = false;
-            
-            if (pollingSpeed !== 'fast') {
-                setPollingSpeed('fast');
-            }
-            
-        } else if (data.status === 'connecting' || data.status === 'authenticated') {
-            console.log('⏳ Conectando WhatsApp...');
+        } else if (data.status === 'connecting' || data.status === 'reconnecting') {
             dot.style.background = '#FFA500';
             text.textContent = 'Conectando...';
             text.style.color = '#FFA500';
-            
-            if (connecting) connecting.style.display = 'block';
-            
-            document.getElementById('btn-connect-whatsapp').style.display = 'none';
-            document.getElementById('btn-disconnect-whatsapp').style.display = 'inline-flex';
-            
-            if (pollingSpeed !== 'fast') {
-                setPollingSpeed('fast');
-            }
-            
-	} else if (data.status === 'timeout') {
-    console.log('?? Timeout - QR Code expirado');
-    dot.style.background = '#e74c3c';
-    text.textContent = 'QR Code Expirado';
-    text.style.color = '#e74c3c';
-    
-    if (disconnected) {
-        disconnected.style.display = 'block';
-        disconnected.innerHTML = `
-            <i class="fas fa-clock" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
-            <p style="color: #e74c3c; font-weight: bold;">Tempo Esgotado</p>
-            <p style="color: #666; font-size: 0.9rem;">O QR Code expirou. Clique em "Conectar WhatsApp" novamente.</p>
-        `;
-    }
-    
-    [qrDisplay, connecting, connected].forEach(el => {
-        if (el) el.style.display = 'none';
-    });
-    
-    document.getElementById('btn-connect-whatsapp').style.display = 'inline-flex';
-    document.getElementById('btn-disconnect-whatsapp').style.display = 'none';
-    
-    isConnecting = false;
-    setPollingSpeed('slow');
-
-        } else if (data.status === 'no_session') {
-            console.log('🆕 Nenhuma sessão encontrada');
-            dot.style.background = '#999';
-            text.textContent = 'Não configurado';
-            text.style.color = '#666';
-            
-            if (disconnected) {
-                disconnected.style.display = 'block';
-                disconnected.innerHTML = `
-                    <i class="fab fa-whatsapp" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
-                    <p style="color: #666; margin-bottom: 0;">WhatsApp não está conectado</p>
-                    <p style="color: #999; font-size: 0.85rem; margin-top: 0.5rem;">Clique no botão abaixo para conectar</p>
-                `;
-            }
-            
-            document.getElementById('btn-connect-whatsapp').style.display = 'inline-flex';
-            document.getElementById('btn-disconnect-whatsapp').style.display = 'none';
-            
-            isConnecting = false;
+            connecting.style.display = 'block';
+            btnConnect.style.display = 'none';
+            btnDisconnect.style.display = 'inline-flex';
             
         } else {
-            console.log('⚪ WhatsApp desconectado');
             dot.style.background = '#ccc';
             text.textContent = 'Desconectado';
             text.style.color = '#666';
-            
-            if (disconnected) disconnected.style.display = 'block';
-            
-            document.getElementById('btn-connect-whatsapp').style.display = 'inline-flex';
-            document.getElementById('btn-disconnect-whatsapp').style.display = 'none';
-            
-            isConnecting = false;
-            
-            if (pollingSpeed === 'fast') {
-                setPollingSpeed('slow');
-            }
+            disconnected.style.display = 'block';
+            btnConnect.style.display = 'inline-flex';
+            btnDisconnect.style.display = 'none';
         }
     })
     .catch(err => {
-        console.error('❌ Erro ao verificar status WhatsApp:', err);
-        
-        const disconnected = document.getElementById('whatsapp-disconnected');
-        if (disconnected) {
-            disconnected.style.display = 'block';
-            disconnected.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
-                <p style="color: #e74c3c; font-weight: bold;">Erro de Comunicação</p>
-                <p style="color: #666; font-size: 0.85rem;">Não foi possível conectar com o servidor WhatsApp.</p>
-            `;
-        }
-        
-        isConnecting = false;
+        console.error('Erro ao verificar status WhatsApp:', err);
     });
 }
 
 function conectarWhatsApp() {
-    if (isConnecting) {
-    console.log('?? J� est� conectando... aguarde');
-    return; // ?? Sem alert - apenas ignora
-}    
-    isConnecting = true;
+    const formData = new FormData();
+    formData.append('action', 'connect');
     
-    const btnConnect = document.getElementById('btn-connect-whatsapp');
-    const originalText = btnConnect.innerHTML;
-    
-    btnConnect.disabled = true;
-    btnConnect.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
-    
-    const connecting = document.getElementById('whatsapp-connecting');
-    const disconnected = document.getElementById('whatsapp-disconnected');
-    const qrDisplay = document.getElementById('qr-code-display');
-    
-    if (disconnected) disconnected.style.display = 'none';
-    if (qrDisplay) qrDisplay.style.display = 'none';
-    
-    if (connecting) {
-        connecting.style.display = 'block';
-        connecting.innerHTML = `
-            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #FFA500; margin-bottom: 1rem;"></i>
-            <p style="font-weight: bold; color: #333;">Iniciando conexão WhatsApp...</p>
-            <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Aguarde alguns segundos</p>
-        `;
-    }
-    
-    const dot = document.querySelector('#whatsapp-status-indicator .status-dot');
-    const text = document.querySelector('#whatsapp-status-indicator .status-text');
-    if (dot) dot.style.background = '#FFA500';
-    if (text) {
-        text.textContent = 'Iniciando...';
-        text.style.color = '#FFA500';
-    }
-    
-   const barbeiroId = localStorage.getItem('user_id');
-if (!barbeiroId) {
-    alert('Erro: Fa�a login primeiro');
-    return;
-}
-
-const formData = new FormData();
-formData.append('action', 'connect');
-formData.append('barbeiro_id', barbeiroId);
-
-fetch('backend/whatsapp_config.php', {
+    fetch('backend/whatsapp_config.php', {
         method: 'POST',
         body: formData
     })
     .then(res => res.json())
     .then(data => {
-        console.log('📡 Resposta da conexão:', data);
-        
         if (data.success) {
-            console.log('✅ Conexão iniciada com sucesso!');
-            
-            setPollingSpeed('fast');
-            
-            if (connecting) {
-                connecting.innerHTML = `
-                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #25D366; margin-bottom: 1rem;"></i>
-                    <p style="font-weight: bold; color: #25D366;">Gerando QR Code...</p>
-                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Isso pode levar at� 60 segundos</p>
-                `;
-            }
-            
-            setTimeout(verificarStatusWhatsApp, 1000);
-            setTimeout(verificarStatusWhatsApp, 3000);
-            setTimeout(verificarStatusWhatsApp, 6000);
-            setTimeout(verificarStatusWhatsApp, 10000);
-            setTimeout(verificarStatusWhatsApp, 15000);
-            
+            iniciarMonitoramentoWhatsApp();
         } else {
-            console.error('❌ Erro ao conectar:', data.message);
             alert('Erro ao conectar: ' + data.message);
-            isConnecting = false;
-            verificarStatusWhatsApp();
         }
     })
     .catch(err => {
-        console.error('❌ Erro de rede:', err);
-        alert('Erro ao conectar. Verifique se o servidor WhatsApp está rodando.');
-        isConnecting = false;
-        verificarStatusWhatsApp();
-    })
-    .finally(() => {
-        btnConnect.disabled = false;
-        btnConnect.innerHTML = originalText;
+        alert('Erro: Certifique-se de que o servidor Node.js está rodando!\n\nExecute: npm start');
+        console.error(err);
     });
 }
 
 function desconectarWhatsApp() {
     if (!confirm('Deseja realmente desconectar o WhatsApp?')) return;
     
-    const barbeiroId = localStorage.getItem('user_id');
     const formData = new FormData();
     formData.append('action', 'disconnect');
-    formData.append('barbeiro_id', barbeiroId);    
+    
     fetch('backend/whatsapp_config.php', {
         method: 'POST',
         body: formData
@@ -1709,35 +1575,24 @@ function desconectarWhatsApp() {
     .then(res => res.json())
     .then(data => {
         alert(data.message);
-        isConnecting = false;
+        pararMonitoramentoWhatsApp();
         verificarStatusWhatsApp();
-        setPollingSpeed('slow');
     });
 }
 
-    function resetarWhatsApp() {
-    if (!confirm('Isso ir� limpar a sess�o do WhatsApp.\n\nVoc� precisar� escanear o QR Code novamente.\n\nContinuar?')) {
-        return;
-    }
+function enviarWhatsAppAutomatico(telefone, nomeCliente, data, hora) {
+    const mensagem = `Olá *${nomeCliente}*! 👋💈\n\nPassando para confirmar seu horário na Barbearia da Nay.\n\n📅 *Data:* ${data}\n⏰ *Horário:* ${hora}\n\nEstá tudo certo! Te aguardo.`;
     
-    const barbeiroId = localStorage.getItem('user_id');
     const formData = new FormData();
-    formData.append('action', 'reset');
-    formData.append('barbeiro_id', barbeiroId);
-    fetch('backend/whatsapp_config.php', {
+    formData.append('action', 'send');
+    formData.append('telefone', telefone);
+    formData.append('mensagem', mensagem);
+    
+    return fetch('backend/whatsapp_config.php', {
         method: 'POST',
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        isConnecting = false;
-        verificarStatusWhatsApp();
-    })
-    .catch(err => {
-        alert('Erro ao resetar sessão');
-        console.error(err);
-    });
+    .then(res => res.json());
 }
 
 function testarMensagemWhatsApp() {
@@ -1751,19 +1606,7 @@ function testarMensagemWhatsApp() {
     const dataFormatada = hoje.toLocaleDateString('pt-BR');
     const horaFormatada = hoje.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     
-    const mensagem = `Olá *${nome}*! 👋\n\nEsta é uma mensagem de teste do ClickAgenda.\n\n📅 ${dataFormatada}\n⏰ ${horaFormatada}`;
-    
-    const barbeiroId = localStorage.getItem('user_id');
-const formData = new FormData();
-formData.append('action', 'send');
-formData.append('barbeiro_id', barbeiroId);
-formData.append('telefone', telefone);
-formData.append('mensagem', mensagem);    
-    fetch('backend/whatsapp_config.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
+    enviarWhatsAppAutomatico(telefone, nome, dataFormatada, horaFormatada)
     .then(data => {
         if (data.success) {
             alert('✅ Mensagem de teste enviada com sucesso!');
@@ -1777,37 +1620,434 @@ formData.append('mensagem', mensagem);
     });
 }
 
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes loading {
-        0% { transform: translateX(-100%); }
-        50% { transform: translateX(200%); }
-        100% { transform: translateX(-100%); }
-    }
-`;
-document.head.appendChild(style);
+// ==================================================
+// LÓGICA DE NOTIFICAÇÕES (Estilo YouTube)
+// ==================================================
 
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden && pollingSpeed === 'fast') {
-        setPollingSpeed('slow');
+// 1. Alternar (Abrir/Fechar) o Painel
+function toggleNotificationDropdown(event) {
+    if (event) {
+        event.stopPropagation(); // Impede que o clique feche o menu instantaneamente
+        event.preventDefault();
+    }
+
+    const dropdown = document.getElementById('notification-dropdown');
+    if (!dropdown) return;
+
+    // Alterna classe 'active'
+    dropdown.classList.toggle('active');
+
+    // Se abriu, carrega a lista atualizada
+    if (dropdown.classList.contains('active')) {
+        carregarListaNotificacoes();
+        
+        // Fecha o menu de perfil se estiver aberto (para não sobrepor)
+        const profileDd = document.getElementById('profile-dropdown');
+        if(profileDd) profileDd.classList.remove('active');
+    }
+}
+
+// 2. Buscar dados e montar o HTML
+function carregarListaNotificacoes() {
+    const listContent = document.getElementById('notif-list-content');
+    if (!listContent) return;
+
+    // Loading state
+    listContent.innerHTML = '<div style="padding:20px; text-align:center; color:#666;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+
+    fetch('backend/listar_notificacoes.php')
+        .then(res => res.json())
+        .then(data => {
+            listContent.innerHTML = ''; // Limpa loading
+
+            if (data.success && data.notificacoes.length > 0) {
+                data.notificacoes.forEach(notif => {
+                    const item = document.createElement('div');
+                    item.className = 'notif-item';
+                    
+                    // Ao clicar no item, vai para a agenda
+                    item.onclick = function() {
+                        verPendentes();
+                        document.getElementById('notification-dropdown').classList.remove('active');
+                    };
+
+                    item.innerHTML = `
+                        <div class="notif-icon-circle">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="notif-content">
+                            <span class="notif-title">${notif.cliente_nome}</span>
+                            <span class="notif-subtitle">Solicitou: <strong>${notif.nome_servico}</strong></span>
+                            <span class="notif-time">
+                                <i class="far fa-clock"></i> ${notif.data_formatada} às ${notif.hora_formatada}
+                            </span>
+                        </div>
+                    `;
+                    listContent.appendChild(item);
+                });
+            } else {
+                listContent.innerHTML = `
+                    <div class="notif-empty">
+                        <i class="far fa-bell-slash" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>Tudo limpo! Nenhuma notificação.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            listContent.innerHTML = '<div class="notif-empty">Erro ao carregar.</div>';
+        });
+}
+
+// 3. Fechar ao clicar fora (Listener Global)
+window.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('notification-dropdown');
+    const bell = document.getElementById('notification-bell');
+
+    if (dropdown && bell) {
+        // Se o clique NÃO foi no dropdown E NÃO foi no sino
+        if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+            dropdown.classList.remove('active');
+        }
     }
 });
 
+// ==================================================
+// GERENCIAMENTO DE PERFIL E SENHA
+// ==================================================
+
+// Carrega os dados do banco para preencher os inputs
+function carregarDadosPerfil() {
+    fetch('backend/obter_perfil.php')
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // 1. Preenche os campos de texto
+            document.getElementById('perfil-nome').value = data.dados.nome;
+            document.getElementById('perfil-email').value = data.dados.email;
+            document.getElementById('perfil-telefone').value = data.dados.telefone || '';
+
+            // 2. Lógica das Iniciais
+            const nome = data.dados.nome;
+            let iniciais = "US"; // Padrão se der erro
+            
+            if (nome) {
+                // Pega as duas primeiras letras e deixa maiúsculo
+                iniciais = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            }
+
+            // 3. Atualiza a Bolinha Grande
+            const previewContainer = document.getElementById('settings-profile-preview');
+            const fotoSalva = localStorage.getItem('user_foto');
+            
+            // Se tiver foto, mostra a foto. Se não, mostra as iniciais.
+            if (fotoSalva && fotoSalva !== 'null' && fotoSalva !== '') {
+                 previewContainer.innerHTML = `<img src="${fotoSalva}" alt="Foto">`;
+            } else {
+                // AQUI ESTÁ A MÁGICA: Força o HTML das iniciais com a cor certa
+                previewContainer.innerHTML = `<span id="settings-profile-initials" style="font-size: 2.5rem; font-weight: bold; color: #1a1a2e;">${iniciais}</span>`;
+                
+                // Garante que o fundo fique dourado (igual ao de cima)
+                previewContainer.style.backgroundColor = "#d4af37";
+            }
+        }
+    });
+}
+
+// Listener para Salvar Perfil
+const formPerfil = document.getElementById('form-perfil');
+if (formPerfil) {
+    formPerfil.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(this);
+        
+        fetch('backend/atualizar_perfil.php', { method: 'POST', body: fd })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                // Atualiza o nome no menu e no localStorage
+                localStorage.setItem('user_nome', fd.get('nome'));
+                atualizarBotaoAuth(); 
+            }
+        });
+    });
+}
+
+// Listener para Alterar Senha
+const formSenha = document.getElementById('form-senha');
+if (formSenha) {
+    formSenha.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(this);
+        
+        fetch('backend/alterar_senha.php', { method: 'POST', body: fd })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                formSenha.reset();
+            }
+        });
+    });
+}
+
+// ==================================================
+// UPLOAD DE FOTO DE PERFIL
+// ==================================================
+
+const fotoInput = document.getElementById('upload-foto-input');
+
+if (fotoInput) {
+    fotoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // 1. Validações básicas no frontend
+        const extensoesValidas = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!extensoesValidas.includes(file.type)) {
+            alert('Por favor, selecione uma imagem JPG ou PNG.');
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) { // 2MB
+            alert('A imagem é muito grande. O máximo é 2MB.');
+            return;
+        }
+
+        // 2. Mostra Feedback Visual (Carregando...)
+        const statusText = document.getElementById('upload-status-text');
+        const btn = fotoInput.nextElementSibling; // O botão "Alterar Foto"
+        const textoOriginalBtn = btn.innerHTML;
+        
+        statusText.textContent = 'Enviando... Aguarde.';
+        statusText.style.color = 'var(--primary)';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        btn.disabled = true;
+
+        // 3. Prepara e envia o formulário
+        const formData = new FormData();
+        formData.append('foto_perfil', file);
+
+        fetch('backend/upload_foto_perfil.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // SUCESSO
+                statusText.textContent = '✅ Foto atualizada com sucesso!';
+                statusText.style.color = '#27ae60';
+                
+                // Salva no localStorage para carregar rápido depois
+                localStorage.setItem('user_foto', data.caminho);
+                
+                // Atualiza a foto em todos os lugares
+                atualizarFotoEmTodaPagina(data.caminho);
+
+            } else {
+                // ERRO DO BACKEND
+                statusText.textContent = '❌ Erro: ' + data.message;
+                statusText.style.color = '#e74c3c';
+                alert(data.message);
+            }
+        })
+        .catch(err => {
+            // ERRO DE REDE
+            console.error(err);
+            statusText.textContent = '❌ Erro de conexão ao enviar.';
+            statusText.style.color = '#e74c3c';
+        })
+        .finally(() => {
+            // Restaura o botão
+            btn.innerHTML = textoOriginalBtn;
+            btn.disabled = false;
+            fotoInput.value = ''; // Limpa o input para poder selecionar a mesma foto se quiser
+        });
+    });
+}
+
+// Função auxiliar para atualizar a imagem no Header e nas Configurações
+function atualizarFotoEmTodaPagina(caminhoFoto) {
+    // 1. Atualiza no Header (Lá em cima, na barra de navegação)
+    const headerAvatar = document.querySelector('.user-avatar');
+    if (headerAvatar) {
+        if (caminhoFoto) {
+            // Se tem foto, coloca ela como imagem de fundo
+            headerAvatar.style.backgroundImage = `url('${caminhoFoto}')`;
+            headerAvatar.style.backgroundSize = 'cover';
+            headerAvatar.style.backgroundPosition = 'center';
+            headerAvatar.textContent = ''; // Esconde as iniciais
+        } else {
+            // Se não tem foto, reseta para mostrar as iniciais
+            headerAvatar.style.backgroundImage = 'none';
+            // O texto das iniciais é recolocado pela função atualizarBotaoAuth
+        }
+    }
+
+    // 2. Atualiza na Tela de Configurações (O preview grande)
+    const previewContainer = document.getElementById('settings-profile-preview');
+    if (previewContainer) {
+        if (caminhoFoto) {
+            previewContainer.innerHTML = `<img src="${caminhoFoto}" alt="Foto de Perfil">`;
+        } else {
+            const nome = localStorage.getItem('user_nome') || 'U S';
+            const iniciais = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            previewContainer.innerHTML = `<span id="settings-profile-initials">${iniciais}</span>`;
+        }
+    }
+}
+
+function removerFotoPerfil() {
+    if (!confirm("Tem certeza que deseja remover sua foto de perfil?")) return;
+
+    const btnRemove = document.querySelector('.btn-remove');
+    const originalHtml = btnRemove.innerHTML;
+    btnRemove.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    fetch('backend/remover_foto_perfil.php', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Limpa do LocalStorage
+            localStorage.removeItem('user_foto');
+            
+            // Atualiza a tela (passando null, ele gera as iniciais)
+            atualizarFotoEmTodaPagina(null);
+            
+            alert('Foto removida!');
+        } else {
+            alert('Erro: ' + data.message);
+        }
+    })
+    .catch(err => console.error(err))
+    .finally(() => {
+        btnRemove.innerHTML = originalHtml;
+    });
+}
+
 // ===== INICIALIZAÇÃO =====
 
+// ==================================================
+// INICIALIZAÇÃO E CORREÇÃO DO F5
+// ==================================================
+
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. Inicializa tudo o que já existia no seu código
     initializeForms();
     initializeLoginForms();
     initializeCalendar();
     initializeHamburgerMenu(); 
     initializeServiceForm();
     
-    // Verifica login e notificações ao carregar
+    // 2. Verifica autenticação
+    const userId = localStorage.getItem('user_id');
     atualizarBotaoAuth();
-    const settingsSection = document.getElementById('settings-section');
-    if (settingsSection && !settingsSection.classList.contains('hidden')) {
-        iniciarMonitoramentoWhatsApp();
+
+    if (userId) {
+        // --- AQUI ESTÁ A CORREÇÃO DO F5 ---
+        // Se estiver logado, verifica o final do link (#dashboard, #clients) para abrir a tela certa
+        checkUrlHash(); 
+        
+        // Se for barbeiro, ativa o sino de notificações
+        if (localStorage.getItem('user_tipo') === 'barbeiro') {
+            const bell = document.getElementById('notification-bell');
+            if (bell) bell.style.display = 'block'; // ou 'flex'
+            // iniciarSistemaNotificacao(); // (Descomente se a função já existir no seu código)
+        }
+    } else {
+        // Se NÃO estiver logado, força a tela inicial limpa
+        window.location.hash = '';
+        showSectionInternal('home');
     }
 
     console.log('ClickAgenda inicializado com sucesso!');
 });
+
+// ==================================================
+// FUNÇÕES DE NAVEGAÇÃO (COPIE ISSO LOGO ABAIXO)
+// ==================================================
+
+// Ouve quando a URL muda (ex: quando você clica em voltar no navegador)
+window.addEventListener('hashchange', checkUrlHash);
+
+function checkUrlHash() {
+    // Pega o nome da seção da URL (tira o #)
+    const hash = window.location.hash.replace('#', '');
+    const userId = localStorage.getItem('user_id');
+
+    if (!userId) return; // Se não logado, ignora
+
+    // Roteador simples: define qual seção interna abrir
+    if (hash === 'dashboard' || hash === '' || hash === 'overview') {
+        showSectionInternal('overview');
+    } else if (hash === 'appointments') {
+        showSectionInternal('appointments');
+    } else if (hash === 'clients') {
+        showSectionInternal('clients');
+    } else if (hash === 'services') {
+        showSectionInternal('services');
+    } else if (hash === 'my-link') {
+        showSectionInternal('my-link');
+    } else if (hash === 'settings') {
+        showSectionInternal('settings');
+    }
+}
+
+// Função usada pelos botões do menu (onclick="showSection('clients')")
+function showSection(sectionName) {
+    window.location.hash = sectionName; // Muda a URL -> O 'hashchange' acima detecta e troca a tela
+}
+
+// Função que realmente esconde/mostra as divs
+function showSectionInternal(sectionId) {
+    // Se for 'home', esconde dashboard e mostra o site
+    if (sectionId === 'home') {
+        document.querySelector('.hero').classList.remove('hidden');
+        document.querySelector('.features').classList.remove('hidden');
+        document.getElementById('dashboard-barbeiro').classList.add('hidden');
+        return;
+    }
+
+    // Se for dashboard, esconde o site e mostra o painel
+    document.querySelector('.hero').classList.add('hidden');
+    document.querySelector('.features').classList.add('hidden');
+    document.getElementById('dashboard-barbeiro').classList.remove('hidden');
+
+    // Atualiza a cor do botão no menu lateral
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+        // Tenta achar o botão correspondente para marcar como ativo
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(sectionId)) {
+            item.classList.add('active');
+        }
+    });
+
+    // Esconde todas as seções internas
+    const sections = ['overview', 'appointments', 'clients', 'services', 'my-link', 'settings'];
+    sections.forEach(s => {
+        const el = document.getElementById(s + '-section');
+        if (el) el.classList.add('hidden');
+    });
+
+    // Mostra a seção alvo
+    const target = document.getElementById(sectionId + '-section');
+    if (target) {
+        target.classList.remove('hidden');
+    }
+
+if (sectionId === 'overview') carregarDadosDashboard();
+    if (sectionId === 'appointments') carregarTodosAgendamentos();
+    if (sectionId === 'clients') carregarClientes();
+    if (sectionId === 'services') carregarServicos();
+    if (sectionId === 'my-link') carregarLinkAgendamento();
+    
+    // ADICIONE ISSO:
+    if (sectionId === 'settings') {
+        // Carrega horários (se existir a função)
+        if(typeof carregarConfiguracoesHorario === 'function') carregarConfiguracoesHorario();
+        // Carrega dados do perfil
+        carregarDadosPerfil();
+    }
+}

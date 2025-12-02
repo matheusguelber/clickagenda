@@ -1,5 +1,4 @@
 <?php
-// Atualizar Status Agendamento - Multi-Sessao
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexao.php';
 
@@ -7,7 +6,7 @@ session_start();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
     http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+    echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
     exit;
 }
 
@@ -18,35 +17,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $status = $_POST['status'] ?? '';
         
         if (!$agendamento_id || !in_array($status, ['pendente', 'confirmado', 'cancelado'])) {
-            echo json_encode(['success' => false, 'message' => 'Dados invalidos']);
+            echo json_encode(['success' => false, 'message' => 'Dados inválidos.']);
             exit;
         }
         
+        // Verifica se pertence ao barbeiro
         $stmt = $pdo->prepare("SELECT id FROM agendamentos WHERE id = ? AND barbeiro_id = ?");
         $stmt->execute([$agendamento_id, $barbeiro_id]);
         
         if ($stmt->rowCount() === 0) {
-            echo json_encode(['success' => false, 'message' => 'Agendamento nao encontrado']);
+            echo json_encode(['success' => false, 'message' => 'Agendamento não encontrado.']);
             exit;
         }
         
+        // Atualiza o status no banco de dados
         $stmt = $pdo->prepare("UPDATE agendamentos SET status = ? WHERE id = ?");
         $stmt->execute([$status, $agendamento_id]);
         
+        // Preparar resposta
         $response = [
             'success' => true,
-            'message' => $status === 'confirmado' ? 'Agendamento confirmado!' : 'Status atualizado!',
+            'message' => $status === 'confirmado' ? 'Agendamento confirmado!' : 'Agendamento cancelado!',
             'whatsapp_sent' => false
         ];
         
-        if ($status === 'confirmado') {
-            $resultado = enviarWhatsAppConfirmacao($agendamento_id, $barbeiro_id, $pdo);
+        // Se for confirmado ou cancelado, envia WhatsApp automaticamente
+        if (in_array($status, ['confirmado', 'cancelado'])) {
+            $acao = $status; // 'confirmado' ou 'cancelado'
+            
+            // Chama a função que envia WhatsApp
+            $resultado = enviarWhatsAppAgendamento($agendamento_id, $acao, $pdo);
             
             if ($resultado['whatsapp_sent']) {
-                $response['message'] = 'Agendamento confirmado! Mensagem enviada via WhatsApp.';
+                $response['message'] .= ' ✅ Mensagem WhatsApp enviada!';
                 $response['whatsapp_sent'] = true;
             } else if (isset($resultado['whatsapp_error'])) {
-                $response['message'] = 'Agendamento confirmado! (WhatsApp: ' . $resultado['whatsapp_error'] . ')';
+                $response['message'] .= ' ⚠️ (WhatsApp indisponível no momento)';
                 $response['whatsapp_error'] = $resultado['whatsapp_error'];
             }
         }
@@ -59,8 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-function enviarWhatsAppConfirmacao($agendamento_id, $barbeiro_id, $pdo) {
+/**
+ * Envia mensagem WhatsApp para confirmação/cancelamento
+ */
+function enviarWhatsAppAgendamento($agendamento_id, $acao, $pdo) {
     try {
+        // Busca informações do agendamento
         $stmt = $pdo->prepare("
             SELECT 
                 a.cliente_nome,
@@ -79,41 +89,56 @@ function enviarWhatsAppConfirmacao($agendamento_id, $barbeiro_id, $pdo) {
         $agendamento = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$agendamento) {
-            return ['whatsapp_sent' => false, 'whatsapp_error' => 'Agendamento nao encontrado'];
+            return ['whatsapp_sent' => false, 'whatsapp_error' => 'Agendamento não encontrado'];
         }
 
+        // Formata datas
         $data_formatada = date('d/m/Y', strtotime($agendamento['data']));
         $hora_formatada = date('H:i', strtotime($agendamento['hora']));
         $preco_formatado = number_format($agendamento['preco'], 2, ',', '.');
 
-        $mensagem = "Ola *{$agendamento['cliente_nome']}*!\n\n";
-        $mensagem .= "Seu agendamento foi *CONFIRMADO*\n\n";
-        $mensagem .= "*Barbearia:* {$agendamento['barbeiro_nome']}\n";
-        $mensagem .= "*Servico:* {$agendamento['nome_servico']}\n";
-        $mensagem .= "*Data:* {$data_formatada}\n";
-        $mensagem .= "*Horario:* {$hora_formatada}\n";
-        $mensagem .= "*Valor:* R$ {$preco_formatado}\n\n";
-        $mensagem .= "Estamos te aguardando! Qualquer duvida, nos chame no WhatsApp.";
+        // Monta a mensagem
+        if ($acao === 'confirmado') {
+            $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋💈\n\n";
+            $mensagem .= "Seu agendamento foi *CONFIRMADO* ✅\n\n";
+            $mensagem .= "*Barbearia:* {$agendamento['barbeiro_nome']}\n";
+            $mensagem .= "*Serviço:* {$agendamento['nome_servico']}\n";
+            $mensagem .= "*📅 Data:* {$data_formatada}\n";
+            $mensagem .= "*⏰ Horário:* {$hora_formatada}\n";
+            $mensagem .= "*💰 Valor:* R$ {$preco_formatado}\n\n";
+            $mensagem .= "Estamos te aguardando! Qualquer dúvida, nos chame no WhatsApp. 😊";
+        } else {
+            $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋\n\n";
+            $mensagem .= "Seu agendamento foi *CANCELADO* ❌\n\n";
+            $mensagem .= "*Barbearia:* {$agendamento['barbeiro_nome']}\n";
+            $mensagem .= "*Serviço:* {$agendamento['nome_servico']}\n";
+            $mensagem .= "*📅 Data:* {$data_formatada}\n";
+            $mensagem .= "*⏰ Horário:* {$hora_formatada}\n\n";
+            $mensagem .= "Se deseja reagendar, acesse nosso link de agendamento ou nos chame no WhatsApp. 📞";
+        }
 
-        return enviarViaNodeServer($barbeiro_id, $agendamento['cliente_telefone'], $mensagem);
+        // Envia via Node.js server
+        return enviarViaNodeServer($agendamento['cliente_telefone'], $mensagem);
 
     } catch (Exception $e) {
         return ['whatsapp_sent' => false, 'whatsapp_error' => $e->getMessage()];
     }
 }
 
-function enviarViaNodeServer($barbeiro_id, $telefone, $mensagem) {
-    $nodeServer = 'http://168.138.133.246:3000';
+/**
+ * Envia mensagem via Node.js WhatsApp Server
+ */
+function enviarViaNodeServer($telefone, $mensagem) {
+    $nodeServer = 'http://localhost:3000';
     
     $dados = [
         'telefone' => $telefone,
         'mensagem' => $mensagem
     ];
 
-    $ch = curl_init($nodeServer . "/send/{$barbeiro_id}");
+    $ch = curl_init($nodeServer . '/send');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dados));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
@@ -124,11 +149,11 @@ function enviarViaNodeServer($barbeiro_id, $telefone, $mensagem) {
     curl_close($ch);
 
     if ($erro) {
-        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Erro de conexao'];
+        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Erro de conexão'];
     }
 
     if ($httpCode !== 200) {
-        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Servidor indisponivel'];
+        return ['whatsapp_sent' => false, 'whatsapp_error' => 'Servidor WhatsApp indisponível'];
     }
 
     $resultado = json_decode($response, true);
