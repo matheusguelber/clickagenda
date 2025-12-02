@@ -3852,3 +3852,96 @@ form .btn-secondary:hover {
     color: #d4af37;
 }
 
+/* ==================================================
+   DESIGN: PÁGINA DE SERVIÇOS
+   ================================================== */
+
+/* 1. O Cartão do Formulário */
+.service-form-wrapper {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 16px;
+    /* Sombra suave para destacar do fundo */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+    border: 1px solid #f0f0f0;
+    max-width: 700px;
+    margin: 0 auto; /* Centraliza na tela */
+    position: relative;
+}
+
+/* 2. A Grade de Serviços (Lista) */
+.services-grid {
+    display: grid;
+    /* PC: 3 colunas | Tablet: 2 colunas | Celular: 1 coluna */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* 3. O Card Individual de Serviço */
+.service-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Efeito ao passar o mouse no card */
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: #d4af37;
+}
+
+.service-card h4 {
+    margin: 0 0 5px 0;
+    color: #1a1a2e;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.service-price {
+    font-size: 1.5rem;
+    color: #d4af37;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.service-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+    font-size: 0.9rem;
+    background: #f9f9f9;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+/* Botão de Excluir (Lixeira discreta) */
+.btn-delete-service {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    border: 1px solid #ffecec;
+    color: #e74c3c;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-delete-service:hover {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+}
