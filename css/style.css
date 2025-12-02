@@ -3340,3 +3340,515 @@ form .btn-secondary:hover {
     color: #333 !important;
 }
 
+/* ==================================================
+   MELHORIA FINAL: BOTÃO NOVO AGENDAMENTO (MOBILE)
+   ================================================== */
+
+@media (max-width: 768px) {
+    
+    /* Esconde o texto do botão e transforma em bolinha flutuante */
+    #appointments-section .btn-primary {
+        position: fixed !important;
+        bottom: 25px !important;
+        right: 20px !important;
+        
+        width: 60px !important;
+        height: 60px !important;
+        border-radius: 50% !important;
+        
+        padding: 0 !important;
+        margin: 0 !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.6) !important;
+        z-index: 1000 !important;
+        
+        /* Esconde o texto "Novo Agendamento" e deixa só o ícone */
+        font-size: 0 !important; 
+    }
+
+    /* 2. Garante que o ícone fique grande e visível */
+    #appointments-section .btn-primary i {
+        font-size: 1.8rem !important;
+        margin: 0 !important;
+    }
+
+    /* 3. O botão da Visão Geral (Agenda da Semana) volta ao normal (barra) */
+    .calendar-header .btn-primary {
+        position: relative !important;
+        width: 100% !important;
+        border-radius: 8px !important;
+        height: auto !important;
+        box-shadow: none !important;
+        font-size: 1rem !important;
+        margin-top: 10px !important;
+    }
+
+    /* Garante que o ícone fique visível e grande */
+    #appointments-section .btn-primary i,
+    .calendar-header .btn-primary i {
+        font-size: 1.5rem !important;
+        margin: 0 !important;
+    }
+}
+
+/* ==================================================
+   DESIGN: SEÇÃO DE SERVIÇOS (Mobile & PC)
+   ================================================== */
+
+/* Ajuste do Grid de Serviços para Celular */
+@media (max-width: 768px) {
+    .services-grid {
+        /* Uma coluna única no celular para os cards ficarem grandes */
+        grid-template-columns: 1fr !important; 
+        gap: 15px !important;
+    }
+}
+
+/* Cartão de Serviço (Visual Moderno) */
+.service-card {
+    background: white !important;
+    border: 1px solid #eee !important;
+    border-left: 5px solid #d4af37 !important; /* Detalhe Dourado na esquerda */
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+}
+
+.service-card h4 {
+    margin: 0 0 5px 0;
+    color: #1a1a2e;
+    font-size: 1.1rem;
+}
+
+.service-price {
+    font-size: 1.4rem !important;
+    color: #d4af37 !important;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.service-card small {
+    color: #888;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Botão de Excluir (Lixeira) */
+.service-card .btn-delete {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #fff5f5 !important;
+    color: #e74c3c !important;
+    width: 35px !important;
+    height: 35px !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ffe0e0 !important;
+    transition: all 0.2s;
+}
+
+.service-card .btn-delete:hover {
+    background: #e74c3c !important;
+    color: white !important;
+    transform: scale(1.1);
+}
+
+/* Mensagem de Erro Bonita */
+.error-message-box {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    color: #c53030;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+/* ==================================================
+   DESIGN: FORMULÁRIO DE SERVIÇOS
+   ================================================== */
+
+/* Container do Formulário (Caixa Branca) */
+.service-form-wrapper {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    margin-bottom: 2rem;
+    max-width: 600px; /* Largura ideal para leitura */
+    margin-left: auto;
+    margin-right: auto; /* Centraliza na tela */
+}
+
+/* Ajuste dos Inputs específicos desta área */
+.service-form-wrapper label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+/* Garante que a linha dupla (Preço/Duração) fique perfeita */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Divide em 2 colunas iguais */
+    gap: 20px; /* Espaço entre elas */
+}
+
+/* Ajuste Responsivo para Celular */
+@media (max-width: 768px) {
+    .service-form-wrapper {
+        padding: 1.5rem;
+    }
+    
+    /* No celular, um embaixo do outro para não apertar */
+    .form-row {
+        grid-template-columns: 1fr !important; 
+        gap: 15px;
+    }
+}
+
+/* ==================================================
+   CORREÇÃO: INPUT DE DATA (FILTRO)
+   ================================================== */
+
+/* Container da barra de filtros */
+.filters-bar {
+    display: flex;
+    gap: 10px;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #eee; /* Borda externa visível */
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Estilo dos inputs (Select e Date) */
+.filters-bar select,
+.filters-bar input[type="date"] {
+    width: 100%; /* Ocupa o espaço disponível */
+    padding: 12px 15px;
+    
+    /* CORREÇÃO PRINCIPAL: BORDA VISÍVEL */
+    border: 1px solid #ccc !important; 
+    border-radius: 8px;
+    
+    background-color: #fff;
+    color: #333;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s;
+    
+    /* Garante altura igual para o botão e o input */
+    height: 45px;
+}
+
+/* Foco Dourado */
+.filters-bar select:focus,
+.filters-bar input[type="date"]:focus {
+    border-color: #d4af37 !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* Ícone de Calendário (WebKit/Chrome) */
+.filters-bar input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+.filters-bar input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Ajuste Mobile: Empilhar */
+@media (max-width: 768px) {
+    .filters-bar {
+        flex-direction: column; /* Um embaixo do outro */
+    }
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: TEXTO NO INPUT DE DATA (MOBILE)
+   ================================================== */
+
+/* 1. Garante que o input tenha posição relativa para segurar o texto */
+.filters-bar input[type="date"] {
+    position: relative;
+    color: #333 !important; /* Texto preto quando selecionado */
+}
+
+/* 2. Esconde a máscara feia padrão do navegador quando vazio */
+.filters-bar input[type="date"]:invalid::-webkit-datetime-edit {
+    color: transparent;
+}
+
+/* 3. CRIA O TEXTO "FAKE" (PLACEHOLDER) */
+.filters-bar input[type="date"]:invalid::before {
+    content: "📅 Escolher Data"; /* O texto que você quer que apareça */
+    color: #888;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Permite clicar através do texto */
+    font-size: 0.95rem;
+}
+
+/* 4. Quando focado ou com data, esconde o texto fake */
+.filters-bar input[type="date"]:focus::before,
+.filters-bar input[type="date"]:valid::before {
+    display: none;
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: MENU DE FUNÇÕES NO CELULAR
+   ================================================== */
+
+@media (max-width: 768px) {
+    
+    .sidebar {
+        /* 1. Fixação e Posicionamento */
+        position: sticky !important;
+        top: 0 !important; /* Cola no topo da área de rolagem */
+        z-index: 950 !important; /* Fica acima do conteúdo, abaixo da navbar */
+        
+        /* 2. Layout Horizontal com Scroll */
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important; /* Permite arrastar para o lado */
+        white-space: nowrap !important;
+        width: 100% !important;
+        
+        /* 3. Visual "App" (Fundo Sólido é o segredo) */
+        background: #ffffff !important;
+        border-bottom: 1px solid #eee !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+        
+        /* 4. Espaçamento */
+        padding: 12px 15px !important;
+        gap: 10px !important;
+        margin-bottom: 20px !important;
+        
+        /* Esconde a barra de rolagem feia */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    /* Esconde barra de rolagem no Chrome */
+    .sidebar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Estilo dos Botões (Cápsulas) */
+    .sidebar-item {
+        flex: 0 0 auto !important; /* Não deixa encolher */
+        margin: 0 !important;
+        padding: 8px 16px !important;
+        
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        
+        border-radius: 25px !important; /* Bem redondo */
+        border: 1px solid #f0f0f0 !important;
+        background: #f8f9fa !important;
+        color: #666 !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    
+    .sidebar-item i {
+        font-size: 0.9rem !important;
+        margin: 0 !important;
+    }
+
+    /* Botão Ativo (Selecionado) */
+    .sidebar-item.active {
+        background: #1a1a2e !important; /* Azul Escuro */
+        color: #d4af37 !important;      /* Dourado */
+        border-color: #1a1a2e !important;
+        box-shadow: 0 2px 8px rgba(26, 26, 46, 0.25) !important;
+    }
+}
+
+/* ==================================================
+   MELHORIA VISUAL: FORMULÁRIO DE AGENDAMENTO (PC)
+   ================================================== */
+
+@media (min-width: 769px) {
+    
+    /* 1. Aumenta a largura do modal para caber duas colunas confortavelmente */
+    #new-appointment-modal .modal-content {
+        max-width: 650px !important;
+        padding: 2.5rem !important;
+    }
+
+    /* 2. Transforma o formulário em uma GRADE de 2 colunas */
+    #appointment-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Duas colunas de tamanho igual */
+        gap: 20px; /* Espaço entre as colunas */
+    }
+
+    /* 3. A linha de Data e Hora (que já tem 2 campos dentro) deve ocupar a largura total */
+    /* Assim ela mantém os dois campos alinhados com a linha de cima */
+    #appointment-form .form-row {
+        grid-column: span 2; /* Ocupa as 2 colunas da grade pai */
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Divide internamente em 2 */
+        gap: 20px;
+    }
+
+    /* 4. A área de Observações deve ocupar a largura total */
+    #appointment-form .form-group:nth-last-of-type(1) { 
+        grid-column: span 2;
+    }
+
+    /* 5. O Botão de Confirmar também ocupa a largura total */
+    #appointment-form button[type="submit"] {
+        grid-column: span 2;
+        padding: 15px;
+        font-size: 1.1rem;
+        margin-top: 10px;
+    }
+
+    /* --- ESTILIZAÇÃO DOS INPUTS (Visual mais Premium) --- */
+    
+    /* Aumenta a altura e suaviza as bordas */
+    #appointment-form select,
+    #appointment-form input,
+    #appointment-form textarea {
+        background-color: #fcfcfc;
+        border: 1px solid #e0e0e0 !important;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+
+    /* Efeito de Foco Dourado */
+    #appointment-form select:focus,
+    #appointment-form input:focus,
+    #appointment-form textarea:focus {
+        background-color: #fff;
+        border-color: #d4af37 !important;
+        box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1); /* Sombra dourada suave */
+    }
+
+    /* Labels mais bonitas */
+    #appointment-form label {
+        font-weight: 600;
+        color: #1a1a2e; /* Azul escuro */
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* Ícones das labels dourados */
+    #appointment-form label i {
+        color: #d4af37;
+    }
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: BOTÃO FLUTUANTE (MOBILE)
+   ================================================== */
+
+@media (max-width: 768px) {
+    
+    /* 1. ESCONDE o botão "Novo Agendamento" na tela de Visão Geral (Dashboard) */
+    .calendar-header .btn-primary {
+        display: none !important;
+    }
+
+    /* 2. MANTÉM o botão flutuante APENAS na aba de Agendamentos */
+    #appointments-section .btn-primary {
+        position: fixed !important; /* Fixa na tela */
+        bottom: 25px !important;    /* Distância do fundo */
+        right: 20px !important;     /* Distância da direita */
+        
+        width: 60px !important;     /* Redondo */
+        height: 60px !important;
+        border-radius: 50% !important;
+        
+        padding: 0 !important;
+        margin: 0 !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        /* Sombra e cor */
+        background: var(--secondary) !important;
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.5) !important;
+        z-index: 1000 !important; /* Fica por cima de tudo */
+        
+        /* Esconde o texto "Novo Agendamento" */
+        font-size: 0 !important; 
+    }
+
+    /* Garante que o ícone (+) fique grande e visível */
+    #appointments-section .btn-primary i {
+        font-size: 1.8rem !important;
+        margin: 0 !important;
+        color: var(--primary) !important; /* Ícone Azul Escuro */
+    }
+}
+
+/* ==================================================
+   ALERTA VISUAL DE NOTIFICAÇÃO (TOAST)
+   ================================================== */
+
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1a1a2e; /* Azul Escuro */
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    border: 2px solid #d4af37; /* Borda Dourada */
+    min-width: 300px;
+}
+
+.notification-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(10px);
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    color: #d4af37;
+}
+

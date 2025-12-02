@@ -125,17 +125,51 @@ function showSection(section) {
 
 // ===== MODAIS =====
 
+// ==================================================
+// CONTROLE DE MODAIS (COM SUPORTE AO BOTÃO VOLTAR)
+// ==================================================
+
 function showModal(modalId) {
-    document.getElementById(modalId + '-modal').classList.add('active');
+    const modal = document.getElementById(modalId + '-modal');
+    if (modal) {
+        modal.classList.add('active');
+        
+        // TRUQUE: Adiciona um estado no histórico do navegador
+        // Isso faz o botão "Voltar" do celular fechar o modal em vez de sair do site
+        window.history.pushState({ modalOpen: true, id: modalId }, "");
+    }
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId + '-modal').classList.remove('active');
+    const modal = document.getElementById(modalId + '-modal');
+    
+    // Se o modal estiver aberto, fecha
+    if (modal && modal.classList.contains('active')) {
+        // Volta o histórico manualmente (simula o botão voltar)
+        // Isso dispara o evento 'popstate' abaixo, que fecha o modal visualmente
+        window.history.back();
+    }
 }
 
+// Escuta quando o usuário aperta o botão "Voltar" do celular ou navegador
+window.addEventListener('popstate', function(event) {
+    // Procura qualquer modal que esteja aberto
+    const openModals = document.querySelectorAll('.modal.active');
+    
+    if (openModals.length > 0) {
+        // Se tiver modal aberto, fecha ele visualmente
+        openModals.forEach(modal => modal.classList.remove('active'));
+    } else {
+        // Se não tiver modal, segue a navegação normal (troca de abas)
+        checkUrlHash();
+    }
+});
+
+// Fecha ao clicar fora (Fundo escuro)
 window.onclick = function(event) {
     if (event.target.classList.contains('modal')) {
-        event.target.classList.remove('active');
+        // Se clicar no fundo escuro, simula o botão voltar para fechar
+        window.history.back();
     }
 }
 
@@ -255,22 +289,28 @@ function criarAgendamentoManual() {
     const form = document.getElementById('appointment-form');
     const formData = new FormData(form);
     
-    const cliente = formData.get('cliente');
+    const clienteSelect = document.getElementById('cliente-select');
+    const clienteValue = clienteSelect.value;
     
-    // Se selecionou "novo cliente", abre campos adicionais
-    if (cliente === 'novo') {
-        alert('Funcionalidade de cadastro rápido em desenvolvimento.\n\nPor enquanto, o cliente precisa fazer o primeiro agendamento pelo link público.');
-        return;
-    }
-    
-    if (!cliente) {
+    // Validação específica
+    if (clienteValue === 'novo') {
+        const nome = formData.get('novo_nome');
+        const tel = formData.get('novo_telefone');
+        if (!nome || !tel || tel.length < 10) {
+            alert("Por favor, preencha o nome e telefone do novo cliente.");
+            return;
+        }
+        // Substitui o valor "novo" pelos dados reais para o backend
+        formData.set('cliente', `${nome}|${tel}`);
+    } else if (!clienteValue) {
         alert('Selecione um cliente.');
         return;
     }
     
     const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
     
     fetch('backend/criar_agendamento_manual.php', {
         method: 'POST',
@@ -278,23 +318,30 @@ function criarAgendamentoManual() {
     })
     .then(response => response.json())
     .then(data => {
-        alert(data.message);
         if (data.success) {
+            alert("✅ " + data.message);
             closeModal('new-appointment');
             form.reset();
+            document.getElementById('novos-campos-cliente').style.display = 'none'; // Esconde de novo
+            
             carregarTodosAgendamentos();
             carregarProximosAgendamentos();
             carregarEstatisticas();
-            verificarNotificacoes();
+            
+            // Se cadastrou novo, recarrega a lista de clientes para aparecer na próxima
+            if(clienteValue === 'novo') carregarClientesParaAgendamento();
+            
+        } else {
+            alert("❌ Erro: " + data.message);
         }
     })
     .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao criar agendamento. Tente novamente.');
+        console.error(error);
+        alert('Erro de conexão.');
     })
     .finally(() => {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-check"></i> Confirmar Agendamento';
+        submitBtn.innerHTML = originalText;
     });
 }
 
@@ -1102,8 +1149,68 @@ function limparFiltros() {
     carregarTodosAgendamentos();
 }
 
-function editarAgendamento(agendamentoId) {
-    alert('Funcionalidade de edição em desenvolvimento! ID: ' + agendamentoId);
+// ==================================================
+// FUNÇÕES DE EDIÇÃO DE AGENDAMENTO
+// ==================================================
+
+function editarAgendamento(id) {
+    // 1. Abre o modal
+    showModal('edit-appointment');
+    
+    // 2. Elementos
+    const selectServico = document.getElementById('edit_servico_id');
+    
+    // 3. Carrega Serviços e Depois os Dados do Agendamento
+    fetch('backend/listar_servicos.php').then(r=>r.json()).then(d => {
+        selectServico.innerHTML = '';
+        d.servicos.forEach(s => {
+            selectServico.innerHTML += `<option value="${s.id}">${s.nome_servico} - R$ ${s.preco}</option>`;
+        });
+
+        // Busca dados do agendamento
+        fetch(`backend/buscar_agendamento.php?id=${id}`)
+        .then(r => r.json())
+        .then(resp => {
+            if (resp.success) {
+                const dados = resp.data;
+                document.getElementById('edit_agendamento_id').value = dados.id;
+                document.getElementById('edit_cliente_nome').value = dados.cliente_nome;
+                document.getElementById('edit_data').value = dados.data;
+                document.getElementById('edit_hora').value = dados.hora;
+                document.getElementById('edit_observacoes').value = dados.observacoes || '';
+                selectServico.value = dados.servico_id;
+            } else {
+                alert('Erro ao carregar dados.');
+                closeModal('edit-appointment');
+            }
+        });
+    });
+}
+
+// Função que salva a edição (Deve ser chamada na inicialização)
+function initializeEditForm() {
+    const form = document.getElementById('form-editar-agendamento');
+    if (form) {
+        // Remove listeners antigos para evitar duplicidade
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        newForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('backend/salvar_edicao_agendamento.php', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    closeModal('edit-appointment');
+                    carregarTodosAgendamentos();
+                    carregarProximosAgendamentos();
+                }
+            });
+        });
+    }
 }
 
 // ===== CLIENTES =====
@@ -2184,6 +2291,91 @@ function removerFotoPerfil() {
     });
 }
 
+// Função visual para mostrar campos
+function verificarNovoCliente(select) {
+    const divNovos = document.getElementById('novos-campos-cliente');
+    const inputNome = divNovos.querySelector('input[name="novo_nome"]');
+    const inputTel = divNovos.querySelector('input[name="novo_telefone"]');
+
+    if (select.value === 'novo') {
+        divNovos.style.display = 'block';
+        inputNome.setAttribute('required', 'true');
+        inputTel.setAttribute('required', 'true');
+        inputNome.focus();
+    } else {
+        divNovos.style.display = 'none';
+        inputNome.removeAttribute('required');
+        inputTel.removeAttribute('required');
+        inputNome.value = '';
+        inputTel.value = '';
+    }
+}
+
+// ==================================================
+// EDIÇÃO DE AGENDAMENTO
+// ==================================================
+
+function editarAgendamento(id) {
+    // 1. Abre o modal
+    showModal('edit-appointment');
+    
+    // 2. Carrega a lista de serviços no select primeiro
+    const selectServico = document.getElementById('edit_servico_id');
+    fetch('backend/listar_servicos.php').then(r=>r.json()).then(d => {
+        selectServico.innerHTML = '';
+        d.servicos.forEach(s => {
+            selectServico.innerHTML += `<option value="${s.id}">${s.nome_servico} - R$ ${s.preco}</option>`;
+        });
+
+        // 3. Depois busca os dados do agendamento para preencher
+        fetch(`backend/buscar_agendamento.php?id=${id}`)
+        .then(r => r.json())
+        .then(resp => {
+            if (resp.success) {
+                const dados = resp.data;
+                
+                document.getElementById('edit_agendamento_id').value = dados.id;
+                document.getElementById('edit_cliente_nome').value = dados.cliente_nome; // Apenas visual
+                document.getElementById('edit_data').value = dados.data;
+                document.getElementById('edit_hora').value = dados.hora;
+                document.getElementById('edit_observacoes').value = dados.observacoes;
+                
+                // Seleciona o serviço correto
+                selectServico.value = dados.servico_id;
+            } else {
+                alert('Erro ao carregar dados.');
+                closeModal('edit-appointment');
+            }
+        });
+    });
+}
+
+// Inicializa o formulário de edição
+function initializeEditForm() {
+    const form = document.getElementById('form-editar-agendamento');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('backend/salvar_edicao_agendamento.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    closeModal('edit-appointment');
+                    // Atualiza as listas
+                    carregarTodosAgendamentos();
+                    carregarProximosAgendamentos();
+                }
+            });
+        });
+    }
+}
+
 // ===== INICIALIZAÇÃO =====
 
 // ==================================================
@@ -2197,6 +2389,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCalendar();
     initializeHamburgerMenu(); 
     initializeServiceForm();
+    initializeEditForm();
     
     // 2. Verifica autenticação
     const userId = localStorage.getItem('user_id');
@@ -2223,7 +2416,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==================================================
-// FUNÇÕES DE NAVEGAÇÃO (COPIE ISSO LOGO ABAIXO)
+// FUNÇÕES DE NAVEGAÇÃO
 // ==================================================
 
 // Ouve quando a URL muda (ex: quando você clica em voltar no navegador)

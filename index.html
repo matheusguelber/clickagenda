@@ -262,7 +262,7 @@
                                 <option value="cancelado">Cancelados</option>
                             </select>
                             
-                            <input type="date" id="filter-date" onchange="carregarTodosAgendamentos()">
+                            <input type="date" id="filter-date" onchange="carregarTodosAgendamentos()" required>
                             
                             <button class="btn btn-secondary" onclick="limparFiltros()">
                                 <i class="fas fa-times"></i> Limpar Filtros
@@ -307,27 +307,40 @@
                             <h3>Meus Serviços</h3>
                         </div>
                     
-                        <form id="form-adicionar-servico" class="form-card">
-                            <h4>Adicionar Novo Serviço</h4>
-                            <div class="form-group">
-                                <label>Nome do Serviço</label>
-                                <input type="text" name="nome_servico" placeholder="Ex: Corte Degradê" required>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Preço (R$)</label>
-                                    <input type="number" name="preco" placeholder="45.00" step="0.01" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Duração (em minutos)</label>
-                                    <input type="number" name="duracao" placeholder="30" step="5" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                                <i class="fas fa-plus"></i> Adicionar Serviço
-                            </button>
-                        </form>
+                        <form id="form-adicionar-servico" class="service-form-wrapper">
+    <h4 style="margin-bottom: 1.5rem; color: var(--primary); text-align: center;">
+        <i class="fas fa-plus-circle" style="color: #d4af37;"></i> Adicionar Novo Serviço
+    </h4>
+
+    <div class="form-group">
+        <label>Nome do Serviço</label>
+        <div class="input-with-icon">
+            <i class="fas fa-cut"></i>
+            <input type="text" name="nome_servico" placeholder="Ex: Corte Degradê + Barba" required>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label>Preço (R$)</label>
+            <div class="input-with-icon">
+                <i class="fas fa-tag"></i>
+                <input type="number" name="preco" placeholder="45.00" step="0.01" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Duração (min)</label>
+            <div class="input-with-icon">
+                <i class="fas fa-clock"></i>
+                <input type="number" name="duracao" placeholder="30" step="5" required>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+        <i class="fas fa-check"></i> Salvar Serviço
+    </button>
+</form>
                         
                         <hr class="divider">
                     
@@ -609,9 +622,19 @@
         <form id="appointment-form">
             <div class="form-group">
                 <label><i class="fas fa-user"></i> Cliente</label>
-                <select name="cliente" required>
-                    <option value="">Carregando clientes...</option>
+                <select name="cliente" id="cliente-select" required onchange="verificarNovoCliente(this)">
+                    <option value="">Carregando...</option>
                 </select>
+            </div>
+
+            <div id="novos-campos-cliente" style="display: none; background: #fffdf0; padding: 15px; border: 1px dashed #d4af37; border-radius: 8px; margin-bottom: 15px; grid-column: span 2;">
+                <p style="color: #d4af37; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
+                    <i class="fas fa-user-plus"></i> Cadastrando Novo Cliente
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <input type="text" name="novo_nome" placeholder="Nome Completo" style="background: white; border: 1px solid #ddd;">
+                    <input type="tel" name="novo_telefone" placeholder="(00) 00000-0000" style="background: white; border: 1px solid #ddd;" onkeyup="this.value=phoneMask(this.value)">
+                </div>
             </div>
             
             <div class="form-group">
@@ -621,10 +644,10 @@
                 </select>
             </div>
             
-            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-row">
                 <div class="form-group">
                     <label><i class="fas fa-calendar"></i> Data</label>
-                    <input type="date" name="data" required min="">
+                    <input type="date" name="data" required>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-clock"></i> Horário</label>
@@ -632,12 +655,12 @@
                 </div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" style="grid-column: span 2;">
                 <label><i class="fas fa-comment"></i> Observações</label>
-                <textarea name="observacoes" rows="3" placeholder="Observações adicionais (opcional)"></textarea>
+                <textarea name="observacoes" rows="2" placeholder="Opcional"></textarea>
             </div>
             
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; grid-column: span 2;">
                 <i class="fas fa-check"></i> Confirmar Agendamento
             </button>
         </form>
@@ -845,6 +868,82 @@
                     <label>Duração (minutos)</label>
                     <input type="number" name="duracao" id="edit-servico-duracao" required>
                 </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="edit-service-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Serviço</h2>
+            <button class="close-modal" onclick="closeModal('edit-service')">&times;</button>
+        </div>
+        <form id="form-editar-servico">
+            <input type="hidden" name="id" id="edit-servico-id">
+            
+            <div class="form-group">
+                <label>Nome do Serviço</label>
+                <input type="text" name="nome_servico" id="edit-servico-nome" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" name="preco" id="edit-servico-preco" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Duração (min)</label>
+                    <input type="number" name="duracao" id="edit-servico-duracao" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="edit-appointment-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Agendamento</h2>
+            <button class="close-modal" onclick="closeModal('edit-appointment')">&times;</button>
+        </div>
+        <form id="form-editar-agendamento">
+            <input type="hidden" name="id" id="edit_agendamento_id">
+
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Cliente</label>
+                <input type="text" id="edit_cliente_nome" readonly style="background: #f9f9f9; color: #666; border-color: #eee;">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-cut"></i> Serviço</label>
+                <select name="servico_id" id="edit_servico_id" required>
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+            
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Data</label>
+                    <input type="date" name="data" id="edit_data" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Horário</label>
+                    <input type="time" name="hora" id="edit_hora" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> Observações</label>
+                <textarea name="observacoes" id="edit_observacoes" rows="2"></textarea>
             </div>
             
             <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -1151,6 +1250,49 @@
 }
 </style>
 
+<div class="modal" id="edit-appointment-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Agendamento</h2>
+            <button class="close-modal" onclick="closeModal('edit-appointment')">&times;</button>
+        </div>
+        <form id="form-editar-agendamento">
+            <input type="hidden" name="id" id="edit_agendamento_id">
+
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Cliente</label>
+                <input type="text" id="edit_cliente_nome" readonly style="background: #f0f0f0; color: #666; border-color: #ddd;">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-cut"></i> Serviço</label>
+                <select name="servico_id" id="edit_servico_id" required>
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+            
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Data</label>
+                    <input type="date" name="data" id="edit_data" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Horário</label>
+                    <input type="time" name="hora" id="edit_hora" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> Observações</label>
+                <textarea name="observacoes" id="edit_observacoes" rows="3"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>
