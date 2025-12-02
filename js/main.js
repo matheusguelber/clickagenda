@@ -2308,3 +2308,259 @@ if (sectionId === 'overview') carregarDadosDashboard();
         carregarDadosPerfil();
     }
 }
+
+// ========================================
+// FUNÇÕES JAVASCRIPT - WHATSAPP MULTI-MÉTODO
+// Adicionar no main.js
+// ========================================
+
+// Variável global para armazenar o método escolhido
+let metodoConexaoWhatsApp = null;
+
+// 1. SUBSTITUIR a função conectarWhatsApp() existente por esta:
+function conectarWhatsApp() {
+    // Abre o modal de escolha
+    showModal('whatsapp-method');
+}
+
+// 2. Escolher método (QR ou Code)
+function escolherMetodo(metodo) {
+    metodoConexaoWhatsApp = metodo;
+    closeModal('whatsapp-method');
+    
+    if (metodo === 'qr') {
+        // Abre modal do QR Code
+        showModal('whatsapp-qr');
+        conectarWhatsAppMetodo('qr');
+    } else if (metodo === 'code') {
+        // Abre modal do Código
+        showModal('whatsapp-code');
+        // Volta para o primeiro passo
+        document.getElementById('code-step-phone').style.display = 'block';
+        document.getElementById('code-step-display').style.display = 'none';
+        document.getElementById('phone-code-input').value = '';
+    }
+}
+
+// 3. Conectar via QR Code
+function conectarWhatsAppMetodo(metodo) {
+    if (metodo === 'qr') {
+        // Mostra loading
+        document.getElementById('qr-loading').style.display = 'block';
+        document.getElementById('qr-display').style.display = 'none';
+        document.getElementById('qr-error').style.display = 'none';
+        
+        const barbeiroId = localStorage.getItem('user_id');
+        const formData = new FormData();
+        formData.append('action', 'connect');
+        formData.append('barbeiro_id', barbeiroId);
+        formData.append('metodo', 'qr');
+        
+        fetch('backend/whatsapp_config.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Inicia polling rápido para pegar o QR Code
+                setPollingSpeed('fast');
+                monitorarQRCode();
+            } else {
+                mostrarErroQR(data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            mostrarErroQR('Erro de conexão com o servidor');
+        });
+    }
+}
+
+// 4. Monitorar QR Code (Polling)
+let qrMonitorInterval = null;
+function monitorarQRCode() {
+    if (qrMonitorInterval) clearInterval(qrMonitorInterval);
+    
+    qrMonitorInterval = setInterval(() => {
+        const barbeiroId = localStorage.getItem('user_id');
+        
+        fetch(`backend/whatsapp_config.php?action=status&barbeiro_id=${barbeiroId}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log('Status QR:', data);
+            
+            if (data.qrCode) {
+                // QR Code gerado!
+                document.getElementById('qr-loading').style.display = 'none';
+                document.getElementById('qr-display').style.display = 'block';
+                document.getElementById('qr-image').src = data.qrCode;
+            }
+            
+            if (data.connected) {
+                // Conectado!
+                clearInterval(qrMonitorInterval);
+                closeModal('whatsapp-qr');
+                alert('✅ WhatsApp conectado com sucesso!');
+                verificarStatusWhatsApp();
+                setPollingSpeed('slow');
+            }
+            
+            if (data.status === 'timeout' || data.status === 'qr_expired') {
+                clearInterval(qrMonitorInterval);
+                mostrarErroQR('QR Code expirou. Tente novamente.');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            clearInterval(qrMonitorInterval);
+            mostrarErroQR('Erro ao buscar QR Code');
+        });
+    }, 3000); // 3 segundos
+}
+
+function mostrarErroQR(mensagem) {
+    document.getElementById('qr-loading').style.display = 'none';
+    document.getElementById('qr-display').style.display = 'none';
+    document.getElementById('qr-error').style.display = 'block';
+    document.getElementById('qr-error-msg').textContent = mensagem;
+}
+
+// 5. Solicitar Código de Emparelhamento
+function solicitarCodigo() {
+    const telefone = document.getElementById('phone-code-input').value.trim();
+    
+    if (!telefone) {
+        alert('Por favor, digite o número do WhatsApp');
+        return;
+    }
+    
+    // Limpa formatação
+    const telefoneLimpo = telefone.replace(/\D/g, '');
+    
+    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
+        alert('Número inválido. Digite com DDD (10 ou 11 dígitos)');
+        return;
+    }
+    
+    // Muda para o passo 2
+    document.getElementById('code-step-phone').style.display = 'none';
+    document.getElementById('code-step-display').style.display = 'block';
+    
+    // Mostra loading
+    document.getElementById('code-loading').style.display = 'block';
+    document.getElementById('code-display').style.display = 'none';
+    document.getElementById('code-error').style.display = 'none';
+    
+    const barbeiroId = localStorage.getItem('user_id');
+    const formData = new FormData();
+    formData.append('action', 'connect');
+    formData.append('barbeiro_id', barbeiroId);
+    formData.append('metodo', 'code');
+    formData.append('telefone', telefoneLimpo);
+    
+    fetch('backend/whatsapp_config.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Inicia polling para pegar o código
+            setPollingSpeed('fast');
+            monitorarCodigo();
+        } else {
+            mostrarErroCodigo(data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        mostrarErroCodigo('Erro de conexão com o servidor');
+    });
+}
+
+// 6. Monitorar Código (Polling)
+let codeMonitorInterval = null;
+function monitorarCodigo() {
+    if (codeMonitorInterval) clearInterval(codeMonitorInterval);
+    
+    codeMonitorInterval = setInterval(() => {
+        const barbeiroId = localStorage.getItem('user_id');
+        
+        fetch(`backend/whatsapp_config.php?action=status&barbeiro_id=${barbeiroId}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log('Status Código:', data);
+            
+            if (data.pairingCode) {
+                // Código gerado!
+                document.getElementById('code-loading').style.display = 'none';
+                document.getElementById('code-display').style.display = 'block';
+                document.getElementById('pairing-code-display').textContent = data.pairingCode;
+            }
+            
+            if (data.connected) {
+                // Conectado!
+                clearInterval(codeMonitorInterval);
+                closeModal('whatsapp-code');
+                alert('✅ WhatsApp conectado com sucesso!');
+                verificarStatusWhatsApp();
+                setPollingSpeed('slow');
+            }
+            
+            if (data.status === 'timeout' || data.status === 'code_expired') {
+                clearInterval(codeMonitorInterval);
+                mostrarErroCodigo('Código expirou. Tente novamente.');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            clearInterval(codeMonitorInterval);
+            mostrarErroCodigo('Erro ao buscar código');
+        });
+    }, 3000); // 3 segundos
+}
+
+function mostrarErroCodigo(mensagem) {
+    document.getElementById('code-loading').style.display = 'none';
+    document.getElementById('code-display').style.display = 'none';
+    document.getElementById('code-error').style.display = 'block';
+    document.getElementById('code-error-msg').textContent = mensagem;
+}
+
+// 7. Voltar para escolha de método
+function voltarEscolha() {
+    // Para os monitoramentos
+    if (qrMonitorInterval) clearInterval(qrMonitorInterval);
+    if (codeMonitorInterval) clearInterval(codeMonitorInterval);
+    
+    // Volta para slow
+    setPollingSpeed('slow');
+    
+    // Abre o modal de escolha novamente
+    setTimeout(() => {
+        showModal('whatsapp-method');
+    }, 300);
+}
+
+// 8. Voltar para inserir número (no modal de código)
+function voltarParaNumero() {
+    document.getElementById('code-step-phone').style.display = 'block';
+    document.getElementById('code-step-display').style.display = 'none';
+    if (codeMonitorInterval) clearInterval(codeMonitorInterval);
+}
+
+// 9. Limpar intervalos ao fechar modais
+window.addEventListener('beforeunload', () => {
+    if (qrMonitorInterval) clearInterval(qrMonitorInterval);
+    if (codeMonitorInterval) clearInterval(codeMonitorInterval);
+});
+
+// Quando o usuário fecha o modal manualmente
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('close-modal')) {
+        if (qrMonitorInterval) clearInterval(qrMonitorInterval);
+        if (codeMonitorInterval) clearInterval(codeMonitorInterval);
+        setPollingSpeed('slow');
+    }
+});

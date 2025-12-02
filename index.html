@@ -917,5 +917,240 @@
 </div>
 
     <script src="js/main.js"></script>
+
+<!-- ========================================
+     MODAL DE ESCOLHA: QR CODE OU CÓDIGO
+     Adicionar no index.html, antes do </body>
+     ======================================== -->
+
+<!-- Modal Principal de Escolha -->
+<div class="modal" id="whatsapp-method-modal" style="z-index: 3000;">
+    <div class="modal-content" style="max-width: 480px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 1.5rem; margin: -2rem -2rem 2rem -2rem; border-radius: 12px 12px 0 0;">
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 0.75rem; color: white;">
+                <i class="fab fa-whatsapp"></i> Conectar WhatsApp
+            </h2>
+            <button class="close-modal" onclick="closeModal('whatsapp-method')" style="color: white;">&times;</button>
+        </div>
+
+        <!-- Instruções -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+                Escolha como deseja conectar seu WhatsApp ao ClickAgenda
+            </p>
+        </div>
+
+        <!-- Opções de Conexão (Cards lado a lado) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+            
+            <!-- Card QR Code -->
+            <div class="method-card" onclick="escolherMetodo('qr')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9;">
+                <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-qrcode" style="font-size: 1.8rem; color: white;"></i>
+                </div>
+                <h4 style="color: #333; margin-bottom: 0.5rem; font-size: 1rem;">QR Code</h4>
+                <p style="font-size: 0.85rem; color: #666; margin: 0; line-height: 1.4;">
+                    Escaneie com<br>o celular
+                </p>
+            </div>
+
+            <!-- Card Código -->
+            <div class="method-card" onclick="escolherMetodo('code')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9;">
+                <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-key" style="font-size: 1.8rem; color: white;"></i>
+                </div>
+                <h4 style="color: #333; margin-bottom: 0.5rem; font-size: 1rem;">Código</h4>
+                <p style="font-size: 0.85rem; color: #666; margin: 0; line-height: 1.4;">
+                    Digite o<br>código no app
+                </p>
+            </div>
+        </div>
+
+        <!-- Nota de Rodapé -->
+        <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <p style="margin: 0; font-size: 0.85rem; color: #856404; display: flex; align-items: flex-start; gap: 0.5rem;">
+                <i class="fas fa-info-circle" style="margin-top: 2px;"></i>
+                <span><strong>Dica:</strong> O método por código é mais rápido e não precisa de câmera!</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal QR Code -->
+<div class="modal" id="whatsapp-qr-modal" style="z-index: 3001;">
+    <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-header" style="background: #25D366; color: white; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 12px 12px 0 0;">
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: white;">
+                <i class="fas fa-qrcode"></i> Escanear QR Code
+            </h3>
+            <button class="close-modal" onclick="closeModal('whatsapp-qr'); voltarEscolha();" style="color: white;">&times;</button>
+        </div>
+
+        <div id="qr-modal-content" style="text-align: center;">
+            <!-- Carregando -->
+            <div id="qr-loading" style="padding: 2rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: #25D366; margin-bottom: 1rem;"></i>
+                <p style="color: #666; font-weight: 600;">Gerando QR Code...</p>
+                <p style="font-size: 0.85rem; color: #999;">Aguarde alguns segundos</p>
+            </div>
+
+            <!-- QR Code Display -->
+            <div id="qr-display" style="display: none;">
+                <img id="qr-image" src="" alt="QR Code" style="max-width: 280px; border: 4px solid #25D366; border-radius: 12px; padding: 10px; background: white;">
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #f0f8ff; border-radius: 8px;">
+                    <p style="margin: 0 0 0.5rem 0; color: #0066cc; font-weight: 600;">
+                        <i class="fas fa-mobile-alt"></i> Como escanear:
+                    </p>
+                    <ol style="text-align: left; font-size: 0.85rem; color: #555; padding-left: 1.5rem; margin: 0; line-height: 1.8;">
+                        <li>Abra o WhatsApp no celular</li>
+                        <li>Toque em "Aparelhos conectados"</li>
+                        <li>Toque em "Conectar aparelho"</li>
+                        <li>Escaneie o código acima</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Erro -->
+            <div id="qr-error" style="display: none; padding: 2rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                <p style="color: #e74c3c; font-weight: bold;">Erro ao gerar QR Code</p>
+                <p id="qr-error-msg" style="font-size: 0.85rem; color: #666;"></p>
+                <button class="btn btn-primary" onclick="conectarWhatsAppMetodo('qr')" style="margin-top: 1rem;">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Código de Emparelhamento -->
+<div class="modal" id="whatsapp-code-modal" style="z-index: 3001;">
+    <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-header" style="background: #0088cc; color: white; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 12px 12px 0 0;">
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: white;">
+                <i class="fas fa-key"></i> Código de Emparelhamento
+            </h3>
+            <button class="close-modal" onclick="closeModal('whatsapp-code'); voltarEscolha();" style="color: white;">&times;</button>
+        </div>
+
+        <!-- Passo 1: Solicitar Número -->
+        <div id="code-step-phone" style="padding: 1rem;">
+            <p style="text-align: center; color: #666; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                Digite o número do WhatsApp que deseja conectar
+            </p>
+
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                    <i class="fas fa-phone"></i> Número de Telefone
+                </label>
+                <input 
+                    type="tel" 
+                    id="phone-code-input" 
+                    placeholder="(19) 99999-9999" 
+                    onkeyup="this.value=phoneMask(this.value)"
+                    style="width: 100%; padding: 0.875rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem;"
+                >
+            </div>
+
+            <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #0088cc;">
+                <p style="margin: 0; font-size: 0.85rem; color: #0066aa; display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <i class="fas fa-info-circle" style="margin-top: 2px;"></i>
+                    <span>Digite o número <strong>COM</strong> o DDD (código de área)</span>
+                </p>
+            </div>
+
+            <button class="btn btn-primary" onclick="solicitarCodigo()" style="width: 100%; padding: 1rem; font-size: 1rem;">
+                <i class="fas fa-arrow-right"></i> Gerar Código
+            </button>
+        </div>
+
+        <!-- Passo 2: Exibir Código -->
+        <div id="code-step-display" style="display: none; text-align: center; padding: 1rem;">
+            <!-- Carregando -->
+            <div id="code-loading" style="padding: 2rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: #0088cc; margin-bottom: 1rem;"></i>
+                <p style="color: #666; font-weight: 600;">Gerando código...</p>
+            </div>
+
+            <!-- Código Gerado -->
+            <div id="code-display" style="display: none;">
+                <div style="background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%); padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 0.5rem;">Seu código é:</p>
+                    <div id="pairing-code-display" style="font-size: 3rem; font-weight: bold; color: white; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+                        ----
+                    </div>
+                </div>
+
+                <div style="background: #f0f8ff; padding: 1rem; border-radius: 8px; text-align: left;">
+                    <p style="margin: 0 0 0.5rem 0; color: #0066cc; font-weight: 600; text-align: center;">
+                        <i class="fas fa-mobile-alt"></i> Como usar:
+                    </p>
+                    <ol style="font-size: 0.85rem; color: #555; padding-left: 1.5rem; margin: 0; line-height: 1.8;">
+                        <li>Abra o WhatsApp no celular</li>
+                        <li>Toque em "Aparelhos conectados"</li>
+                        <li>Toque em "Conectar aparelho"</li>
+                        <li>Escolha "Conectar com número de telefone"</li>
+                        <li>Digite o código acima</li>
+                    </ol>
+                </div>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <p style="margin: 0; font-size: 0.85rem; color: #856404; display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <i class="fas fa-clock"></i>
+                        <span>O código expira em <strong>3 minutos</strong></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Erro -->
+            <div id="code-error" style="display: none; padding: 2rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                <p style="color: #e74c3c; font-weight: bold;">Erro ao gerar código</p>
+                <p id="code-error-msg" style="font-size: 0.85rem; color: #666;"></p>
+                <button class="btn btn-secondary" onclick="voltarParaNumero()" style="margin-top: 1rem;">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Hover nos cards de método */
+.method-card:hover {
+    border-color: #25D366 !important;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.2);
+}
+
+/* Animação de Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal.active .modal-content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+    .modal-content {
+        max-width: 95% !important;
+        padding: 1.5rem !important;
+    }
+    
+    .method-card {
+        padding: 1.5rem 0.75rem !important;
+    }
+    
+    #pairing-code-display {
+        font-size: 2.5rem !important;
+        letter-spacing: 5px !important;
+    }
+}
+</style>
+
+
 </body>
 </html>

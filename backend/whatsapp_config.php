@@ -1,30 +1,27 @@
 <?php
 // ========================================
-// WhatsApp Config - Multi-Sessão COMPLETO
+// WhatsApp Config - Multi-MÃ©todo (QR + CÃ³digo)
 // ========================================
 
 header('Content-Type: application/json');
 require_once 'conexao.php';
 session_start();
 
-// ?? IP CORRETO da VM WhatsApp
+// ðŸ”¥ IP CORRETO da VM WhatsApp
 define('WHATSAPP_SERVER', 'http://168.138.133.246:3000');
 
 /**
- * Pega o ID do barbeiro da sessão ou do request
+ * Pega o ID do barbeiro da sessÃ£o ou do request
  */
 function getBarbeiroId() {
-    // Tenta pegar do POST
     if (isset($_POST['barbeiro_id'])) {
         return intval($_POST['barbeiro_id']);
     }
     
-    // Tenta pegar do GET
     if (isset($_GET['barbeiro_id'])) {
         return intval($_GET['barbeiro_id']);
     }
     
-    // Tenta pegar da sessão PHP
     if (isset($_SESSION['user_id'])) {
         return intval($_SESSION['user_id']);
     }
@@ -33,7 +30,7 @@ function getBarbeiroId() {
 }
 
 /**
- * Faz requisição para o servidor Node.js WhatsApp
+ * Faz requisiÃ§Ã£o para o servidor Node.js WhatsApp
  */
 function fazerRequisicao($endpoint, $metodo = 'GET', $dados = null, $timeout = 30) {
     $url = WHATSAPP_SERVER . $endpoint;
@@ -59,21 +56,21 @@ function fazerRequisicao($endpoint, $metodo = 'GET', $dados = null, $timeout = 3
     if ($error) {
         return [
             'success' => false, 
-            'message' => 'Erro de conexão: ' . $error
+            'message' => 'Erro de conexÃ£o: ' . $error
         ];
     }
     
     if ($httpCode !== 200) {
         return [
             'success' => false, 
-            'message' => 'Servidor retornou código: ' . $httpCode
+            'message' => 'Servidor retornou cÃ³digo: ' . $httpCode
         ];
     }
     
     $result = json_decode($response, true);
     return $result ?? [
         'success' => false, 
-        'message' => 'Resposta inválida do servidor'
+        'message' => 'Resposta invÃ¡lida do servidor'
     ];
 }
 
@@ -81,7 +78,7 @@ function fazerRequisicao($endpoint, $metodo = 'GET', $dados = null, $timeout = 3
 // ROTAS DA API
 // ========================================
 
-// ?? STATUS (GET)
+// ðŸ”¥ STATUS (GET)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'status') {
     $barbeiroId = getBarbeiroId();
     
@@ -90,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
             'success' => false,
             'connected' => false,
             'status' => 'no_session',
-            'message' => 'Faça login primeiro'
+            'message' => 'FaÃ§a login primeiro'
         ]);
         exit;
     }
@@ -100,31 +97,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     exit;
 }
 
-// ?? CONECTAR (POST)
+// ðŸ”¥ CONECTAR (POST) - SUPORTA QR E CÃ“DIGO
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'connect') {
     $barbeiroId = getBarbeiroId();
+    $metodo = $_POST['metodo'] ?? 'qr'; // 'qr' ou 'code'
+    $telefone = $_POST['telefone'] ?? null;
     
     if (!$barbeiroId) {
         echo json_encode([
             'success' => false,
-            'message' => 'ID do barbeiro não encontrado. Faça login novamente.'
+            'message' => 'ID do barbeiro nÃ£o encontrado. FaÃ§a login novamente.'
         ]);
         exit;
     }
     
-    $result = fazerRequisicao("/connect/{$barbeiroId}", 'POST', [], 60);
+    // Valida telefone se for mÃ©todo code
+    if ($metodo === 'code' && empty($telefone)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'NÃºmero de telefone Ã© obrigatÃ³rio para mÃ©todo cÃ³digo'
+        ]);
+        exit;
+    }
+    
+    // Prepara dados da requisiÃ§Ã£o
+    $dados = ['metodo' => $metodo];
+    if ($metodo === 'code') {
+        $dados['telefone'] = $telefone;
+    }
+    
+    $result = fazerRequisicao("/connect/{$barbeiroId}", 'POST', $dados, 60);
     echo json_encode($result);
     exit;
 }
 
-// ?? DESCONECTAR (POST)
+// ðŸ”¥ DESCONECTAR (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'disconnect') {
     $barbeiroId = getBarbeiroId();
     
     if (!$barbeiroId) {
         echo json_encode([
             'success' => false,
-            'message' => 'ID do barbeiro não encontrado'
+            'message' => 'ID do barbeiro nÃ£o encontrado'
         ]);
         exit;
     }
@@ -134,14 +148,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// ?? RESETAR (POST)
+// ðŸ”¥ RESETAR (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'reset') {
     $barbeiroId = getBarbeiroId();
     
     if (!$barbeiroId) {
         echo json_encode([
             'success' => false,
-            'message' => 'ID do barbeiro não encontrado'
+            'message' => 'ID do barbeiro nÃ£o encontrado'
         ]);
         exit;
     }
@@ -151,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// ?? ENVIAR MENSAGEM (POST)
+// ðŸ”¥ ENVIAR MENSAGEM (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send') {
     $barbeiroId = getBarbeiroId();
     $telefone = $_POST['telefone'] ?? '';
@@ -160,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$barbeiroId) {
         echo json_encode([
             'success' => false,
-            'message' => 'ID do barbeiro não encontrado'
+            'message' => 'ID do barbeiro nÃ£o encontrado'
         ]);
         exit;
     }
@@ -168,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (empty($telefone) || empty($mensagem)) {
         echo json_encode([
             'success' => false, 
-            'message' => 'Telefone e mensagem são obrigatórios'
+            'message' => 'Telefone e mensagem sÃ£o obrigatÃ³rios'
         ]);
         exit;
     }
@@ -182,9 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// Ação inválida
+// AÃ§Ã£o invÃ¡lida
 echo json_encode([
     'success' => false, 
-    'message' => 'Ação inválida ou método não permitido'
+    'message' => 'AÃ§Ã£o invÃ¡lida ou mÃ©todo nÃ£o permitido'
 ]);
 ?>
