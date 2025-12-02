@@ -3311,3 +3311,32 @@ input:checked + .slider:before {
     line-height: 1.5 !important;
     margin: 0 !important;
 }
+
+/* ==================================================
+   CORREÇÃO URGENTE: BOTÕES INVISÍVEIS
+   ================================================== */
+
+/* Força botões secundários dentro de áreas brancas a terem cor */
+.settings-card .btn-secondary,
+#whatsapp-container .btn-secondary,
+form .btn-secondary {
+    color: #d4af37 !important;       /* Texto Dourado */
+    border: 2px solid #d4af37 !important; /* Borda Dourada */
+    background-color: transparent !important;
+    font-weight: 700 !important;
+}
+
+/* Efeito ao passar o mouse (Fica todo dourado) */
+.settings-card .btn-secondary:hover,
+#whatsapp-container .btn-secondary:hover,
+form .btn-secondary:hover {
+    background-color: #d4af37 !important;
+    color: white !important;
+}
+
+/* Garante que o botão de "Digitar Código" no mobile também fique legível */
+.method-btn {
+    border: 1px solid #ddd !important;
+    color: #333 !important;
+}
+
