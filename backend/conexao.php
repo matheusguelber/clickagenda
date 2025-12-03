@@ -2,7 +2,7 @@
 $host = 'localhost';
 $db   = 'clickagenda';
 $user = 'root';
-$pass = ''; // coloque a senha do seu MySQL, se houver
+$pass = ''; // Se seu MySQL tiver senha, coloque aqui
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);

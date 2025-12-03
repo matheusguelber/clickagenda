@@ -33,13 +33,13 @@ try {
     
     $params = [$barbeiro_id];
     
-    // Filtro por status
+    // Se foi passado um status, filtra os agendamentos por ele
     if (isset($_GET['status']) && $_GET['status'] !== 'todos') {
         $sql .= " AND a.status = ?";
         $params[] = $_GET['status'];
     }
     
-    // Filtro por data
+    // Se foi passada uma data, filtra os agendamentos por ela
     if (isset($_GET['data']) && !empty($_GET['data'])) {
         $sql .= " AND a.data = ?";
         $params[] = $_GET['data'];

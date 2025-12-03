@@ -17,8 +17,8 @@ try {
         SELECT 
             a.cliente_nome,
             a.cliente_telefone,
-            COUNT(a.id) as total_agendamentos,
-            COALESCE(SUM(s.preco), 0) as total_gasto
+            COUNT(a.id) as total_agendamentos, // Conta quantos agendamentos o cliente fez
+            COALESCE(SUM(s.preco), 0) as total_gasto // Soma o valor gasto pelo cliente
         FROM agendamentos a
         JOIN servicos s ON a.servico_id = s.id
         WHERE a.barbeiro_id = ? AND a.status != 'cancelado'

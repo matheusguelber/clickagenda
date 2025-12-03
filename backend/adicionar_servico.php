@@ -1,23 +1,23 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-require_once __DIR__ . '/conexao.php'; // Conexão PDO em $pdo
+require_once __DIR__ . '/conexao.php'; // Inclui conexão com o banco
 
-// Inicia a sessão para saber QUEM está logado
+// Inicia a sessão para identificar o usuário logado
 session_start();
 
-// Segurança: Verifica se o usuário está logado
+// Só deixa continuar se o usuário for barbeiro e estiver logado
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
-    http_response_code(403); // Proibido
+    http_response_code(403); // Não tem permissão
     echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Pega o ID do barbeiro que está logado
+        // Recupera o ID do barbeiro logado
         $barbeiro_id = $_SESSION['user_id'];
         
-        // Pega os dados do formulário
+        // Recebe os dados enviados pelo formulário
         $nome_servico = trim($_POST['nome_servico'] ?? '');
         $preco = $_POST['preco'] ?? 0;
         $duracao = $_POST['duracao'] ?? 0;
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Insere o serviço na tabela 'servicos', ligando-o ao barbeiro
+        // Salva o serviço novo no banco, associando ao barbeiro
         $stmt = $pdo->prepare(
             "INSERT INTO servicos (barbeiro_id, nome_servico, preco, duracao_minutos) 
              VALUES (?, ?, ?, ?)"

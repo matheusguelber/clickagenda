@@ -4,7 +4,7 @@ require_once __DIR__ . '/conexao.php';
 
 session_start();
 
-// Verifica se o usuário está logado
+// Só deixa continuar se o usuário for barbeiro e estiver logado
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 try {
     $barbeiro_id = $_SESSION['user_id'];
     
-    // 1. Agendamentos de HOJE
+    // Conta quantos agendamentos tem hoje
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as total 
         FROM agendamentos 
@@ -23,7 +23,7 @@ try {
     $stmt->execute([$barbeiro_id]);
     $agendamentos_hoje = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     
-    // 2. Total de clientes únicos
+    // Conta quantos clientes diferentes já agendaram
     $stmt = $pdo->prepare("
         SELECT COUNT(DISTINCT cliente_telefone) as total 
         FROM agendamentos 
@@ -32,7 +32,7 @@ try {
     $stmt->execute([$barbeiro_id]);
     $total_clientes = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     
-    // 3. Faturamento do mês
+    // Soma o valor total dos serviços confirmados no mês
     $stmt = $pdo->prepare("
         SELECT COALESCE(SUM(s.preco), 0) as total 
         FROM agendamentos a
@@ -46,7 +46,7 @@ try {
     $faturamento_mes = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     $faturamento_formatado = number_format($faturamento_mes, 2, ',', '.');
     
-    // 4. Taxa de presença (agendamentos confirmados vs total)
+    // Calcula a taxa de presença (quantos compareceram vs total de agendamentos)
     $stmt = $pdo->prepare("
         SELECT 
             COUNT(*) as total,

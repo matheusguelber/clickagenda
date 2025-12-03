@@ -6,7 +6,7 @@ $barbeiro_id = isset($_GET['barbeiro_id']) ? intval($_GET['barbeiro_id']) : 0;
 $data_solicitada = $_GET['data'] ?? ''; 
 
 if ($barbeiro_id === 0 || empty($data_solicitada)) {
-    // Se não passar dados, retornamos sucesso=false mas sem quebrar
+    // Se faltar algum dado, retorna erro mas não quebra o sistema
     echo json_encode(['sucesso' => false, 'mensagem' => 'Dados incompletos.']);
     exit;
 }
@@ -26,7 +26,7 @@ try {
             'hora_fim' => $linha['hora_fim']
         ]);
     } else {
-        // Se não configurou, assumimos fechado ou um horário padrão (aqui assumi fechado para segurança)
+        // Se não tiver configuração, considera fechado para evitar problemas
         echo json_encode(['sucesso' => false, 'aberto' => 0, 'mensagem' => 'Não configurado']);
     }
 } catch (PDOException $e) {

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Verifica se pertence ao barbeiro
+        // Garante que o agendamento é do barbeiro logado
         $stmt = $pdo->prepare("SELECT id FROM agendamentos WHERE id = ? AND barbeiro_id = ?");
         $stmt->execute([$agendamento_id, $barbeiro_id]);
         
@@ -30,18 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Atualiza o status no banco de dados
+        // Salva o novo status do agendamento
         $stmt = $pdo->prepare("UPDATE agendamentos SET status = ? WHERE id = ?");
         $stmt->execute([$status, $agendamento_id]);
         
-        // Preparar resposta
+        // Prepara a resposta para o frontend
         $response = [
             'success' => true,
             'message' => $status === 'confirmado' ? 'Agendamento confirmado!' : 'Agendamento cancelado!',
             'whatsapp_sent' => false
         ];
         
-        // Se for confirmado ou cancelado, envia WhatsApp automaticamente
+        // Se mudou para confirmado ou cancelado, já manda WhatsApp para o cliente
         if (in_array($status, ['confirmado', 'cancelado'])) {
             $acao = $status;
             $resultado = enviarWhatsAppAgendamento($agendamento_id, $acao, $barbeiro_id, $pdo);
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  */
 function enviarWhatsAppAgendamento($agendamento_id, $acao, $barbeiro_id, $pdo) {
     try {
-        // Busca informações do agendamento
+        // Pega todos os dados do agendamento para montar a mensagem
         $stmt = $pdo->prepare("
             SELECT 
                 a.cliente_nome,
@@ -91,12 +91,12 @@ function enviarWhatsAppAgendamento($agendamento_id, $acao, $barbeiro_id, $pdo) {
             return ['whatsapp_sent' => false, 'whatsapp_error' => 'Agendamento não encontrado'];
         }
 
-        // Formata datas
+        // Deixa as datas e valores bonitinhos para a mensagem
         $data_formatada = date('d/m/Y', strtotime($agendamento['data']));
         $hora_formatada = date('H:i', strtotime($agendamento['hora']));
         $preco_formatado = number_format($agendamento['preco'], 2, ',', '.');
 
-        // Monta a mensagem
+        // Cria o texto que vai ser enviado para o cliente
         if ($acao === 'confirmado') {
             $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋💈\n\n";
             $mensagem .= "Seu agendamento foi *CONFIRMADO* ✅\n\n";
@@ -124,7 +124,7 @@ function enviarWhatsAppAgendamento($agendamento_id, $acao, $barbeiro_id, $pdo) {
             }
         }
 
-        // 🔥 TENTA PRIMEIRO COM MULTI-SESSÃO, DEPOIS FAZ FALLBACK
+        // Tenta enviar usando multi-sessão, se não funcionar tenta o modo antigo
         return enviarViaNodeServer($barbeiro_id, $agendamento['cliente_telefone'], $mensagem);
 
     } catch (Exception $e) {
@@ -144,7 +144,7 @@ function enviarViaNodeServer($barbeiro_id, $telefone, $mensagem) {
         'mensagem' => $mensagem
     ];
 
-    // 🔥 TENTATIVA 1: Multi-sessão (com ID do barbeiro)
+    // Primeiro tenta enviar usando o ID do barbeiro
     $ch = curl_init($nodeServer . "/send/{$barbeiro_id}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -158,7 +158,7 @@ function enviarViaNodeServer($barbeiro_id, $telefone, $mensagem) {
     $erro = curl_error($ch);
     curl_close($ch);
 
-    // Se deu 404, tenta a rota antiga /send (sem ID)
+    // Se não achar a rota, tenta o endpoint antigo sem ID
     if ($httpCode === 404) {
         error_log("⚠️ Rota /send/{$barbeiro_id} retornou 404. Tentando /send...");
         

@@ -17,7 +17,7 @@ try {
     $agendamento = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($agendamento) {
-        // Formata a hora para HH:MM (remove os segundos se tiver)
+        // Ajusta a hora para mostrar só horas e minutos
         $agendamento['hora'] = substr($agendamento['hora'], 0, 5);
         echo json_encode(['success' => true, 'data' => $agendamento]);
     } else {

@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 try {
     $barbeiro_id = $_SESSION['user_id'];
     
-    // Busca clientes únicos que já agendaram com este barbeiro
+    // Pega todos os clientes que já marcaram horário com esse barbeiro
     $stmt = $pdo->prepare("
         SELECT DISTINCT 
             cliente_nome,

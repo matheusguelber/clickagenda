@@ -3,7 +3,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexao.php';
 session_start();
 
-// Verifica se está logado
+// Só deixa continuar se o usuário for barbeiro
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
     echo json_encode(['success' => false, 'message' => 'Não autorizado.']);
     exit;
@@ -19,30 +19,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Inicia uma transação (para garantir que tudo seja feito ou nada seja feito)
+        // Começa uma transação para garantir que tudo ou nada seja feito
         $pdo->beginTransaction();
 
-        // 1. PRIMEIRO: Deleta os agendamentos ligados a esse serviço
-        // Isso resolve o erro SQLSTATE[23000]
+        // Primeiro apaga todos os agendamentos que usam esse serviço
+        // Isso evita erro de restrição do banco
         $stmt = $pdo->prepare("DELETE FROM agendamentos WHERE servico_id = ? AND barbeiro_id = ?");
         $stmt->execute([$id, $barbeiro_id]);
 
-        // 2. SEGUNDO: Deleta o serviço
+        // Depois apaga o serviço em si
         $stmt = $pdo->prepare("DELETE FROM servicos WHERE id = ? AND barbeiro_id = ?");
         $stmt->execute([$id, $barbeiro_id]);
 
         if ($stmt->rowCount() > 0) {
-            // Confirma as alterações
+            // Se deu tudo certo, confirma no banco
             $pdo->commit();
             echo json_encode(['success' => true, 'message' => 'Serviço excluído com sucesso!']);
         } else {
-            // Se não achou o serviço para deletar
+            // Se não encontrou o serviço, desfaz tudo
             $pdo->rollBack();
             echo json_encode(['success' => false, 'message' => 'Serviço não encontrado.']);
         }
 
     } catch (PDOException $e) {
-        // Se der qualquer erro, desfaz tudo
+        // Se acontecer algum erro, desfaz tudo
         $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => 'Erro ao excluir: ' . $e->getMessage()]);
     }

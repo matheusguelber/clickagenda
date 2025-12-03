@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([$servico_id, $data, $hora, $observacoes, $id, $barbeiro_id]);
 
-        echo json_encode(['success' => true, 'message' => 'Agendamento atualizado com sucesso!']);
+        echo json_encode(['success' => true, 'message' => 'Agendamento editado com sucesso!']);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => 'Erro ao atualizar: ' . $e->getMessage()]);
     }

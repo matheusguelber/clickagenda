@@ -1,4 +1,4 @@
-/* ===== RESET E VARIÁVEIS ===== */
+/* Reset de estilos e variáveis globais */
 * {
     margin: 0;
     padding: 0;
@@ -22,7 +22,7 @@ body {
     line-height: 1.6;
 }
 
-/* ===== UTILITÁRIOS ===== */
+/* Utilitários gerais para layout */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -33,7 +33,7 @@ body {
     display: none;
 }
 
-/* ===== NAVBAR ===== */
+/* Estilos da barra de navegação */
 .navbar {
     background: var(--primary);
     color: white;
@@ -91,7 +91,7 @@ body {
 
 
 
-/* ===== BOTÕES ===== */
+/* Estilos dos botões */
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
@@ -152,7 +152,7 @@ body {
     transform: scale(1.1);
 }
 
-/* ===== HERO SECTION ===== */
+/* Seção principal do topo (hero) */
 .hero {
     background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
     color: white;
@@ -182,7 +182,7 @@ body {
     flex-wrap: wrap;
 }
 
-/* ===== FEATURES SECTION ===== */
+/* Seção de recursos e diferenciais */
 .features {
     padding: 5rem 0;
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
@@ -306,7 +306,7 @@ body {
     min-width: 16px;
 }
 
-/* CTA Section */
+/* Seção de chamada para ação (CTA) */
 .cta-section {
     text-align: center;
     padding: 4rem 2rem;
@@ -338,7 +338,7 @@ body {
     margin-right: 0.5rem;
 }
 
-/* Responsividade */
+/* Estilos para responsividade em telas menores */
 @media (max-width: 768px) {
     .section-title {
         font-size: 2rem;

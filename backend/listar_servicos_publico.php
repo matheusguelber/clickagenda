@@ -2,7 +2,7 @@
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexao.php';
 
-// Pega o ID do barbeiro da URL
+// Recebe o ID do barbeiro pela URL
 $barbeiro_id = isset($_GET['barbeiro_id']) ? intval($_GET['barbeiro_id']) : 0;
 
 if (!$barbeiro_id) {
@@ -11,7 +11,7 @@ if (!$barbeiro_id) {
 }
 
 try {
-    // Busca os serviços desse barbeiro
+    // Pega todos os serviços cadastrados para esse barbeiro
     $stmt = $pdo->prepare("SELECT id, nome_servico, preco, duracao_minutos FROM servicos WHERE barbeiro_id = ? ORDER BY nome_servico");
     $stmt->execute([$barbeiro_id]);
     $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);

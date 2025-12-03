@@ -11,21 +11,21 @@ if (!isset($_SESSION['user_id'])) {
 $id = $_SESSION['user_id'];
 
 try {
-    // 1. Busca o caminho da foto atual para deletar o arquivo
+    // Busca o caminho da foto atual para poder apagar
     $stmt = $pdo->prepare("SELECT foto_perfil FROM usuarios WHERE id = ?");
     $stmt->execute([$id]);
     $caminhoFoto = $stmt->fetchColumn();
 
-    // 2. Se existir arquivo físico, apaga
+    // Se existir o arquivo, apaga do servidor
     if ($caminhoFoto && file_exists(__DIR__ . '/../' . $caminhoFoto)) {
         unlink(__DIR__ . '/../' . $caminhoFoto);
     }
 
-    // 3. Limpa o campo no banco de dados (define como NULL)
+    // Limpa o campo da foto no banco de dados
     $stmt = $pdo->prepare("UPDATE usuarios SET foto_perfil = NULL WHERE id = ?");
     $stmt->execute([$id]);
 
-    // 4. Limpa a sessão
+    // Remove a foto da sessão do usuário
     unset($_SESSION['user_foto']);
 
     echo json_encode(['success' => true, 'message' => 'Foto removida com sucesso!']);

@@ -4,7 +4,7 @@ require_once __DIR__ . '/conexao.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Não logado']);
+    echo json_encode(['success' => false, 'message' => 'Usuário não está logado']);
     exit;
 }
 

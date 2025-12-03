@@ -1,8 +1,5 @@
 <?php
-// ========================================
-// enviar_whatsapp_agendamento.php
-// COMPLETO E ATUALIZADO - Multi-Sessão
-// ========================================
+// Envio de mensagem WhatsApp para confirmação ou cancelamento de agendamento (multi-sessão)
 
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexao.php';
@@ -18,14 +15,14 @@ require_once __DIR__ . '/conexao.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $agendamento_id = intval($_POST['agendamento_id'] ?? 0);
-        $acao = $_POST['acao'] ?? ''; // 'confirmado' ou 'cancelado'
+        $acao = $_POST['acao'] ?? ''; // Pode ser 'confirmado' ou 'cancelado'
         
         if (!$agendamento_id || !in_array($acao, ['confirmado', 'cancelado'])) {
             echo json_encode(['success' => false, 'message' => 'Parâmetros inválidos']);
             exit;
         }
 
-        // 1. Busca informações do agendamento
+        // Busca todos os dados do agendamento para montar a mensagem
         $stmt = $pdo->prepare("
             SELECT 
                 a.id,
@@ -52,12 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // 2. Formata a data e hora
+        // Deixa a data, hora e valor prontos para a mensagem
         $data_formatada = date('d/m/Y', strtotime($agendamento['data']));
         $hora_formatada = date('H:i', strtotime($agendamento['hora']));
         $preco_formatado = number_format($agendamento['preco'], 2, ',', '.');
 
-        // 3. Monta a mensagem conforme a ação
+        // Cria o texto da mensagem de acordo com a ação
         if ($acao === 'confirmado') {
             $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋✂️\n\n";
             $mensagem .= "Seu agendamento foi *CONFIRMADO* ✅\n\n";
@@ -72,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mensagem .= "📞 {$agendamento['barbeiro_telefone']}";
             }
         } else {
-            // CANCELADO
+            // Se for cancelado, monta a mensagem de cancelamento
             $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋\n\n";
             $mensagem .= "Seu agendamento foi *CANCELADO* ❌\n\n";
             $mensagem .= "*Barbearia:* {$agendamento['barbeiro_nome']}\n";
@@ -86,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // 4. Envia via WhatsApp (usando a sessão do barbeiro)
+        // Envia a mensagem pelo WhatsApp usando a sessão do barbeiro
         $barbeiro_id = $agendamento['barbeiro_id'];
         $resultado = enviarWhatsAppViaNode($barbeiro_id, $agendamento['cliente_telefone'], $mensagem);
 
@@ -97,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'whatsapp_sent' => true
             ]);
         } else {
-            // Mesmo que falhe o WhatsApp, o agendamento já foi confirmado/cancelado no banco
+            // Se não conseguir enviar pelo WhatsApp, o agendamento já foi atualizado no banco
             echo json_encode([
                 'success' => true,
                 'message' => 'Agendamento atualizado. WhatsApp não disponível no momento.',
@@ -121,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  * @return array ['success' => bool, 'message' => string]
  */
 function enviarWhatsAppViaNode($barbeiro_id, $telefone, $mensagem) {
-    // 🔥 IP da VM WhatsApp
+    // Endereço do servidor Node do WhatsApp
     $nodeServer = 'http://168.138.133.246:3000';
     
     $dados = [
@@ -129,7 +126,7 @@ function enviarWhatsAppViaNode($barbeiro_id, $telefone, $mensagem) {
         'mensagem' => $mensagem
     ];
 
-    // 🔥 ATUALIZADO: Endpoint com ID do barbeiro
+    // Endpoint atualizado que usa o ID do barbeiro para multi-sessão
     $ch = curl_init($nodeServer . "/send/{$barbeiro_id}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);

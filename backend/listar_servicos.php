@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 try {
     $barbeiro_id = $_SESSION['user_id'];
     
-    // CORREÇÃO AQUI: Adicionei "id" na lista de campos
+    // Corrigido: agora inclui o campo "id" na lista de serviços
     $stmt = $pdo->prepare("SELECT id, nome_servico, preco, duracao_minutos FROM servicos WHERE barbeiro_id = ? ORDER BY nome_servico");
     $stmt->execute([$barbeiro_id]);
     

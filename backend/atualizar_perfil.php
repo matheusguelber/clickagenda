@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE usuarios SET nome = ?, email = ?, telefone = ? WHERE id = ?");
         $stmt->execute([$nome, $email, $telefone, $id]);
         
-        // Atualiza a sessão
+        // Atualiza o nome na sessão para refletir a alteração
         $_SESSION['user_nome'] = $nome;
         
         echo json_encode(['success' => true, 'message' => 'Dados atualizados com sucesso!']);

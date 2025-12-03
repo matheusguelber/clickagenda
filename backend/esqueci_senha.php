@@ -16,22 +16,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Verifica se o email existe
+        // Procura o e-mail informado no banco
         $stmt = $pdo->prepare("SELECT id, nome FROM usuarios WHERE email = ?");
         $stmt->execute([$email]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$usuario) {
-            // Por segurança, não informamos se o email existe ou não
+            // Por segurança, não dizemos se o e-mail está cadastrado ou não
             echo json_encode(['success' => true, 'message' => 'Se o e-mail estiver cadastrado, você receberá as instruções em breve.']);
             exit;
         }
 
-        // Gera um token único
+        // Cria um token único para recuperação de senha
         $token = bin2hex(random_bytes(32));
         $expiracao = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-        // Salva o token no banco
+        // Salva ou atualiza o token no banco
         $stmt = $pdo->prepare("
             INSERT INTO tokens_recuperacao (usuario_id, token, expiracao) 
             VALUES (?, ?, ?)
@@ -39,11 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([$usuario['id'], $token, $expiracao, $token, $expiracao]);
 
-        // Envia o email
+        // Prepara e envia o e-mail de recuperação
         $mail = new PHPMailer(true);
 
         try {
-            // Configurações do servidor SMTP
+            // Configura o servidor SMTP para envio
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
@@ -53,11 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->Port       = 587;
             $mail->CharSet    = 'UTF-8';
 
-            // Remetente e destinatário
+            // Define quem envia e quem recebe
             $mail->setFrom('contato@clickagenda.com.br', 'ClickAgenda');
             $mail->addAddress($email, $usuario['nome']);
 
-            // Conteúdo do email
+            // Monta o conteúdo do e-mail com o link de recuperação
             $link_recuperacao = "http://" . $_SERVER['HTTP_HOST'] . "/clickagenda/redefinir_senha.php?token=" . $token;
             
             $mail->isHTML(true);

@@ -1,10 +1,10 @@
 <?php
-// backend/listar_notificacoes.php
+// Lista as notificações de agendamentos pendentes para o barbeiro logado
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexao.php';
 session_start();
 
-// 1. Segurança: Apenas barbeiro logado pode ver
+// Só mostra notificações se o usuário for barbeiro e estiver logado
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
     echo json_encode(['success' => false, 'notificacoes' => []]);
     exit;
@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 $barbeiro_id = $_SESSION['user_id'];
 
 try {
-    // 2. Busca agendamentos PENDENTES com detalhes
+    // Busca os agendamentos pendentes desse barbeiro, trazendo os detalhes
     $stmt = $pdo->prepare("
         SELECT 
             a.id, 
@@ -30,7 +30,7 @@ try {
     $stmt->execute([$barbeiro_id]);
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. Formata datas para ficar amigável (Ex: "Hoje", "Amanhã" ou "25/11")
+    // Deixa as datas mais amigáveis para exibir na tela (ex: "Hoje", "Amanhã" ou "25/11")
     foreach ($result as &$row) {
         $dataObj = new DateTime($row['data']);
         $hoje = new DateTime();

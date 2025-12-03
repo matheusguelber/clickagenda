@@ -1,4 +1,4 @@
-/* SISTEMA DE NOTIFICAÇÕES TOAST */
+/* Estilos para os toasts de notificação */
 #toast-container {
     position: fixed;
     top: 90px;
@@ -120,7 +120,7 @@
     .toast { min-width: auto; }
 }
 
-/* MODAL DE CONFIRMAÇÃO */
+/* Estilos para o modal de confirmação */
 .confirm-modal {
     position: fixed;
     top: 0;

@@ -1,4 +1,4 @@
-// SISTEMA DE NOTIFICAÇÕES TOAST
+// Funções para mostrar notificações toast na tela
 
 function showToast(message, type = 'info', title = '') {
     const container = document.getElementById('toast-container');

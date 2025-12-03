@@ -440,8 +440,8 @@
 </div>
 
     
-    <!-- WhatsApp Automático -->
-    <!-- Seção WhatsApp Automático - COMPLETA -->
+    <!-- Área de integração automática com WhatsApp -->
+    <!-- Tudo sobre o WhatsApp automático -->
 <div class="settings-card">
     <div class="card-header-row">
         <h3><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Automático</h3>
@@ -451,7 +451,7 @@
         </div>
     </div>
 
-    <!-- Info Box -->
+    <!-- Caixa de informações explicando como funciona -->
     <div class="whatsapp-info-box" style="display: flex; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left: 4px solid #25D366; border-radius: 8px; margin-bottom: 1.5rem;">
         <i class="fas fa-info-circle" style="font-size: 1.5rem; color: #25D366; margin-top: 0.25rem;"></i>
         <div>
@@ -462,10 +462,10 @@
         </div>
     </div>
 
-    <!-- Área de Status/QR Code -->
+    <!-- Área que mostra o status e o QR Code -->
     <div id="whatsapp-qr-container" style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 12px; margin-bottom: 1.5rem;">
         
-        <!-- QR Code Display -->
+        <!-- Mostra o QR Code para conectar -->
         <div id="qr-code-display" style="display: none;">
             <p style="color: #666; margin-bottom: 1rem; font-weight: 600;">
                 <i class="fas fa-mobile-alt"></i> Abra o WhatsApp no celular e escaneie o código
@@ -476,21 +476,21 @@
             </p>
         </div>
         
-        <!-- Conectando -->
+        <!-- Mensagem de conexão em andamento -->
         <div id="whatsapp-connecting" style="display: none; color: #666;">
             <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #FFA500; margin-bottom: 1rem;"></i>
             <p style="font-weight: 600;">Conectando WhatsApp...</p>
             <p style="font-size: 0.85rem; color: #999;">Aguarde alguns segundos</p>
         </div>
         
-        <!-- Conectado -->
+        <!-- Mensagem de sucesso ao conectar -->
         <div id="whatsapp-connected" style="display: none; color: #25D366;">
             <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
             <p style="font-weight: 600; font-size: 1.1rem; margin: 0;">WhatsApp Conectado com Sucesso!</p>
             <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">As mensagens serão enviadas automaticamente</p>
         </div>
         
-        <!-- Desconectado -->
+        <!-- Mensagem de desconexão -->
         <div id="whatsapp-disconnected">
             <i class="fab fa-whatsapp" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
             <p style="color: #666; margin-bottom: 0;">WhatsApp não está conectado</p>
@@ -498,7 +498,7 @@
         </div>
     </div>
 
-    <!-- Botões de Ação -->
+    <!-- Botões para conectar, desconectar, resetar ou testar -->
     <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
         <button id="btn-connect-whatsapp" class="btn btn-primary" onclick="conectarWhatsApp()" style="min-width: 160px;">
             <i class="fab fa-whatsapp"></i> Conectar WhatsApp
@@ -517,7 +517,7 @@
         </button>
     </div>
 
-    <!-- Nota de Rodapé -->
+    <!-- Aviso importante sobre manter o WhatsApp Web aberto -->
     <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px;">
         <p style="margin: 0; font-size: 0.85rem; color: #856404; display: flex; align-items: center; gap: 0.5rem;">
             <i class="fas fa-exclamation-triangle"></i>
@@ -1032,11 +1032,9 @@
     <script src="js/main.js"></script>
     
 
-<!-- ========================================
-     MODAL DE ESCOLHA: QR CODE OU CÓDIGo
-     ======================================== -->
+<!-- Modal para escolher entre QR Code ou Código -->
 
-<!-- Modal Principal de Escolha -->
+<!-- Modal principal para escolher o método de conexão -->
 <div class="modal" id="whatsapp-method-modal" style="z-index: 3000;">
     <div class="modal-content" style="max-width: 480px;">
         <div class="modal-header" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 1.5rem; margin: -2rem -2rem 2rem -2rem; border-radius: 12px 12px 0 0;">
@@ -1046,17 +1044,17 @@
             <button class="close-modal" onclick="closeModal('whatsapp-method')" style="color: white;">&times;</button>
         </div>
 
-        <!-- Instruções -->
+        <!-- Explicação rápida para o usuário -->
         <div style="text-align: center; margin-bottom: 2rem;">
             <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
                 Escolha como deseja conectar seu WhatsApp ao ClickAgenda
             </p>
         </div>
 
-        <!-- Opções de Conexão (Cards lado a lado) -->
+        <!-- Cartões para escolher o método de conexão -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
             
-            <!-- Card QR Code -->
+            <!-- Cartão para conectar via QR Code -->
             <div class="method-card" onclick="escolherMetodo('qr')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9;">
                 <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-qrcode" style="font-size: 1.8rem; color: white;"></i>
@@ -1067,10 +1065,10 @@
                 </p>
             </div>
 
-            <!-- Card Código (DESABILITADO) -->
+            <!-- Cartão para conectar via código (em breve) -->
             <div class="method-card method-card-disabled" onclick="escolherMetodo('code')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9; opacity: 0.6; position: relative;">
                 
-                <!-- Badge "Em breve" -->
+                <!-- Selo "Em breve" -->
                 <div style="position: absolute; top: 10px; right: 10px; background: #f39c12; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">
                     EM BREVE
                 </div>
@@ -1085,7 +1083,7 @@
             </div>
         </div>
 
-        <!-- Nota de Rodapé -->
+        <!-- Dica sobre o método por código -->
         <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
             <p style="margin: 0; font-size: 0.85rem; color: #856404; display: flex; align-items: flex-start; gap: 0.5rem;">
                 <i class="fas fa-info-circle" style="margin-top: 2px;"></i>
@@ -1095,7 +1093,7 @@
     </div>
 </div>
 
-<!-- Modal QR Code -->
+<!-- Modal para escanear QR Code -->
 <div class="modal" id="whatsapp-qr-modal" style="z-index: 3001;">
     <div class="modal-content" style="max-width: 420px;">
         <div class="modal-header" style="background: #25D366; color: white; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 12px 12px 0 0;">
@@ -1106,14 +1104,14 @@
         </div>
 
         <div id="qr-modal-content" style="text-align: center;">
-            <!-- Carregando -->
+            <!-- Mostra animação de carregando QR Code -->
             <div id="qr-loading" style="padding: 2rem;">
                 <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: #25D366; margin-bottom: 1rem;"></i>
                 <p style="color: #666; font-weight: 600;">Gerando QR Code...</p>
                 <p style="font-size: 0.85rem; color: #999;">Aguarde alguns segundos</p>
             </div>
 
-            <!-- QR Code Display -->
+            <!-- Mostra o QR Code gerado -->
             <div id="qr-display" style="display: none;">
                 <img id="qr-image" src="" alt="QR Code" style="max-width: 280px; border: 4px solid #25D366; border-radius: 12px; padding: 10px; background: white;">
                 <div style="margin-top: 1.5rem; padding: 1rem; background: #f0f8ff; border-radius: 8px;">
@@ -1129,7 +1127,7 @@
                 </div>
             </div>
 
-            <!-- Erro -->
+            <!-- Mensagem de erro ao gerar QR Code -->
             <div id="qr-error" style="display: none; padding: 2rem;">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem;"></i>
                 <p style="color: #e74c3c; font-weight: bold;">Erro ao gerar QR Code</p>
@@ -1142,7 +1140,7 @@
     </div>
 </div>
 
-<!-- Modal Código de Emparelhamento -->
+<!-- Modal para emparelhar usando código -->
 <div class="modal" id="whatsapp-code-modal" style="z-index: 3001;">
     <div class="modal-content" style="max-width: 420px;">
         <div class="modal-header" style="background: #0088cc; color: white; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 12px 12px 0 0;">
@@ -1152,7 +1150,7 @@
             <button class="close-modal" onclick="closeModal('whatsapp-code'); voltarEscolha();" style="color: white;">&times;</button>
         </div>
 
-        <!-- Passo 1: Solicitar Número -->
+        <!-- Primeiro passo: pedir o número do WhatsApp -->
         <div id="code-step-phone" style="padding: 1rem;">
             <p style="text-align: center; color: #666; margin-bottom: 1.5rem; font-size: 0.95rem;">
                 Digite o número do WhatsApp que deseja conectar
@@ -1185,13 +1183,13 @@
 
         <!-- Passo 2: Exibir Código -->
         <div id="code-step-display" style="display: none; text-align: center; padding: 1rem;">
-            <!-- Carregando -->
+            <!-- Mostra animação de carregando código -->
             <div id="code-loading" style="padding: 2rem;">
                 <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: #0088cc; margin-bottom: 1rem;"></i>
                 <p style="color: #666; font-weight: 600;">Gerando código...</p>
             </div>
 
-            <!-- Código Gerado -->
+            <!-- Mostra o código gerado para emparelhar -->
             <div id="code-display" style="display: none;">
                 <div style="background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%); padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem;">
                     <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 0.5rem;">Seu código é:</p>
@@ -1221,7 +1219,7 @@
                 </div>
             </div>
 
-            <!-- Erro -->
+            <!-- Mensagem de erro ao gerar código -->
             <div id="code-error" style="display: none; padding: 2rem;">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem;"></i>
                 <p style="color: #e74c3c; font-weight: bold;">Erro ao gerar código</p>

@@ -1,13 +1,11 @@
 <?php
-// ========================================
-// WhatsApp Config - Multi-MÃ©todo (QR + CÃ³digo)
-// ========================================
+// Configuração do WhatsApp - Suporte para QR Code e Código
 
 header('Content-Type: application/json');
 require_once 'conexao.php';
 session_start();
 
-// ðŸ”¥ IP CORRETO da VM WhatsApp (Confira se Ã© este mesmo)
+// Endereço do servidor Node do WhatsApp
 define('WHATSAPP_SERVER', 'http://168.138.133.246:3000');
 
 function getBarbeiroId() {
@@ -28,7 +26,7 @@ function fazerRequisicao($endpoint, $metodo = 'GET', $dados = null, $timeout = 3
     if ($metodo === 'POST') {
         curl_setopt($ch, CURLOPT_POST, true);
         if ($dados) {
-            // ðŸ”¥ AQUI Ã‰ IMPORTANTE: Enviando metodo e telefone como JSON
+            // Envia o método e telefone como JSON para o Node
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dados));
             curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         }
@@ -45,7 +43,7 @@ function fazerRequisicao($endpoint, $metodo = 'GET', $dados = null, $timeout = 3
     return $result ?? ['success' => false, 'message' => 'Erro JSON do Node'];
 }
 
-// === ROTAS ===
+// Rotas da API do WhatsApp
 
 // STATUS
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'status') {

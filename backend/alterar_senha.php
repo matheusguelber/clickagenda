@@ -25,18 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // 1. Busca a senha atual (hash) no banco
+        // Busca a senha atual do usuário no banco
         $stmt = $pdo->prepare("SELECT senha FROM usuarios WHERE id = ?");
         $stmt->execute([$id]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // 2. Verifica se a senha atual digitada bate com a do banco
+        // Confere se a senha digitada está certa
         if (!password_verify($senha_atual, $usuario['senha'])) {
             echo json_encode(['success' => false, 'message' => 'Sua senha atual está incorreta.']);
             exit;
         }
 
-        // 3. Atualiza para a nova senha
+        // Salva a nova senha no banco
         $nova_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("UPDATE usuarios SET senha = ? WHERE id = ?");
         $stmt->execute([$nova_hash, $id]);

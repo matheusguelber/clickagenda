@@ -11,12 +11,12 @@ if (!$barbeiro_id || !$data) {
 }
 
 try {
-    // Busca horários ocupados (ignora cancelados)
+    // Pega só os horários que estão ocupados, ignorando os cancelados
     $stmt = $pdo->prepare("SELECT hora FROM agendamentos WHERE barbeiro_id = ? AND data = ? AND status != 'cancelado'");
     $stmt->execute([$barbeiro_id, $data]);
     $ocupados = $stmt->fetchAll(PDO::FETCH_COLUMN);
     
-    // Formata para garantir HH:MM (ex: 09:00)
+    // Ajusta o formato para mostrar só horas e minutos
     $ocupadosFormatados = array_map(function($hora) {
         return substr($hora, 0, 5);
     }, $ocupados);

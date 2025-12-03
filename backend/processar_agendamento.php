@@ -12,13 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hora = $_POST['hora'] ?? '';
         $observacoes = trim($_POST['observacoes'] ?? '');
 
-        // 1. Validação Básica
+        // Valida se todos os campos obrigatórios foram preenchidos
         if (!$barbeiro_id || !$servico_id || !$cliente_nome || !$cliente_telefone || !$data || !$hora) {
             echo json_encode(['success' => false, 'message' => 'Todos os campos obrigatórios devem ser preenchidos.']);
             exit;
         }
 
-        // 2. Validação de Data Passada
+        // Não deixa agendar para datas que já passaram
         $data_agendamento = new DateTime($data);
         $hoje = new DateTime();
         $hoje->setTime(0, 0, 0);
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // 3. (NOVO) Validação do Horário de Funcionamento
+        // Checa se o horário está dentro do funcionamento do barbeiro
         $dia_semana = date('w', strtotime($data));
         $stmt = $pdo->prepare("SELECT aberto, hora_inicio, hora_fim FROM configuracao_horarios WHERE dia_semana = ? AND barbeiro_id = ?");
         $stmt->execute([$dia_semana, $barbeiro_id]);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // 4. Validação de Conflito (Já agendado?)
+        // Garante que não tem outro agendamento no mesmo horário
         $stmt = $pdo->prepare("SELECT id FROM agendamentos WHERE barbeiro_id = ? AND data = ? AND hora = ? AND status != 'cancelado'");
         $stmt->execute([$barbeiro_id, $data, $hora]);
         
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // 5. Inserir Agendamento
+        // Salva o novo agendamento no banco
         $stmt = $pdo->prepare("
             INSERT INTO agendamentos (barbeiro_id, servico_id, cliente_nome, cliente_telefone, data, hora, observacoes, status) 
             VALUES (?, ?, ?, ?, ?, ?, ?, 'pendente')

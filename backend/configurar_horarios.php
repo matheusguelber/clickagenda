@@ -3,7 +3,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/conexao.php';
 session_start();
 
-// Verifica se é barbeiro
+// Só deixa continuar se o usuário for barbeiro
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 
 $barbeiro_id = $_SESSION['user_id'];
 
-// --- SALVAR (POST) ---
+// Salva as configurações de horários (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $jsonHorarios = $_POST['horarios'] ?? '';
     $horarios = json_decode($jsonHorarios, true);
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($horarios as $dia) {
             $dia_semana = intval($dia['dia_semana']);
             $aberto = $dia['aberto'] ? 1 : 0;
-            // Se fechado ou vazio, define padrão, mas o flag 'aberto' é o que conta
+            // Se o dia estiver fechado ou sem horário, usa padrão, mas o que vale é o flag 'aberto'
             $inicio = ($aberto && !empty($dia['hora_inicio'])) ? $dia['hora_inicio'] : '09:00:00';
             $fim = ($aberto && !empty($dia['hora_fim'])) ? $dia['hora_fim'] : '18:00:00';
 
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } 
 
-// --- CARREGAR (GET) ---
+// Carrega as configurações de horários (GET)
 else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         $stmt = $pdo->prepare("SELECT * FROM configuracao_horarios WHERE barbeiro_id = ?");

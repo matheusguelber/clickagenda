@@ -14,19 +14,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $barbeiro_id = $_SESSION['user_id'];
         
-        // Pega dados do formulário
+        // Recebe os dados enviados pelo formulário
         $cliente_info = $_POST['cliente'] ?? '';
         $servico_id = intval($_POST['servico_id'] ?? 0);
         $data = $_POST['data'] ?? '';
         $hora = $_POST['hora'] ?? '';
         $observacoes = trim($_POST['observacoes'] ?? '');
         
-        // Separa nome e telefone do cliente (formato: "Nome|Telefone")
+        // Divide nome e telefone do cliente (vem juntos separados por '|')
         $cliente_parts = explode('|', $cliente_info);
         $cliente_nome = $cliente_parts[0] ?? '';
         $cliente_telefone = $cliente_parts[1] ?? '';
         
-        // Validações
+        // Checa se os dados obrigatórios foram preenchidos
         if (empty($cliente_nome) || empty($cliente_telefone)) {
             echo json_encode(['success' => false, 'message' => 'Cliente inválido.']);
             exit;
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Valida se a data não é no passado
+        // Não deixa agendar para datas que já passaram
         $data_agendamento = new DateTime($data);
         $hoje = new DateTime();
         $hoje->setTime(0, 0, 0);
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Valida se já existe agendamento neste horário
+        // Garante que não tem outro agendamento no mesmo horário
         $stmt = $pdo->prepare("
             SELECT id FROM agendamentos 
             WHERE barbeiro_id = ? AND data = ? AND hora = ? AND status != 'cancelado'
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Insere o agendamento
+        // Salva o novo agendamento no banco
         $stmt = $pdo->prepare("
             INSERT INTO agendamentos 
             (barbeiro_id, servico_id, cliente_nome, cliente_telefone, data, hora, observacoes, status) 

@@ -14,22 +14,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Busca o usuário pelo email
+        // Procura o usuário pelo e-mail informado
         $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->execute([$email]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Verifica senha
+        // Confere se a senha está correta
         if ($usuario && password_verify($senha, $usuario['senha'])) {
             
-            // Salva na sessão
+            // Guarda os dados do usuário na sessão
             $_SESSION['user_id'] = $usuario['id'];
             $_SESSION['user_tipo'] = $usuario['tipo'];
             $_SESSION['user_nome'] = $usuario['nome'];
             $_SESSION['user_slug'] = $usuario['slug'];
             $_SESSION['user_foto'] = $usuario['foto_perfil']; // Salva foto na sessão
 
-            // Retorna JSON para o JavaScript
+            // Envia resposta em JSON para o frontend
             echo json_encode([
                  'success' => true, 
                  'message' => 'Login realizado com sucesso!',

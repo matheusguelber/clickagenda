@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Força conversão para garantir que o ID é número
+    // Garante que o ID recebido é um número
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $nome = trim($_POST['nome_servico'] ?? '');
     $preco = $_POST['preco'] ?? 0;
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Atualiza apenas se o ID bater E o dono for o barbeiro logado
+        // Só atualiza se o serviço for do barbeiro logado
         $stmt = $pdo->prepare("UPDATE servicos SET nome_servico=?, preco=?, duracao_minutos=? WHERE id=? AND barbeiro_id=?");
         $stmt->execute([$nome, $preco, $duracao, $id, $barbeiro_id]);
 

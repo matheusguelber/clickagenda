@@ -15,11 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Gera um slug único baseado no nome da barbearia
+        // Cria um identificador único para a barbearia
         $slug_base = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $nome));
         $slug_base = trim($slug_base, '-');
         
-        // Verifica se o slug já existe e adiciona número se necessário
+        // Se já existir, coloca um número no final para não repetir
         $slug = $slug_base;
         $contador = 1;
         

@@ -4,7 +4,7 @@ require_once __DIR__ . '/conexao.php';
 
 session_start();
 
-// Verifica se o usuário está logado
+// Só deixa continuar se o usuário for barbeiro e estiver logado
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
 try {
     $barbeiro_id = $_SESSION['user_id'];
     
-    // Busca os próximos agendamentos (de hoje em diante, não cancelados)
+    // Pega os próximos agendamentos (a partir de hoje, que não foram cancelados)
     $stmt = $pdo->prepare("
         SELECT 
             a.id,
@@ -38,7 +38,7 @@ try {
     $stmt->execute([$barbeiro_id]);
     $agendamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Formata o preço
+    // Deixa o preço no formato brasileiro
     foreach ($agendamentos as &$agendamento) {
         $agendamento['preco'] = number_format($agendamento['preco'], 2, ',', '.');
     }

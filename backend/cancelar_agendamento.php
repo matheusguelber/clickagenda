@@ -4,7 +4,7 @@ require_once __DIR__ . '/conexao.php';
 
 session_start();
 
-// Verifica se o usuário está logado
+// Só deixa continuar se o usuário for barbeiro e estiver logado
 if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] != 'barbeiro') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Verifica se o agendamento pertence ao barbeiro logado
+        // Garante que o agendamento é do barbeiro logado
         $stmt = $pdo->prepare("SELECT id FROM agendamentos WHERE id = ? AND barbeiro_id = ?");
         $stmt->execute([$agendamento_id, $barbeiro_id]);
         
@@ -30,18 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Atualiza o status para cancelado
+        // Marca o agendamento como cancelado no banco
         $stmt = $pdo->prepare("UPDATE agendamentos SET status = 'cancelado' WHERE id = ?");
         $stmt->execute([$agendamento_id]);
         
-        // Prepara resposta
+        // Prepara a resposta para o frontend
         $response = [
             'success' => true,
             'message' => 'Agendamento cancelado com sucesso!',
             'whatsapp_sent' => false
         ];
         
-        // Envia WhatsApp de cancelamento
+        // Manda mensagem de cancelamento para o cliente via WhatsApp
         $resultado = enviarWhatsAppCancelamento($agendamento_id, $barbeiro_id, $pdo);
         
         if ($resultado['whatsapp_sent']) {
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  */
 function enviarWhatsAppCancelamento($agendamento_id, $barbeiro_id, $pdo) {
     try {
-        // Busca informações do agendamento
+        // Pega todos os dados do agendamento para montar a mensagem
         $stmt = $pdo->prepare("
             SELECT 
                 a.cliente_nome,
@@ -89,11 +89,11 @@ function enviarWhatsAppCancelamento($agendamento_id, $barbeiro_id, $pdo) {
             return ['whatsapp_sent' => false, 'whatsapp_error' => 'Agendamento não encontrado'];
         }
 
-        // Formata datas
+        // Deixa as datas bonitinhas para a mensagem
         $data_formatada = date('d/m/Y', strtotime($agendamento['data']));
         $hora_formatada = date('H:i', strtotime($agendamento['hora']));
 
-        // Monta a mensagem de cancelamento
+        // Cria o texto que vai ser enviado para o cliente avisando do cancelamento
         $mensagem = "Olá *{$agendamento['cliente_nome']}*! 👋\n\n";
         $mensagem .= "Seu agendamento foi *CANCELADO* ❌\n\n";
         $mensagem .= "*Barbearia:* {$agendamento['barbeiro_nome']}\n";
@@ -106,7 +106,7 @@ function enviarWhatsAppCancelamento($agendamento_id, $barbeiro_id, $pdo) {
             $mensagem .= "Tel: {$agendamento['barbeiro_telefone']}";
         }
 
-        // 🔥 ENVIA COM BARBEIRO_ID
+        // Envia usando o ID do barbeiro para multi-sessão
         return enviarViaNodeServer($barbeiro_id, $agendamento['cliente_telefone'], $mensagem);
 
     } catch (Exception $e) {
@@ -119,7 +119,7 @@ function enviarWhatsAppCancelamento($agendamento_id, $barbeiro_id, $pdo) {
  * 🔥 ATUALIZADO: IP da VM + barbeiro_id na URL
  */
 function enviarViaNodeServer($barbeiro_id, $telefone, $mensagem) {
-    // 🔥 IP CORRETO da VM WhatsApp
+    // Endereço do servidor Node do WhatsApp
     $nodeServer = 'http://168.138.133.246:3000';
     
     $dados = [
@@ -127,7 +127,7 @@ function enviarViaNodeServer($barbeiro_id, $telefone, $mensagem) {
         'mensagem' => $mensagem
     ];
 
-    // 🔥 ENDPOINT COM ID DO BARBEIRO
+    // Endpoint que usa o ID do barbeiro para multi-sessão
     $ch = curl_init($nodeServer . "/send/{$barbeiro_id}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
