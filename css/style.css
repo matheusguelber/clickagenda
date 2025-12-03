@@ -3945,3 +3945,30 @@ form .btn-secondary:hover {
     color: white;
     border-color: #e74c3c;
 }
+
+/* ==================================================
+   CORREÇÃO: CAMPOS DE NOVO CLIENTE (Responsivo)
+   ================================================== */
+
+/* Padrão (Mobile): Um embaixo do outro */
+.new-client-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* PC (Telas maiores): Lado a lado */
+@media (min-width: 769px) {
+    .new-client-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Divide em 2 */
+        gap: 15px;
+    }
+}
+
+/* Ajuste extra para garantir que os inputs fiquem bonitos */
+#novos-campos-cliente input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+}
