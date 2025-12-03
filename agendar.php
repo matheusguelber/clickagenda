@@ -17,6 +17,7 @@ if (!$barbeiro) { die("Barbearia não encontrada."); }
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendar - <?php echo htmlspecialchars($barbeiro['nome']); ?></title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/toast.css">
     <style>
         :root { --primary: #1a1a2e; --accent: #d4af37; --bg: #f4f6f8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
@@ -43,6 +44,7 @@ if (!$barbeiro) { die("Barbearia não encontrada."); }
     </style>
 </head>
 <body>
+<div id="toast-container"></div>
 <div class="booking-container">
     <div class="header">
         <h1><i class="fas fa-cut"></i> <?php echo htmlspecialchars($barbeiro['nome']); ?></h1>
@@ -73,8 +75,75 @@ if (!$barbeiro) { die("Barbearia não encontrada."); }
         </div>
         <button type="submit" class="btn-submit">CONFIRMAR AGENDAMENTO</button>
     </form>
+
+    <!-- MODAL DE SUCESSO -->
+    <div id="success-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+            <h2 style="color: #27ae60; margin-top: 0; margin-bottom: 1.5rem; font-size: 1.5rem;">Agendamento Confirmado!</h2>
+            
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left;">
+                <p style="margin: 0 0 0.75rem 0; color: #666;"><strong>Nome:</strong> <span id="success-nome"></span></p>
+                <p style="margin: 0 0 0.75rem 0; color: #666;"><strong>Telefone:</strong> <span id="success-telefone"></span></p>
+                <p style="margin: 0 0 0.75rem 0; color: #666;"><strong>Serviço:</strong> <span id="success-servico"></span></p>
+                <p style="margin: 0 0 0.75rem 0; color: #666;"><strong>Data:</strong> <span id="success-data"></span></p>
+                <p style="margin: 0; color: #666;"><strong>Horário:</strong> <span id="success-hora"></span></p>
+            </div>
+            
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 1.5rem;">Você receberá um WhatsApp de confirmação em breve!</p>
+            
+            <button onclick="document.getElementById('success-modal').style.display='none'; document.getElementById('booking-form').reset(); setTimeout(() => window.location.reload(), 300);" style="background: #27ae60; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;">OK</button>
+        </div>
+    </div>
 </div>
 <script>
+// ===== FUNÇÃO DE TOAST SIMPLES (SE showError NÃO EXISTIR) =====
+function showToastError(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-left: 4px solid #e74c3c;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        font-family: Arial, sans-serif;
+    `;
+    toast.innerHTML = `
+        <strong style="color: #e74c3c;">❌ Erro</strong><br>
+        <small style="color: #666;">${message}</small>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+function showToastSuccess(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-left: 4px solid #27ae60;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        font-family: Arial, sans-serif;
+    `;
+    toast.innerHTML = `
+        <strong style="color: #27ae60;">✅ Sucesso</strong><br>
+        <small style="color: #666;">${message}</small>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+// ===== SCRIPT DE AGENDAMENTO CORRIGIDO =====
+
 const barbeiroId = document.getElementById('barbeiro_id').value;
 const dataInput = document.getElementById('data_input');
 const gridHorarios = document.getElementById('grid-horarios');
@@ -151,21 +220,88 @@ function gerarBotoesHorario(inicio, fim, ocupados, dataSelecionada) {
 
 document.getElementById('booking-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    if(!document.getElementById('servico_id').value) { alert('Selecione um serviço!'); return; }
-    if(!document.getElementById('hora_input').value) { alert('Selecione um horário!'); return; }
+    
+    // Validações
+    if(!document.getElementById('servico_id').value) { 
+        showToastError('Selecione um serviço!');
+        return; 
+    }
+    if(!document.getElementById('hora_input').value) { 
+        showToastError('Selecione um horário!');
+        return; 
+    }
+    
     const btn = document.querySelector('.btn-submit');
     const textoOriginal = btn.innerText;
-    btn.innerText = 'AGENDANDO...'; btn.disabled = true;
-    fetch('backend/processar_agendamento.php', { method: 'POST', body: new FormData(this) })
-    .then(res => res.json()).then(data => {
-        if(data.success) { alert('✅ Agendado com sucesso!'); window.location.reload(); }
-        else { alert('❌ ' + data.message); btn.innerText = textoOriginal; btn.disabled = false; }
-    }).catch(err => { alert('Erro ao processar.'); btn.innerText = textoOriginal; btn.disabled = false; });
+    btn.innerText = 'AGENDANDO...'; 
+    btn.disabled = true;
+    
+    fetch('backend/processar_agendamento.php', { 
+        method: 'POST', 
+        body: new FormData(this) 
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('Response:', data); // Debug
+        
+        if(data.success) {
+            // ===== SUCESSO! =====
+            
+            // Pega os dados do formulário para exibir na modal
+            const formData = new FormData(document.getElementById('booking-form'));
+            const nomeServico = document.querySelector('.service-item.selected span strong').textContent;
+            const dataFormatada = new Date(formData.get('data')).toLocaleDateString('pt-BR');
+            
+            // Preenche a modal com os dados
+            document.getElementById('success-nome').textContent = formData.get('cliente_nome');
+            document.getElementById('success-telefone').textContent = formData.get('cliente_telefone');
+            document.getElementById('success-servico').textContent = nomeServico;
+            document.getElementById('success-data').textContent = dataFormatada;
+            document.getElementById('success-hora').textContent = formData.get('hora');
+            
+            // Mostra a modal de sucesso
+            const successModal = document.getElementById('success-modal');
+            if (successModal) {
+                successModal.style.display = 'flex';
+            }
+            
+        } else {
+            // ===== ERRO! =====
+            showToastError(data.message || 'Erro ao processar o agendamento');
+            btn.innerText = textoOriginal; 
+            btn.disabled = false;
+        }
+    })
+    .catch(err => { 
+        console.error('Fetch error:', err);
+        showToastError('Erro de conexão ao processar.'); 
+        btn.innerText = textoOriginal; 
+        btn.disabled = false; 
+    });
+});
+
+// ===== BOTÃO OK DA MODAL DE SUCESSO =====
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.textContent.includes('OK') && 
+        e.target.parentElement && e.target.parentElement.id === 'success-modal') {
+        
+        // Limpa o formulário
+        document.getElementById('booking-form').reset();
+        
+        // Esconde a modal
+        document.getElementById('success-modal').style.display = 'none';
+        
+        // Recarrega a página depois de um pequeno delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 300);
+    }
 });
 document.getElementById('phone').addEventListener('input', function (e) {
     var x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
     e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
 });
 </script>
+<script src="js/toast.js"></script>
 </body>
 </html>

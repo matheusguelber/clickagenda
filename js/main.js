@@ -296,13 +296,13 @@ function criarAgendamentoManual() {
         const nome = formData.get('novo_nome');
         const tel = formData.get('novo_telefone');
         if (!nome || !tel || tel.length < 10) {
-            alert("Por favor, preencha o nome e telefone do novo cliente.");
+            showError("Por favor, preencha o nome e telefone do novo cliente.");
             return;
         }
         // Substitui o valor "novo" pelos dados reais antes de enviar ao backend
         formData.set('cliente', `${nome}|${tel}`);
     } else if (!clienteValue) {
-        alert('Selecione um cliente.');
+        showError('Selecione um cliente.');
         return;
     }
     
@@ -351,9 +351,11 @@ function editAppointment(appointmentId) {
 }
 
 function deleteAppointment(appointmentId) {
-    if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
-        console.log('Deletando agendamento (visual):', appointmentId);
-    }
+    showConfirm('Tem certeza que deseja cancelar este agendamento?').then(confirmed => {
+        if (confirmed) {
+            console.log('Deletando agendamento (visual):', appointmentId);
+        }
+    });
 }
 
 // Seção: Serviços
@@ -774,7 +776,7 @@ function initializeLoginForms() {
             const confirmPassword = document.getElementById('register-password-confirm').value;
             
             if (password !== confirmPassword) {
-                alert('As senhas não coincidem!');
+                showError('As senhas não coincidem!');
                 return;
             }
             
@@ -814,7 +816,7 @@ function solicitarRecuperacaoSenha() {
     const email = prompt('Digite seu e-mail cadastrado:');
     if (!email) return;
     if (!validateEmail(email)) {
-        alert('Por favor, digite um e-mail válido.');
+        showError('Por favor, digite um e-mail válido.');
         return;
     }
     
@@ -2119,11 +2121,11 @@ if (fotoInput) {
         // 1. Validações básicas no frontend
         const extensoesValidas = ['image/jpeg', 'image/png', 'image/jpg'];
         if (!extensoesValidas.includes(file.type)) {
-            alert('Por favor, selecione uma imagem JPG ou PNG.');
+            showError('Por favor, selecione uma imagem JPG ou PNG.');
             return;
         }
         if (file.size > 2 * 1024 * 1024) { // 2MB
-            alert('A imagem é muito grande. O máximo é 2MB.');
+            showError('A imagem é muito grande. O máximo é 2MB.');
             return;
         }
 
@@ -2312,7 +2314,7 @@ function initializeEditForm() {
             })
             .then(res => res.json())
             .then(data => {
-                alert(data.message);
+                showInfo(data.message);
                 if (data.success) {
                     closeModal('edit-appointment');
                     // Atualiza as listas
@@ -2587,7 +2589,7 @@ function solicitarCodigo() {
     const telefone = document.getElementById('phone-code-input').value.trim();
     
     if (!telefone) {
-        alert('Por favor, digite o número do WhatsApp');
+        showError('Por favor, digite o número do WhatsApp');
         return;
     }
     
@@ -2595,7 +2597,7 @@ function solicitarCodigo() {
     const telefoneLimpo = telefone.replace(/\D/g, '');
     
     if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
-        alert('Número inválido. Digite com DDD (10 ou 11 dígitos)');
+        showError('Número inválido. Digite com DDD (10 ou 11 dígitos)');
         return;
     }
     
