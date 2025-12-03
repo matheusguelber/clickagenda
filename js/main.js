@@ -134,8 +134,7 @@ function showModal(modalId) {
     if (modal) {
         modal.classList.add('active');
         
-        // TRUQUE: Adiciona um estado no histórico do navegador
-        // Isso faz o botão "Voltar" do celular fechar o modal em vez de sair do site
+        // Adiciona estado no histórico para que o botão "Voltar" feche o modal
         window.history.pushState({ modalOpen: true, id: modalId }, "");
     }
 }
@@ -260,7 +259,7 @@ function carregarServicosParaAgendamento() {
                     mensagem.style.color = '#e74c3c';
                     mensagem.style.fontSize = '0.9rem';
                     mensagem.style.marginTop = '0.5rem';
-                    mensagem.innerHTML = '⚠️ Cadastre seus serviços primeiro na aba "Serviços"';
+                    mensagem.innerHTML = 'Cadastre seus serviços primeiro na aba "Serviços"';
                     selectServico.parentElement.appendChild(mensagem);
                     return;
                 }
@@ -300,7 +299,7 @@ function criarAgendamentoManual() {
             alert("Por favor, preencha o nome e telefone do novo cliente.");
             return;
         }
-        // Substitui o valor "novo" pelos dados reais para o backend
+        // Substitui o valor "novo" pelos dados reais antes de enviar ao backend
         formData.set('cliente', `${nome}|${tel}`);
     } else if (!clienteValue) {
         alert('Selecione um cliente.');
@@ -357,9 +356,9 @@ function deleteAppointment(appointmentId) {
     }
 }
 
-// (Mantenha todo o código anterior de NAVEGAÇÃO, MODAIS, FORMS, AGENDAMENTOS e CLIENTES igual ao que te mandei antes, até chegar na parte de SERVIÇOS)
+// Seção: Serviços
 
-// ===== SERVIÇOS (Atualizado) =====
+// Serviços (atualizado)
 
 function toggleService(serviceCard) {
     serviceCard.classList.toggle('selected');
@@ -419,7 +418,7 @@ function carregarServicos() {
 
     listaDiv.innerHTML = '<p>Atualizando lista...</p>';
 
-    // O TRUQUE ANTI-CACHE
+    // Anti-cache: adiciona timestamp à URL para forçar atualização
     const timestamp = new Date().getTime();
 
     fetch('backend/listar_servicos.php?t=' + timestamp)
@@ -501,6 +500,56 @@ function excluirServico(id) {
             });
         }
     });
+
+    // ✅ ADICIONA AVISO MOBILE NA SEÇÃO WHATSAPP
+    if (isMobileDevice()) {
+        const whatsappCard = document.querySelector('.settings-card .fab.fa-whatsapp')?.closest('.settings-card');
+        if (whatsappCard) {
+            const aviso = document.createElement('div');
+            aviso.style.cssText = `
+                background: #fff3cd;
+                border: 2px solid #ffc107;
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+            `;
+            aviso.innerHTML = `
+                <i class="fas fa-mobile-alt" style="font-size: 2rem; color: #856404;"></i>
+                <div>
+                    <strong style="display: block; color: #856404; margin-bottom: 0.5rem;">
+                        📱 Dispositivo Móvel Detectado
+                    </strong>
+                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.5;">
+                        A conexão do WhatsApp só funciona em computadores (PC/Notebook). 
+                        Por favor, acesse pelo seu computador para conectar o WhatsApp.
+                    </p>
+                </div>
+            `;
+            
+            // Insere o aviso no início do card
+            const firstElement = whatsappCard.querySelector('.card-header-row')?.nextElementSibling;
+            if (firstElement) {
+                whatsappCard.insertBefore(aviso, firstElement);
+            }
+            
+            // Desabilita todos os botões de WhatsApp
+            const btnConnect = document.getElementById('btn-connect-whatsapp');
+            const btnDisconnect = document.getElementById('btn-disconnect-whatsapp');
+            if (btnConnect) {
+                btnConnect.disabled = true;
+                btnConnect.style.opacity = '0.5';
+                btnConnect.style.cursor = 'not-allowed';
+            }
+            if (btnDisconnect) {
+                btnDisconnect.disabled = true;
+                btnDisconnect.style.opacity = '0.5';
+                btnDisconnect.style.cursor = 'not-allowed';
+            }
+        }
+    }
 }
 
 // ===== CALENDÁRIO =====
@@ -653,8 +702,7 @@ function initializeLoginForms() {
         });
     }
 
-    // Login Submit
-    // Login Submit (COM DIAGNÓSTICO DE ERRO)
+    // Login: envio e tratamento da resposta (inclui diagnóstico em caso de erro)
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
@@ -1285,7 +1333,7 @@ function copiarLink() {
     
     try {
         document.execCommand('copy');
-        alert('✅ Link copiado com sucesso!');
+        alert('Link copiado com sucesso.');
     } catch (err) {
         alert('Erro ao copiar. Por favor, copie manualmente.');
     }
@@ -1381,8 +1429,8 @@ function carregarConfiguracoesHorario() {
 // Variável global para controlar se o número aumentou
 let ultimoTotalPendentes = 0;
 
-// 1. TRUQUE PARA DESTRAVAR ÁUDIO NO IPHONE/ANDROID
-// O som só toca se o usuário já tiver clicado na tela pelo menos uma vez.
+// Destravar áudio em dispositivos móveis
+// O som só é permitido após interação do usuário; tocamos e pausamos para liberar o recurso
 function unlockAudio() {
     const audio = document.getElementById('notification-sound');
     if (audio) {
@@ -1445,7 +1493,7 @@ function verificarNotificacoes() {
         // LÓGICA DE TOCAR O SOM
         // Se o número aumentou (ex: de 0 pra 1, ou de 1 pra 2)
         if (totalAtual > ultimoTotalPendentes) {
-            console.log(`🔔 Nova notificação detectada! (Total: ${totalAtual})`);
+            console.log(`Nova notificação detectada (total: ${totalAtual})`);
             
             if(audio) {
                 audio.volume = 1.0; // Garante volume máximo
@@ -1456,10 +1504,10 @@ function verificarNotificacoes() {
                 
                 if (playPromise !== undefined) {
                     playPromise.then(_ => {
-                        console.log("🔊 Som tocou com sucesso.");
+                        console.log("Som tocou com sucesso.");
                     })
                     .catch(error => {
-                        console.warn("🔇 O navegador bloqueou o som. O usuário precisa interagir com a página primeiro.");
+                        console.warn("O navegador bloqueou o som. Usuário precisa interagir com a página primeiro.");
                     });
                 }
             }
@@ -1534,7 +1582,7 @@ let isConnecting = false;
 
 // ===== 2. MONITORAMENTO =====
 function iniciarMonitoramentoWhatsApp() {
-    console.log("🔌 Iniciando monitoramento WhatsApp...");
+    console.log("Iniciando monitoramento WhatsApp...");
     verificarStatusWhatsApp();
     
     if (whatsappStatusInterval) clearInterval(whatsappStatusInterval);
@@ -1557,7 +1605,7 @@ function setPollingSpeed(speed) {
     
     const interval = speed === 'fast' ? 3000 : 10000;
     whatsappStatusInterval = setInterval(verificarStatusWhatsApp, interval);
-    console.log(`⏱️ Polling ajustado para: ${interval}ms`);
+    console.log(`Polling ajustado para: ${interval}ms`);
 }
 
 // ===== 3. VERIFICAR STATUS =====
@@ -1568,7 +1616,7 @@ function verificarStatusWhatsApp() {
     fetch(`backend/whatsapp_config.php?action=status&barbeiro_id=${barbeiroId}`)
     .then(res => res.json())
     .then(data => {
-        console.log('📊 Status WhatsApp:', data);
+        console.log('Status WhatsApp:', data);
         
         const indicator = document.getElementById('whatsapp-status-indicator');
         if (!indicator) return;
@@ -1586,7 +1634,7 @@ function verificarStatusWhatsApp() {
         });
         
         if (data.connected) {
-            console.log('✅ WhatsApp conectado!');
+            console.log('WhatsApp conectado');
             dot.style.background = '#25D366';
             text.textContent = 'Conectado';
             text.style.color = '#25D366';
@@ -1602,7 +1650,7 @@ function verificarStatusWhatsApp() {
             }
             
         } else if (data.status === 'qr_ready' && data.qrCode) {
-            console.log('📱 QR Code disponível!');
+            console.log('QR Code disponível');
             dot.style.background = '#FFA500';
             text.textContent = 'Escaneie o QR Code';
             text.style.color = '#FFA500';
@@ -1626,7 +1674,7 @@ function verificarStatusWhatsApp() {
             }
             
         } else if (data.status === 'connecting' || data.status === 'authenticated') {
-            console.log('⏳ Conectando WhatsApp...');
+            console.log('Conectando WhatsApp...');
             dot.style.background = '#FFA500';
             text.textContent = 'Conectando...';
             text.style.color = '#FFA500';
@@ -1686,7 +1734,7 @@ function verificarStatusWhatsApp() {
             isConnecting = false;
             
         } else {
-            console.log('⚪ WhatsApp desconectado');
+            console.log('WhatsApp desconectado');
             dot.style.background = '#ccc';
             text.textContent = 'Desconectado';
             text.style.color = '#666';
@@ -1704,7 +1752,7 @@ function verificarStatusWhatsApp() {
         }
     })
     .catch(err => {
-        console.error('❌ Erro ao verificar status WhatsApp:', err);
+        console.error('Erro ao verificar status WhatsApp:', err);
         
         const disconnected = document.getElementById('whatsapp-disconnected');
         if (disconnected) {
@@ -1722,96 +1770,17 @@ function verificarStatusWhatsApp() {
 
 // ===== 4. CONECTAR =====
 function conectarWhatsApp() {
-    if (isConnecting) {
-        console.log('⏳ Já está conectando... aguarde');
-        return;
-    }    
-    isConnecting = true;
-    
-    const btnConnect = document.getElementById('btn-connect-whatsapp');
-    const originalText = btnConnect.innerHTML;
-    
-    btnConnect.disabled = true;
-    btnConnect.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
-    
-    const connecting = document.getElementById('whatsapp-connecting');
-    const disconnected = document.getElementById('whatsapp-disconnected');
-    const qrDisplay = document.getElementById('qr-code-display');
-    
-    if (disconnected) disconnected.style.display = 'none';
-    if (qrDisplay) qrDisplay.style.display = 'none';
-    
-    if (connecting) {
-        connecting.style.display = 'block';
-        connecting.innerHTML = `
-            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #FFA500; margin-bottom: 1rem;"></i>
-            <p style="font-weight: bold; color: #333;">Iniciando conexão WhatsApp...</p>
-            <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Aguarde alguns segundos</p>
-        `;
-    }
-    
-    const dot = document.querySelector('#whatsapp-status-indicator .status-dot');
-    const text = document.querySelector('#whatsapp-status-indicator .status-text');
-    if (dot) dot.style.background = '#FFA500';
-    if (text) {
-        text.textContent = 'Iniciando...';
-        text.style.color = '#FFA500';
-    }
-    
-    const barbeiroId = localStorage.getItem('user_id');
-    if (!barbeiroId) {
-        alert('Erro: Faça login primeiro');
+    // ✅ VERIFICA SE ESTÁ NO CELULAR
+    if (isMobileDevice()) {
+        showError(
+            'A conexão do WhatsApp só funciona em computadores. Por favor, acesse pelo seu PC ou notebook para conectar.',
+            '📱 Dispositivo Móvel Detectado'
+        );
         return;
     }
-
-    const formData = new FormData();
-    formData.append('action', 'connect');
-    formData.append('barbeiro_id', barbeiroId);
-
-    fetch('backend/whatsapp_config.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log('📡 Resposta da conexão:', data);
-        
-        if (data.success) {
-            console.log('✅ Conexão iniciada com sucesso!');
-            
-            setPollingSpeed('fast');
-            
-            if (connecting) {
-                connecting.innerHTML = `
-                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #25D366; margin-bottom: 1rem;"></i>
-                    <p style="font-weight: bold; color: #25D366;">Gerando QR Code...</p>
-                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Isso pode levar até 60 segundos</p>
-                `;
-            }
-            
-            setTimeout(verificarStatusWhatsApp, 1000);
-            setTimeout(verificarStatusWhatsApp, 3000);
-            setTimeout(verificarStatusWhatsApp, 6000);
-            setTimeout(verificarStatusWhatsApp, 10000);
-            setTimeout(verificarStatusWhatsApp, 15000);
-            
-        } else {
-            console.error('❌ Erro ao conectar:', data.message);
-            showError('Erro ao conectar: ' + data.message);
-            isConnecting = false;
-            verificarStatusWhatsApp();
-        }
-    })
-    .catch(err => {
-        console.error('❌ Erro de rede:', err);
-        showError('Erro ao conectar. Verifique se o servidor WhatsApp está rodando.');
-        isConnecting = false;
-        verificarStatusWhatsApp();
-    })
-    .finally(() => {
-        btnConnect.disabled = false;
-        btnConnect.innerHTML = originalText;
-    });
+    
+    // Abre o modal de escolha
+    showModal('whatsapp-method');
 }
 
 // ===== 5. DESCONECTAR =====
@@ -1954,6 +1923,10 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
+// ===== 11. DETECÇÃO DE DISPOSITIVO MÓVEL =====
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+}
 
 // ==================================================
 // LÓGICA DE NOTIFICAÇÕES (Estilo YouTube)
@@ -2176,7 +2149,7 @@ if (fotoInput) {
         .then(data => {
             if (data.success) {
                 // SUCESSO
-                statusText.textContent = '✅ Foto atualizada com sucesso!';
+                statusText.textContent = 'Foto atualizada com sucesso!';
                 statusText.style.color = '#27ae60';
                 
                 // Salva no localStorage para carregar rápido depois
@@ -2187,7 +2160,7 @@ if (fotoInput) {
 
             } else {
                 // ERRO DO BACKEND
-                statusText.textContent = '❌ Erro: ' + data.message;
+                statusText.textContent = 'Erro: ' + data.message;
                 statusText.style.color = '#e74c3c';
                 showError(data.message);
             }
@@ -2195,7 +2168,7 @@ if (fotoInput) {
         .catch(err => {
             // ERRO DE REDE
             console.error(err);
-            statusText.textContent = '❌ Erro de conexão ao enviar.';
+            statusText.textContent = 'Erro de conexão ao enviar.';
             statusText.style.color = '#e74c3c';
         })
         .finally(() => {
@@ -2501,10 +2474,10 @@ function escolherMetodo(metodo) {
         showModal('whatsapp-qr');
         conectarWhatsAppMetodo('qr');
     } else if (metodo === 'code') {
-        // 🚧 MÉTODO EM DESENVOLVIMENTO
+        // Método em desenvolvimento
         showWarning(
             'Esta funcionalidade está em desenvolvimento e estará disponível em breve!',
-            '🚧 Em Desenvolvimento'
+            'Em desenvolvimento'
         );
 
         // Reabre o modal de escolha após 2 segundos para que o usuário possa escolher QR
@@ -2516,6 +2489,17 @@ function escolherMetodo(metodo) {
 
 // 3. Conectar via QR Code
 function conectarWhatsAppMetodo(metodo) {
+    // ✅ DUPLA VERIFICAÇÃO (caso tentem burlar)
+    if (isMobileDevice()) {
+        showError(
+            'A conexão do WhatsApp só funciona em computadores. Por favor, acesse pelo seu PC ou notebook.',
+            '📱 Dispositivo Móvel Detectado'
+        );
+        closeModal('whatsapp-qr');
+        closeModal('whatsapp-code');
+        return;
+    }
+
     if (metodo === 'qr') {
         // Mostra loading
         document.getElementById('qr-loading').style.display = 'block';
