@@ -1316,5 +1316,77 @@
     </div>
 </div>
 
+
+<!-- Modal de Boas-Vindas -->
+<div class="welcome-modal" id="welcome-modal">
+    <div class="welcome-overlay"></div>
+    <div class="welcome-content">
+        <button class="welcome-close" onclick="fecharWelcomeModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="welcome-header">
+            <div class="welcome-icon">
+                <i class="fas fa-cut"></i>
+            </div>
+            <h2>Seja Bem-Vindo ao ClickAgenda!</h2>
+        </div>
+        
+        <div class="welcome-body">
+            <div class="welcome-image">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            
+            <div class="welcome-text">
+                <p class="welcome-intro">
+                    Estamos felizes em tê-lo aqui! 🎉
+                </p>
+                
+                <p class="welcome-description">
+                    O <strong>ClickAgenda</strong> é um projeto acadêmico desenvolvido por alunos do curso de 
+                    <strong>Análise e Desenvolvimento de Sistemas</strong> da <strong>Universidade São Francisco (USF)</strong>, 
+                    atualmente em sua <strong>versão 1.0 (Beta)</strong>.
+                </p>
+                
+                <div class="welcome-features">
+                    <div class="welcome-feature-item">
+                        <i class="fas fa-flask"></i>
+                        <span>Projeto experimental em desenvolvimento</span>
+                    </div>
+                    <div class="welcome-feature-item">
+                        <i class="fas fa-users"></i>
+                        <span>Criado para facilitar a gestão de barbearias</span>
+                    </div>
+                    <div class="welcome-feature-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Desenvolvido com fins educacionais</span>
+                    </div>
+                </div>
+                
+                <p class="welcome-note">
+                    <i class="fas fa-info-circle"></i>
+                    Estamos constantemente aprimorando a plataforma. Seu feedback é essencial para tornarmos 
+                    o ClickAgenda ainda melhor!
+                </p>
+            </div>
+        </div>
+        
+        <div class="welcome-footer">
+            <label class="welcome-checkbox">
+                <input type="checkbox" id="nao-mostrar-novamente">
+                <span>Não mostrar esta mensagem novamente</span>
+            </label>
+            
+            <button class="btn btn-primary" onclick="confirmarWelcomeModal()">
+                Entendi, vamos começar! <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        <div class="welcome-credits">
+            Desenvolvido por: <strong>Nayara Victória & Matheus Rubens</strong> | USF 2025
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

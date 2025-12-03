@@ -2334,6 +2334,7 @@ function initializeEditForm() {
 
 document.addEventListener('DOMContentLoaded', function() {
     // 1. Inicializa tudo o que já existia no seu código
+    verificarWelcomePopup();
     initializeForms();
     initializeLoginForms();
     initializeCalendar();
@@ -2341,6 +2342,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeServiceForm();
     initializeEditForm();
     
+
     // 2. Verifica autenticação
     const userId = localStorage.getItem('user_id');
     atualizarBotaoAuth();
@@ -2722,3 +2724,72 @@ document.addEventListener('click', (e) => {
         setPollingSpeed('slow');
     }
 });
+
+// ==================================================
+// POPUP DE BOAS-VINDAS
+// ==================================================
+
+// Função que verifica se deve mostrar o popup
+function verificarWelcomePopup() {
+    // Busca no navegador se o usuário já marcou "não mostrar"
+    const naoMostrarNovamente = localStorage.getItem('welcome_popup_hidden');
+    
+    // Se ele marcou, não mostra o popup
+    if (naoMostrarNovamente === 'true') {
+        return; // Para aqui
+    }
+    
+    // Se não marcou, aguarda 1 segundo e mostra o popup
+    setTimeout(() => {
+        mostrarWelcomeModal();
+    }, 1000);
+}
+
+// Função que ABRE o popup
+function mostrarWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) {
+        modal.classList.add('active'); // Ativa o popup
+        document.body.style.overflow = 'hidden'; // Trava o scroll da página
+    }
+}
+
+// Função que FECHA o popup (quando clica no X)
+function fecharWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) {
+        modal.classList.remove('active'); // Desativa o popup
+        document.body.style.overflow = ''; // Libera o scroll da página
+    }
+}
+
+// Função do botão "Entendi, vamos começar!"
+function confirmarWelcomeModal() {
+    // Pega o checkbox
+    const checkbox = document.getElementById('nao-mostrar-novamente');
+    
+    // Se o usuário MARCOU o checkbox
+    if (checkbox && checkbox.checked) {
+        // Salva no navegador que ele não quer ver mais
+        localStorage.setItem('welcome_popup_hidden', 'true');
+        console.log('✅ Popup não será exibido novamente');
+    }
+    
+    // Fecha o popup
+    fecharWelcomeModal();
+}
+
+// Fecha ao clicar no fundo escuro
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('welcome-overlay')) {
+        fecharWelcomeModal();
+    }
+});
+
+// ===== FUNÇÃO EXTRA PARA TESTAR =====
+// Digite no Console (F12): resetarWelcomePopup()
+function resetarWelcomePopup() {
+    localStorage.removeItem('welcome_popup_hidden');
+    console.log('🔄 Popup resetado! Recarregue a página.');
+    location.reload(); // Recarrega a página automaticamente
+}
