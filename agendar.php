@@ -1,19 +1,34 @@
 <?php
-require_once 'backend/conexao.php';
+// Exibe erros para facilitar o debug (remova depois se quiser)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Usa __DIR__ para garantir que o caminho funcione no Linux/Ubuntu
+require_once __DIR__ . '/backend/conexao.php';
 
 $slug = $_GET['barbeiro'] ?? '';
 if (!$slug) { die("Link inválido."); }
 
-// === CORREÇÃO AQUI ===
-// Instancia sua classe de API
-$api = new SupabaseAPI();
+try {
+    $api = new SupabaseAPI();
 
-// Usa o método selectOne da sua classe em vez de SQL puro
-// Busca na tabela 'usuarios', filtrando pelo slug e tipo
-$barbeiro = $api->selectOne('usuarios', ['slug' => $slug, 'tipo' => 'barbeiro'], 'id, nome, telefone');
-// =====================
+    // BUSCA O BARBEIRO
+    // Removi o filtro 'tipo' => 'barbeiro' para evitar erro caso o cadastro esteja como 'admin' ou outro
+    // Buscamos apenas pelo SLUG que é único.
+    $barbeiro = $api->selectOne('usuarios', ['slug' => $slug]);
 
-if (!$barbeiro) { die("Barbearia não encontrada."); }
+    if (!$barbeiro) { 
+        // Debug detalhado se não encontrar
+        echo "<h3>Barbearia não encontrada.</h3>";
+        echo "<p>O sistema buscou pelo slug: <strong>" . htmlspecialchars($slug) . "</strong></p>";
+        echo "<p>Verifique no Supabase se a coluna 'slug' está exatamente igual (sem espaços extras).</p>";
+        exit;
+    }
+
+} catch (Exception $e) {
+    die("Erro na API: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -131,21 +146,17 @@ const dataInput = document.getElementById('data_input');
 const gridHorarios = document.getElementById('grid-horarios');
 const stepHorarios = document.getElementById('step-horarios');
 
-// Substitua o trecho do fetch('backend/listar_servicos_publico.php'...) por este:
-
 fetch(`backend/listar_servicos_publico.php?barbeiro_id=${barbeiroId}&t=${Date.now()}`)
     .then(res => res.json())
     .then(data => {
         const container = document.getElementById('lista-servicos');
         container.innerHTML = '';
         
-        // CORREÇÃO: O backend retorna uma lista direta [ ... ], então checamos se é Array
         if(Array.isArray(data) && data.length > 0) {
             data.forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'service-item';
                 
-                // Garante que preço é número
                 const precoFormatado = parseFloat(s.preco).toFixed(2);
                 
                 div.innerHTML = `
@@ -245,7 +256,6 @@ document.getElementById('booking-form').addEventListener('submit', function(e) {
     .then(res => res.json())
     .then(data => {
         if(data.success) {
-            // ===== SUCESSO! =====
             const formData = new FormData(document.getElementById('booking-form'));
             const nomeServico = document.querySelector('.service-item.selected span strong').textContent;
             const dataParts = formData.get('data').split('-');
