@@ -1,0 +1,4377 @@
+/* Reset de estilos e variáveis globais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #1a1a2e;
+    --secondary: #d4af37;
+    --accent: #e94560;
+    --bg: #f5f5f5;
+    --card: #ffffff;
+    --text: #333333;
+    --text-light: #666666;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* Utilitários gerais para layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Estilos da barra de navegação */
+.navbar {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.logo i {
+    color: var(--secondary);
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--secondary);
+}
+
+
+.hamburger-menu {
+    display: none; 
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: white; 
+    cursor: pointer;
+    z-index: 1001; 
+}
+
+
+
+/* Estilos dos botões */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: var(--secondary);
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background: #c9a12e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid var(--secondary);
+}
+
+.btn-secondary:hover {
+    background: var(--secondary);
+    color: var(--primary);
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-edit {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-delete {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Seção principal do topo (hero) */
+.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, white, var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    color: #ddd;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Seção de recursos e diferenciais */
+.features {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.15rem;
+    color: var(--text-light);
+    margin-bottom: 4rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-bottom: 4rem;
+}
+
+.feature-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--secondary) 0%, #f4a261 100%);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    border-color: var(--secondary);
+}
+
+.feature-card:hover::before {
+    transform: scaleX(1);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--secondary) 0%, #f4a261 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+    transition: all 0.3s;
+}
+
+.feature-icon i {
+    font-size: 2.5rem;
+    color: white !important;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5);
+}
+
+.feature-card h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.feature-card > p {
+    color: var(--text-light);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.feature-list li {
+    padding: 0.5rem 0;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.feature-list li i {
+    color: var(--secondary);
+    font-size: 0.85rem;
+    min-width: 16px;
+}
+
+/* Seção de chamada para ação (CTA) */
+.cta-section {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.cta-section h3 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+}
+
+.cta-section p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.btn-large {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.btn-large i {
+    margin-right: 0.5rem;
+}
+
+/* Estilos para responsividade em telas menores */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .feature-card {
+        padding: 2rem;
+    }
+    
+    .cta-section {
+        padding: 3rem 1.5rem;
+    }
+    
+    .cta-section h3 {
+        font-size: 1.5rem;
+    }
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--primary);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: var(--card);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: var(--secondary);
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+/* ===== DASHBOARD ===== */
+.dashboard {
+    padding: 4rem 0;
+    background: white;
+}
+
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    height: fit-content;
+}
+
+.sidebar-item {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sidebar-item:hover {
+    background: var(--bg);
+}
+
+.sidebar-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.sidebar-item i {
+    width: 20px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ===== ESTATÍSTICAS ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--secondary);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+/* ===== CALENDÁRIO ===== */
+.calendar-section {
+    margin-top: 2rem;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border: 2px solid var(--bg);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0.5rem;
+}
+
+.calendar-day:hover {
+    border-color: var(--secondary);
+    background: var(--bg);
+}
+
+.calendar-day.has-appointment {
+    background: var(--primary);
+    color: white;
+}
+
+.calendar-day.today {
+    border-color: var(--accent);
+    font-weight: bold;
+}
+
+.calendar-day.selected {
+    background: var(--secondary) !important;
+    color: var(--primary) !important;
+    font-weight: bold;
+    border-color: var(--secondary) !important;
+}
+
+.calendar-day {
+    cursor: pointer;
+}
+
+/* ===== AGENDAMENTOS ===== */
+.appointments-list {
+    margin-top: 2rem;
+}
+
+.appointment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+
+.appointment-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.appointment-info {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.appointment-time {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+    min-width: 80px;
+}
+
+.appointment-details h4 {
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+
+.appointment-details p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ===== SERVIÇOS ===== */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.service-card {
+    background: var(--bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.service-card.selected {
+    border: 2px solid var(--secondary);
+    background: #fff9e6;
+}
+
+.service-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--secondary);
+    margin: 0.5rem 0;
+}
+
+/* ===== MODAIS ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    color: var(--primary);
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+}
+
+/* ===== FORMULÁRIOS ===== */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--bg);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--secondary);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 4rem;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .dashboard-container {
+        grid-template-columns: 1fr;
+    }
+        .nav-links {
+        display: none; 
+
+        
+        position: absolute;
+        top: 60px; 
+        left: 0;
+        width: 100%;
+        background-color: var(--primary); 
+        flex-direction: column;
+        padding: 1rem 0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    
+    .nav-links.active {
+        display: flex; 
+    }
+
+   
+    .nav-links a,
+    .nav-links button {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem 0;
+    }
+
+    .nav-links button {
+        margin: 0.5rem 1rem 0 1rem;
+        width: auto;
+    }
+    
+    
+    .hamburger-menu {
+        display: block;
+    }
+
+
+    .calendar-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.25rem;
+    }
+
+    .calendar-day {
+        font-size: 0.8rem;
+        padding: 0.25rem;
+    }
+
+    .appointment-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .appointment-time {
+        min-width: auto;
+    }
+
+/*MODAL DE LOGIN  */
+.login-modal-content {
+    max-width: 480px;
+    padding: 2rem;
+}
+
+.login-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.login-logo i {
+    font-size: 2.5rem;
+    color: var(--secondary);
+}
+
+.login-logo h2 {
+    color: var(--primary);
+    margin: 0;
+}
+
+.modal-header {
+    border-bottom: none;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.modal-header .close-modal {
+    position: absolute;
+    right: -0.5rem;
+    top: -0.5rem;
+}
+
+/* Formulários */
+.auth-form {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-title {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.form-description {
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+}
+
+/* Input com Ícone */
+/* ==================================================
+   CORREÇÃO DEFINITIVA: FORMULÁRIOS (Login/Cadastro)
+   ================================================== */
+
+/* 1. O Container (A caixa invisível que segura tudo) */
+.input-with-icon {
+    position: relative !important; /* Essencial para segurar os ícones */
+    display: block !important;     /* Remove flexbox para evitar conflitos */
+    width: 100% !important;
+}
+
+/* 2. O Campo de Digitação (Input) */
+.input-with-icon input {
+    width: 100% !important;
+    height: 50px !important;       /* Altura fixa para alinhar bem */
+    padding-left: 45px !important; /* Espaço para o ícone da esquerda (Cadeado) */
+    padding-right: 50px !important;/* Espaço para o ícone da direita (Olho) */
+    border: 1px solid #ddd;
+    border-radius: 50px;           /* Borda redonda */
+    outline: none;
+    background: #fff;
+    font-size: 1rem;
+    box-sizing: border-box !important; /* Garante que o padding não estoure a largura */
+    transition: border-color 0.3s;
+}
+
+.input-with-icon input:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* 3. O Ícone da Esquerda (Cadeado, Email, etc) */
+.input-with-icon > i:first-child {
+    position: absolute !important;
+    left: 15px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente exato */
+    color: #d4af37; /* Dourado */
+    z-index: 5;
+    pointer-events: none; /* O clique passa através dele */
+    font-size: 1.1rem;
+}
+
+/* 4. O Botão do Olho (Direita) */
+.toggle-password {
+    position: absolute !important;
+    right: 15px !important; /* Cola na direita, DENTRO da caixa */
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente exato */
+    
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    
+    padding: 5px !important; /* Área de clique */
+    z-index: 10 !important;  /* Fica acima de tudo */
+    
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    
+    color: #aaa; /* Cinza padrão */
+    transition: color 0.3s;
+}
+
+.toggle-password:hover {
+    color: #d4af37; /* Dourado ao passar o mouse */
+}
+
+/* Ícone dentro do botão */
+.toggle-password i {
+    font-size: 1.1rem !important;
+}
+
+/* 5. Links dos Modais (Tirar o azul feio) */
+.modal-footer p, 
+.modal-footer a, 
+.checkbox-text a,
+.forgot-link {
+    color: #666 !important;
+    font-size: 0.9rem;
+}
+
+.modal-footer a, 
+.checkbox-text a,
+.forgot-link {
+    color: #d4af37 !important; /* Link Dourado */
+    text-decoration: none !important;
+    font-weight: 600;
+}
+
+.modal-footer a:hover, 
+.checkbox-text a:hover,
+.forgot-link:hover {
+    text-decoration: underline !important;
+}
+
+/* Opções do Formulário */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.checkbox-text {
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.checkbox-text a {
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.checkbox-text a:hover {
+    text-decoration: underline;
+}
+
+.forgot-link {
+    color: var(--secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: opacity 0.3s;
+}
+
+.forgot-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Footer do Formulário */
+.form-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--bg);
+}
+
+.form-footer p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.form-footer a {
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+.form-footer a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Seletor de Tipo de Usuário */
+.user-type-selection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.user-type-card {
+    cursor: pointer;
+    display: block;
+}
+
+.user-type-card input[type="radio"] {
+    display: none;
+}
+
+.type-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid var(--bg);
+    border-radius: 8px;
+    transition: all 0.3s;
+    background: white;
+}
+
+.type-box i {
+    font-size: 1.8rem;
+    color: var(--text-light);
+    transition: all 0.3s;
+}
+
+.type-box div {
+    flex: 1;
+    text-align: left;
+}
+
+.type-box strong {
+    display: block;
+    color: var(--primary);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.type-box span {
+    display: block;
+    color: var(--text-light);
+    font-size: 0.8rem;
+}
+
+.user-type-card input[type="radio"]:checked + .type-box {
+    border-color: var(--secondary);
+    background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+.user-type-card input[type="radio"]:checked + .type-box i {
+    color: var(--secondary);
+}
+
+.user-type-card:hover .type-box {
+    border-color: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* Indicador de Força da Senha */
+.password-strength {
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.password-strength.active {
+    display: block;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--bg);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s;
+    border-radius: 2px;
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.strength-fill.weak {
+    width: 33%;
+    background: var(--accent);
+}
+
+.strength-text.weak {
+    color: var(--accent);
+}
+
+.strength-fill.medium {
+    width: 66%;
+    background: #f39c12;
+}
+
+.strength-text.medium {
+    color: #f39c12;
+}
+
+.strength-fill.strong {
+    width: 100%;
+    background: #27ae60;
+}
+
+.strength-text.strong {
+    color: #27ae60;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .login-modal-content {
+        max-width: 95%;
+        padding: 1.5rem;
+    }
+
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+}
+
+/* Caixa de Informação da Barbearia */
+/* ==================================================
+   ESTILO CARD "COMO FUNCIONA" (IGUAL IMAGEM)
+   ================================================== */
+
+.barbershop-info-box {
+    /* Layout Flex para colocar ícone ao lado do texto */
+    display: flex;
+    align-items: flex-start; /* Alinha no topo */
+    gap: 15px; /* Espaço entre o ícone e o texto */
+    
+    /* Visual da Caixa */
+    background: #eef9fe; /* Azul bem clarinho (igual da imagem) */
+    padding: 1.5rem;
+    border-radius: 12px;
+    
+    /* A barra dourada lateral */
+    border-left: 6px solid #d4af37; 
+    
+    margin-bottom: 1.5rem;
+    text-align: left; /* Garante texto alinhado à esquerda */
+}
+
+/* A Bolinha Dourada do Ícone */
+.barbershop-info-box i {
+    min-width: 32px;
+    height: 32px;
+    background-color: #d4af37; /* Fundo Dourado */
+    color: white;              /* Letra "i" branca */
+    border-radius: 50%;        /* Deixa redondo */
+    
+    /* Centraliza o "i" na bolinha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: 1.1rem;
+    margin-top: 2px; /* Ajuste fino para alinhar com o título */
+}
+
+/* O Título "Como funciona?" */
+.barbershop-info-box strong {
+    display: block;
+    color: #1a1a2e; /* Cor escura */
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+/* O Texto explicativo */
+.barbershop-info-box p {
+    color: #444; /* Cinza escuro para leitura */
+    font-size: 0.95rem;
+    line-height: 1.5; /* Espaçamento entre linhas para leitura fácil */
+    margin: 0;
+}
+
+/* --- Estilos para o novo formulário de serviço --- */
+.form-card {
+    background: var(--bg);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.divider {
+    border: none;
+    height: 1px;
+    background: var(--bg);
+    margin: 2.5rem 0;
+}
+
+/* Ajusta o grid de serviços para a lista */
+#lista-de-servicos {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+#lista-de-servicos .service-card {
+    background: white;
+    border: 1px solid var(--bg);
+}
+
+/* ===== LINK DE AGENDAMENTO ===== */
+.link-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.link-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.link-info i {
+    font-size: 1.5rem;
+    color: #1976d2;
+    margin-top: 0.25rem;
+}
+
+.link-info p {
+    margin: 0;
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.link-display {
+    margin-bottom: 2rem;
+}
+
+.link-display label {
+    display: block;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.link-box {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.link-box input {
+    flex: 1;
+    padding: 1rem;
+    border: 2px solid var(--secondary);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff9e6;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.link-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.link-help {
+    display: block;
+    margin-top: 0.75rem;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.link-preview {
+    padding-top: 2rem;
+    border-top: 2px solid var(--bg);
+}
+
+.link-preview h4 {
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.link-preview p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+/*FILTROS E BUSCA*/
+
+.filters-bar input[type="date"] {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s;
+    min-width: 180px;
+    color: #333;
+}
+
+.filters-bar input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    color: #d4af37;
+    font-size: 1.1rem;
+}
+
+.filters-bar input[type="date"]:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+
+.filters-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.filters-bar select,
+.filters-bar input[type="date"] {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s;
+    min-width: 180px;
+}
+
+.filters-bar select:focus,
+.filters-bar input[type="date"]:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.filters-bar select:hover,
+.filters-bar input[type="date"]:hover {
+    border-color: #d4af37;
+}
+
+.search-bar {
+    margin-bottom: 1.5rem;
+}
+
+.search-bar .input-with-icon {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-bar .input-with-icon i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 1rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.search-bar input::placeholder {
+    color: #aaa;
+}
+
+/* ===== LISTA COMPLETA DE AGENDAMENTOS ===== */
+.appointments-list-full {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.appointment-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.appointment-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.appointment-card.status-pendente {
+    border-left: 4px solid #f39c12;
+}
+
+.appointment-card.status-confirmado {
+    border-left: 4px solid #27ae60;
+}
+
+.appointment-card.status-cancelado {
+    border-left: 4px solid var(--accent);
+    opacity: 0.6;
+}
+
+.appointment-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-pendente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-confirmado {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-cancelado {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* GRID DE CLIENTES */
+.clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.client-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    padding: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    position: relative;
+}
+
+.client-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--secondary) 0%, #f4a261 100%);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.client-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+    border-color: var(--secondary);
+}
+
+.client-card:hover::before {
+    transform: scaleX(1);
+}
+
+.client-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem 2rem 1.5rem 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
+    position: relative;
+}
+
+.client-avatar {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--secondary) 0%, #f4a261 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+}
+
+.client-card:hover .client-avatar {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.6);
+}
+
+.client-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.client-info h4 {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.client-info p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.client-info p i {
+    color: var(--secondary);
+    min-width: 16px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.client-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 2rem;
+}
+
+.client-stat {
+    padding: 1.25rem;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.client-stat:first-child {
+    border-right: 2px solid #e9ecef;
+}
+
+.client-stat:hover {
+    transform: scale(1.05);
+}
+
+.client-stat i {
+    font-size: 1.5rem;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.7;
+}
+
+.client-stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: block;
+    line-height: 1;
+}
+
+.client-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    display: block;
+}
+
+/* Animação de entrada dos cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.client-card {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.client-card:nth-child(1) { animation-delay: 0.1s; }
+.client-card:nth-child(2) { animation-delay: 0.2s; }
+.client-card:nth-child(3) { animation-delay: 0.3s; }
+.client-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Responsividade para cards de clientes */
+@media (max-width: 768px) {
+    .clients-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .client-header {
+        padding: 1.5rem;
+    }
+    
+    .client-avatar {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        font-size: 1.5rem;
+        border-radius: 15px;
+    }
+    
+    .client-info h4 {
+        font-size: 1.1rem;
+    }
+    
+    .client-stats {
+        padding: 1.5rem;
+    }
+    
+    .client-stat-number {
+        font-size: 1.75rem;
+    }
+}
+
+/*GRID DE CLIENTES */
+.clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.client-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    padding: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    position: relative;
+}
+
+.client-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--secondary) 0%, #f4a261 100%);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.client-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+    border-color: var(--secondary);
+}
+
+.client-card:hover::before {
+    transform: scaleX(1);
+}
+
+.client-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem 2rem 1.5rem 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
+    position: relative;
+}
+
+.client-avatar {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--secondary) 0%, #f4a261 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+}
+
+.client-card:hover .client-avatar {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.6);
+}
+
+.client-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.client-info h4 {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.client-info p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.client-info p i {
+    color: var(--secondary);
+    min-width: 16px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.client-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 2rem;
+}
+
+.client-stat {
+    padding: 1.25rem;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.client-stat:first-child {
+    border-right: 2px solid #e9ecef;
+}
+
+.client-stat:hover {
+    transform: scale(1.05);
+}
+
+.client-stat i {
+    font-size: 1.5rem;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.7;
+}
+
+.client-stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: block;
+    line-height: 1;
+}
+
+.client-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    display: block;
+}
+
+/* Responsividade para cards de clientes */
+@media (max-width: 768px) {
+    .clients-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .client-header {
+        padding: 1.5rem;
+    }
+    
+    .client-avatar {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        font-size: 1.5rem;
+        border-radius: 15px;
+    }
+    
+    .client-info h4 {
+        font-size: 1.1rem;
+    }
+    
+    .client-stats {
+        padding: 1.5rem;
+    }
+    
+    .client-stat-number {
+        font-size: 1.75rem;
+    }
+}
+
+}
+/* ==========================================================================
+   ESTILOS FINAIS - CONFIGURAÇÕES, LINK E HORÁRIOS (Cole no final do arquivo)
+   ========================================================================== */
+
+/* --- 1. ESTRUTURA DOS CARDS --- */
+.settings-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+    margin-bottom: 2.5rem;
+    display: block;
+    position: relative;
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.card-header-row h3 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- 2. ESTILO DO LINK DE AGENDAMENTO --- */
+.link-input-group {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.link-input-group input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.8rem;
+    font-family: 'Courier New', monospace;
+    color: #555;
+    outline: none;
+    width: 100%;
+}
+
+.link-input-group button {
+    margin: 0;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    flex-shrink: 0;
+}
+
+.link-actions {
+    background: #fff9e6;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px dashed #d4af37;
+    text-align: center;
+}
+
+.link-actions p {
+    margin-bottom: 1rem;
+    color: #8a6d0b;
+}
+
+/* --- 3. ESTILO DA GRADE DE HORÁRIOS (O que estava faltando) --- */
+.schedule-grid {
+    display: grid;
+    /* 4 colunas: Dia, Switch, Início, Fim */
+    grid-template-columns: 1.5fr 1fr 1fr 1fr; 
+    gap: 1.5rem 1rem;
+    align-items: center;
+}
+
+.schedule-header {
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 0.5rem;
+}
+
+.schedule-row {
+    display: contents; /* Faz os itens respeitarem o grid pai */
+}
+
+.day-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+}
+
+.day-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-width: 60px;
+}
+
+/* Inputs de Hora */
+.schedule-row input[type="time"] {
+    padding: 0.6rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    width: 100%;
+    color: #333;
+    background: #fff;
+    transition: all 0.3s;
+}
+
+.schedule-row input[type="time"]:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    outline: none;
+}
+
+.schedule-row input[type="time"]:disabled {
+    background-color: #f9f9f9;
+    color: #ccc;
+    cursor: not-allowed;
+    border-color: #eee;
+}
+
+/* --- 4. ESTILO DOS SWITCHES (BOTÕES DE LIGAR) --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e0e0e0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: var(--secondary);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--secondary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* --- 5. RESPONSIVIDADE --- */
+@media (max-width: 768px) {
+    /* Cards */
+    .card-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .card-header-row button { width: 100%; }
+    
+    /* Link */
+    .link-input-group { flex-direction: column; }
+    .link-input-group input { 
+        text-align: center; margin-bottom: 0.5rem; border-bottom: 1px solid #eee; 
+    }
+    .link-input-group button { width: 100%; }
+
+    /* Horários */
+    .schedule-grid {
+        grid-template-columns: 1fr 1fr; /* Vira 2 colunas no celular */
+        gap: 1rem;
+    }
+    .schedule-header { display: none; }
+    .day-label {
+        grid-column: 1 / -1; /* Ocupa linha toda */
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+        color: var(--primary);
+    }
+    .schedule-row:first-of-type .day-label { border-top: none; margin-top: 0; }
+    .day-status { grid-column: 1 / -1; margin-bottom: 0.5rem; }
+}
+
+/* ===== DROPDOWN DE NOTIFICAÇÕES (ESTILO YOUTUBE) ===== */
+
+.notification-dropdown {
+    position: absolute;
+    top: 50px; /* Logo abaixo da navbar */
+    right: 0;
+    width: 360px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border: 1px solid #e0e0e0;
+    z-index: 2000;
+    display: none; /* Escondido por padrão */
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-header h4 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.dropdown-header i {
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #333;
+    text-decoration: none; /* Remove sublinhado de link */
+}
+
+.notif-item:hover {
+    background: #f9f9f9;
+}
+
+.notif-icon {
+    width: 40px;
+    height: 40px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notif-content {
+    flex: 1;
+}
+
+.notif-content strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+    color: var(--primary);
+}
+
+.notif-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.notif-time {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 0.3rem;
+    display: block;
+}
+
+.notif-empty {
+    padding: 2rem;
+    text-align: center;
+    color: #999;
+}
+
+.dropdown-footer {
+    padding: 0.8rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.dropdown-footer a {
+    color: var(--secondary);
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.dropdown-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Animação Suave */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+    .notification-dropdown {
+        width: 300px;
+        right: -60px; /* Ajuste para telas pequenas */
+    }
+}
+
+/* ==========================================================================
+   MELHORIAS DE LAYOUT - AGENDAMENTOS E CLIENTES
+   ========================================================================== */
+
+/* --- Estilização Geral de Inputs (Select, Date, Text) --- */
+.filters-bar select,
+.filters-bar input[type="date"],
+.search-bar input {
+    padding: 0.8rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+    outline: none;
+}
+
+/* Efeito de Foco (Borda Dourada) */
+.filters-bar select:focus,
+.filters-bar input[type="date"]:focus,
+.search-bar input:focus {
+    border-color: var(--secondary);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* --- Barra de Filtros (Agendamentos) --- */
+.filters-bar {
+    display: flex;
+    gap: 10px;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; /* Quebra linha no celular */
+    align-items: center;
+}
+
+.filters-bar select {
+    flex: 1;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+.filters-bar input[type="date"] {
+    flex: 1;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+/* Botão de Limpar Filtros */
+.filters-bar .btn-secondary {
+    border: 1px solid #ddd;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.8rem 1.2rem;
+    height: 100%; /* Mesma altura dos inputs */
+}
+
+.filters-bar .btn-secondary:hover {
+    background-color: #eee;
+    color: #333;
+    border-color: #ccc;
+}
+
+/* --- Barra de Busca (Clientes) --- */
+.search-bar {
+    margin-bottom: 1.5rem;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    color: var(--secondary); /* Lupa Dourada */
+    font-size: 1.1rem;
+    pointer-events: none; /* Permite clicar através do ícone */
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding-left: 45px; /* Espaço para o ícone */
+    height: 50px;
+    border-radius: 25px; /* Arredondado estilo App */
+    border: 1px solid #e0e0e0;
+    font-size: 1rem;
+}
+
+/* --- Mensagens de "Vazio" --- */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #e0e0e0;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filters-bar .btn-secondary {
+        justify-content: center;
+    }
+
+    /* ===== MODAL DE NOVO AGENDAMENTO ===== */
+#new-appointment-modal .modal-content {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#new-appointment-modal .modal-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #2a2a3e 100%);
+    color: white;
+    padding: 1.5rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 12px 12px 0 0;
+}
+
+#new-appointment-modal .modal-header h2 {
+    color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#new-appointment-modal .modal-header h2 i {
+    color: var(--secondary);
+}
+
+#new-appointment-modal .modal-header .close-modal {
+    color: white;
+    opacity: 0.8;
+}
+
+#new-appointment-modal .modal-header .close-modal:hover {
+    opacity: 1;
+}
+
+#new-appointment-modal .form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+#new-appointment-modal .form-group label i {
+    color: var(--secondary);
+    width: 18px;
+    text-align: center;
+}
+
+#new-appointment-modal select,
+#new-appointment-modal input[type="date"],
+#new-appointment-modal input[type="time"],
+#new-appointment-modal textarea {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#new-appointment-modal select:focus,
+#new-appointment-modal input:focus,
+#new-appointment-modal textarea:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+#new-appointment-modal textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+#new-appointment-modal .btn-primary {
+    margin-top: 1rem;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    #new-appointment-modal .modal-content {
+        max-width: 95%;
+        padding: 1.5rem;
+    }
+    
+    #new-appointment-modal .form-row {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Navbar e Topo */
+    .nav-content {
+        padding: 0 10px; /* Um pouco mais de espaço nas bordas */
+    }
+
+    /* Garante que o Sino e o Hambúrguer fiquem lado a lado */
+    .nav-content > div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* Espaço entre sino e menu */
+    }
+
+    .notification-wrapper {
+        margin: 0 !important; /* Remove margem extra */
+        display: block !important;
+    }
+
+    /* Menu Hambúrguer */
+    .hamburger-menu { display: block !important; }
+    
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px; /* Ajuste da altura da navbar */
+        left: 0;
+        width: 100%;
+        background-color: #1a1a2e;
+        flex-direction: column;
+        padding: 1rem;
+        z-index: 1000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .nav-links.active { display: flex !important; }
+    .nav-links a { 
+        padding: 15px; 
+        text-align: center; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); 
+        width: 100%;
+    }
+    .nav-links button { width: 100%; margin-top: 15px; }
+
+    /* --- CORREÇÃO DA DASHBOARD --- */
+    .dashboard-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+    }
+
+    /* Sidebar (Menu Horizontal) */
+    .sidebar {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding: 10px !important;
+        gap: 10px !important;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 60px;
+        z-index: 900;
+        /* Esconde a barra de rolagem mas permite rolar */
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .sidebar-item {
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 8px 15px !important;
+        border: 1px solid #eee;
+        border-radius: 20px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .sidebar-item.active {
+        background: #1a1a2e !important;
+        color: #d4af37 !important;
+        border-color: #1a1a2e !important;
+    }
+
+    /* --- CORREÇÃO DO CALENDÁRIO (Para não espremer) --- */
+    .calendar-grid {
+        display: flex !important; /* Muda de Grid para Flex */
+        overflow-x: auto !important; /* Permite rolagem lateral */
+        gap: 10px !important;
+        padding-bottom: 10px; /* Espaço para scroll */
+    }
+
+    .calendar-day {
+        min-width: 60px !important; /* Largura fixa mínima */
+        height: 70px !important;
+        flex: 0 0 auto !important; /* Impede encolhimento */
+    }
+
+    /* Cards de Estatísticas empilhados */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    .stat-number { font-size: 2rem !important; }
+
+    /* Dropdown de Notificação */
+    .notification-dropdown {
+        position: fixed !important;
+        top: 65px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 95% !important;
+        right: auto !important;
+        max-height: 70vh;
+    }
+}
+
+/* ==========================================================================
+   ESTILOS DO MENU DE PERFIL E CORREÇÃO NAV (Adicionar ao final)
+   ========================================================================== */
+
+/* Ajuste para jogar o menu para a direita no PC */
+.nav-content {
+    justify-content: space-between;
+}
+
+/* --- Avatar do Usuário --- */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4a261 100%); /* Dourado */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+}
+
+.user-avatar:hover {
+    transform: scale(1.05);
+}
+
+/* --- Dropdown de Perfil --- */
+.profile-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 200px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    border: 1px solid #eee;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 2000;
+}
+
+.profile-dropdown.active {
+    display: flex;
+}
+
+.profile-header {
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.profile-header strong {
+    display: block;
+    color: #1a1a2e;
+    font-size: 0.95rem;
+}
+
+.profile-header small {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.profile-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-menu li a {
+    display: block;
+    padding: 12px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-menu li a:hover {
+    background: #f5f5f5;
+}
+
+.profile-menu li.divider {
+    height: 1px;
+    background: #eee;
+    margin: 0;
+}
+
+/* --- Ajuste Mobile para o User Nav --- */
+@media (max-width: 768px) {
+    /* Garante que o container do usuário fique alinhado na direita */
+    #user-nav {
+        margin-left: auto; 
+    }
+    
+    /* Dropdown de perfil não vazar a tela */
+    .profile-dropdown {
+        right: 10px;
+    }
+}
+
+}
+/* ==================================================
+   CORREÇÃO FINAL: MENU PERFIL "CARD" (Igual Mobile)
+   ================================================== */
+
+/* 1. O Avatar (Bolinha com as iniciais) */
+.profile-wrapper {
+    position: relative;
+    margin-left: 15px;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    background: #d4af37; /* Dourado */
+    color: #1a1a2e;      /* Azul Escuro */
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: all 0.2s;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+/* 2. O Menu Dropdown (A caixa branca que abre) */
+.profile-dropdown {
+    position: absolute;
+    top: 60px;  /* Empurra para baixo do avatar */
+    right: 0;   /* Alinha à direita */
+    width: 240px;
+    background: white !important; /* Fundo BRANCO Sólido */
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2); /* Sombra forte estilo App */
+    border: 1px solid #eee;
+    z-index: 10000;
+    
+    /* Configuração Flex para organizar itens */
+    display: none; 
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Quando estiver ativo, aparece */
+.profile-dropdown.active {
+    display: flex !important;
+}
+
+/* 3. Cabeçalho do Menu (Nome e Cargo) */
+.profile-info {
+    background: #f8f9fa;
+    padding: 20px 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-info strong {
+    display: block;
+    font-size: 1.1rem;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+}
+
+.profile-info span {
+    font-size: 0.85rem;
+    color: #666;
+    background: #eee;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* 4. Lista de Links (Remove as bolinhas feias) */
+.profile-links {
+    list-style: none !important; /* Tira bolinhas */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.profile-links li {
+    margin: 0;
+    padding: 0;
+}
+
+.profile-links li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #fbfbfb;
+    transition: background 0.2s;
+}
+
+.profile-links li a:hover {
+    background: #fff9e6; /* Fundo amarelinho ao passar mouse */
+    color: #d4af37;
+}
+
+.profile-links li a i {
+    width: 20px;
+    text-align: center;
+    color: #999;
+}
+
+.profile-links li a:hover i {
+    color: #d4af37;
+}
+
+/* Botão Sair Vermelho */
+.logout-btn {
+    color: #e74c3c !important;
+}
+.logout-btn:hover {
+    background: #ffebeb !important;
+    color: #c0392b !important;
+}
+.logout-btn i {
+    color: #e74c3c !important;
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: SINO E BOLINHA VERMELHA (Badge)
+   ================================================== */
+
+/* Container do Sino */
+.notification-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+/* Ícone do Sino */
+.notification-bell-icon {
+    position: relative; /* Importante para a bolinha se basear nele */
+    padding: 5px;
+    color: white;
+    font-size: 1.4rem; /* Tamanho do ícone */
+    transition: transform 0.2s;
+}
+
+.notification-bell-icon:hover {
+    transform: scale(1.1); /* Efeito de zoom leve ao passar o mouse */
+}
+
+/* A Bolinha Vermelha (O "Vermelhinho") */
+#notification-badge {
+    position: absolute;
+    top: 0;           /* Alinha no topo do ícone */
+    right: 0;         /* Alinha na direita do ícone */
+    
+    background-color: #e74c3c; /* Vermelho vivo */
+    color: white;
+    
+    font-size: 0.65rem; /* Fonte pequena */
+    font-weight: bold;
+    
+    /* Tamanho e forma da bolinha */
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    
+    /* Centraliza o número dentro da bolinha */
+    display: flex; /* (Controlado pelo JS: none/flex) */
+    align-items: center;
+    justify-content: center;
+    
+    /* Borda escura para destacar do fundo */
+    border: 2px solid #1a1a2e; 
+    
+    /* Faz a bolinha "flutuar" um pouco pra fora */
+    transform: translate(25%, -25%); 
+    z-index: 10;
+}
+
+/* Correção para o Dropdown não quebrar no celular */
+.notification-dropdown {
+    top: 50px !important; /* Distância do topo */
+}
+
+/* ==================================================
+   PAINEL DE NOTIFICAÇÕES (Estilo YouTube)
+   ================================================== */
+
+/* O Container do Sino */
+.notification-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* O Ícone do Sino */
+.notification-bell-icon {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    font-size: 1.3rem;
+    color: white;
+    transition: transform 0.2s;
+}
+.notification-bell-icon:hover { transform: scale(1.1); }
+
+/* A Bolinha Vermelha (Badge) */
+#notification-badge {
+    position: absolute;
+    top: 0; right: 0;
+    background-color: #e74c3c; color: white;
+    font-size: 0.65rem; font-weight: bold;
+    min-width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #1a1a2e; /* Borda da cor do fundo para destacar */
+    display: none; /* JS ativa se > 0 */
+}
+
+/* O PAINEL FLUTUANTE (Dropdown) */
+.notification-dropdown {
+    position: absolute;
+    top: 50px;
+    right: -10px; /* Alinha à direita do sino */
+    width: 340px; /* Largura confortável */
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    border: 1px solid #eee;
+    z-index: 2000;
+    
+    /* Escondido por padrão */
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Classe que o JS adiciona para mostrar */
+.notification-dropdown.active {
+    display: flex;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Cabeçalho do Painel */
+.notif-header {
+    padding: 12px 16px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.notif-header h4 { margin: 0; color: #333; font-size: 1rem; }
+.notif-header small { color: #d4af37; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+
+/* Lista de Itens */
+.notif-list {
+    max-height: 350px; /* Scroll se for muito grande */
+    overflow-y: auto;
+    background: #fff;
+}
+
+/* Item Individual */
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+.notif-item:hover { background-color: #f2f8ff; }
+
+/* Ícone do Usuário (Bolinha Azul) */
+.notif-icon-circle {
+    width: 36px; height: 36px;
+    background: #e3f2fd; color: #1976d2;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Texto da Notificação */
+.notif-content { flex: 1; }
+.notif-title { display: block; font-weight: 600; font-size: 0.95rem; color: #333; }
+.notif-subtitle { display: block; font-size: 0.85rem; color: #666; margin-top: 2px; }
+.notif-time { font-size: 0.75rem; color: #d4af37; font-weight: 600; margin-top: 4px; display: block; }
+
+/* Estado Vazio */
+.notif-empty { padding: 30px; text-align: center; color: #999; font-size: 0.9rem; }
+
+/* Animação */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* RESPONSIVIDADE (Celular) */
+@media (max-width: 768px) {
+    .notification-dropdown {
+        position: fixed; /* Fixa na tela */
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%); /* Centraliza */
+        width: 95%; /* Quase tela toda */
+        right: auto;
+    }
+}
+
+/* Preview da foto de perfil nas configurações */
+.profile-image-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #f0f2f5;
+    border: 3px solid #d4af37; /* Borda dourada */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* A imagem em si, para preencher o círculo */
+.profile-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* As iniciais, caso não tenha foto */
+#settings-profile-initials {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #999;
+}
+
+/* Botão de Remover Foto */
+.btn-remove {
+    background-color: transparent;
+    color: #e74c3c; /* Vermelho */
+    border: 2px solid #e74c3c;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: FORMULÁRIOS E OLHO DA SENHA
+   ================================================== */
+
+/* 1. O Container (A caixa que segura tudo) */
+.input-with-icon {
+    position: relative !important; /* Essencial: define os limites */
+    display: block !important;     /* Essencial: evita comportamentos estranhos de flex */
+    width: 100% !important;
+}
+
+/* 2. O Input (Onde você digita) */
+.input-with-icon input {
+    width: 100% !important;
+    height: 45px !important;       /* Altura padrão confortável */
+    padding-left: 40px !important; /* Espaço para o cadeado na esquerda */
+    padding-right: 45px !important;/* Espaço para o olho na direita */
+    box-sizing: border-box !important; /* Garante que o padding não aumente a largura */
+    border-radius: 8px !important;
+    border: 1px solid #ccc !important;
+}
+
+/* 3. O Ícone da Esquerda (Cadeado/Email) */
+.input-with-icon > i {
+    position: absolute !important;
+    left: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente */
+    color: #d4af37 !important; /* Dourado */
+    z-index: 2;
+    pointer-events: none; /* O clique atravessa ele */
+}
+
+/* 4. O Botão do Olho (Direita) */
+.toggle-password {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    right: 5px !important; /* Cola na direita, com leve margem */
+    margin: auto !important; /* Ajuda na centralização */
+    
+    width: 40px !important; /* Largura fixa para área de clique */
+    height: 40px !important; /* Altura fixa */
+    
+    background: transparent !important; /* Remove fundo cinza padrão */
+    border: none !important; /* Remove bordas padrão */
+    padding: 0 !important;
+    
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    cursor: pointer !important;
+    z-index: 10 !important; /* Fica por cima de tudo */
+    color: #aaa !important;
+}
+
+.toggle-password:hover {
+    color: #d4af37 !important;
+}
+
+/* 5. Correção dos Links Azuis Feios (Login/Cadastro) */
+.form-footer a, 
+.forgot-link, 
+.checkbox-text a {
+    color: #d4af37 !important; /* Dourado */
+    text-decoration: none !important;
+    font-weight: 600;
+}
+
+.form-footer a:hover, 
+.forgot-link:hover {
+    text-decoration: underline !important;
+    color: #b3932a !important;
+}
+
+/* ==================================================
+   CORREÇÃO DE EMERGÊNCIA: INPUTS EM MOBILE/TABLET
+   ================================================== */
+
+@media (max-width: 1024px) {
+
+    /* 1. Força o container a ser um bloco relativo */
+    .input-with-icon {
+        position: relative !important;
+        display: block !important; /* Garante que não seja flex */
+        width: 100% !important;
+        height: auto !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* 2. Força o input a ter espaço para o olho */
+    .input-with-icon input {
+        width: 100% !important;
+        height: 50px !important;       /* Altura fixa ajuda no alinhamento */
+        padding-left: 45px !important; /* Ícone esquerdo */
+        padding-right: 50px !important;/* Ícone direito (olho) */
+        box-sizing: border-box !important; /* O padding fica dentro da largura */
+    }
+
+    /* 3. Posiciona o Olho de forma absoluta e agressiva */
+    .toggle-password {
+        position: absolute !important;
+        
+        /* Técnica de centralização vertical robusta para mobile */
+        top: 0 !important;
+        bottom: 0 !important;
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+        
+        right: 5px !important; /* Cola na direita */
+        left: auto !important; /* Garante que não cole na esquerda */
+        
+        width: 45px !important; /* Área de toque grande */
+        height: 45px !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        background: transparent !important;
+        border: none !important;
+        z-index: 999 !important; /* Fica acima de tudo */
+        transform: none !important; /* Remove transforms que podem bugar no mobile */
+    }
+
+    /* 4. Garante que o ícone da esquerda (Cadeado) também fique certo */
+    .input-with-icon > i {
+        position: absolute !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+        left: 15px !important;
+        height: 20px !important; /* Altura fixa para o ícone */
+        transform: none !important;
+    }
+    
+    /* 5. Remove margens estranhas que o celular possa adicionar */
+    .form-group {
+        display: block !important;
+        position: relative !important;
+    }
+}
+
+/* ==================================================
+   AJUSTE DE ESPAÇAMENTO: LOGIN
+   ================================================== */
+
+/* Aumenta o espaço entre o "Lembrar-me" e o botão "Entrar" */
+.form-options {
+    margin-bottom: 2rem !important; /* Aumentei bastante para desgrudar */
+    padding-bottom: 0.5rem; /* Um pouco de respiro extra */
+}
+
+/* Garante que o botão tenha um espaço em cima também */
+.auth-form button[type="submit"] {
+    margin-top: 10px !important;
+}
+
+/* ==================================================
+   CORREÇÃO: CHECKBOX AO LADO DO TEXTO
+   ================================================== */
+
+/* ==================================================
+   CORREÇÃO FINAL: CHECKBOX CENTRALIZADO
+   ================================================== */
+
+.checkbox-container {
+    display: flex !important;
+    align-items: center !important; /* Alinha o centro vertical */
+    justify-content: flex-start !important;
+    margin-bottom: 1.5rem !important;
+    cursor: pointer;
+    line-height: 1.1 !important; /* Reduz a altura da linha do texto */
+}
+
+.checkbox-container input[type="checkbox"] {
+    /* Zera qualquer margem que o navegador esteja colocando */
+    margin: 0 !important; 
+    padding: 0 !important;
+    
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0 !important;
+    
+    /* Pequeno ajuste para subir ou descer o quadrado manualmente */
+    position: relative !important;
+    top: -1px !important; /* Sobe 1 pixel para compensar o olho humano */
+    
+    cursor: pointer;
+    accent-color: #d4af37;
+}
+
+.checkbox-text {
+    margin-left: 10px !important; /* Espaço entre o quadrado e o texto */
+    font-size: 0.9rem !important;
+    color: #555;
+    display: inline-block !important;
+}
+
+.checkbox-text a {
+    color: #d4af37 !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ==================================================
+   CORREÇÃO VISUAL: CARD "COMO FUNCIONA"
+   ================================================== */
+
+.barbershop-info-box {
+    /* Visual da Caixa */
+    background-color: #eef9fe !important; /* Azul bem clarinho */
+    border-left: 5px solid #d4af37 !important; /* Barra Dourada grossa */
+    border-radius: 8px !important;
+    padding: 1.2rem 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    
+    /* Layout Flex para alinhar ícone e texto */
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
+    text-align: left !important;
+}
+
+/* Estilização do Ícone (A bolinha dourada) */
+.barbershop-info-box i {
+    /* Tamanho e forma da bolinha */
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 50% !important;
+    
+    /* Cores */
+    background-color: #d4af37 !important; /* Fundo Dourado */
+    color: white !important;              /* Letra "i" branca */
+    
+    /* Centralizar o ícone dentro da bolinha */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    font-size: 0.9rem !important;
+    flex-shrink: 0 !important; /* Impede que a bolinha amasse */
+    margin-top: 3px !important; /* Alinha com a primeira linha do texto */
+    
+    /* Remove estilos padrão do FontAwesome que possam atrapalhar */
+    padding: 0 !important;
+}
+
+/* Título */
+.barbershop-info-box strong {
+    display: block !important;
+    color: #1a1a2e !important; /* Azul escuro */
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 5px !important;
+}
+
+/* Texto */
+.barbershop-info-box p {
+    color: #444 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+}
+
+/* ==================================================
+   CORREÇÃO URGENTE: BOTÕES INVISÍVEIS
+   ================================================== */
+
+/* Força botões secundários dentro de áreas brancas a terem cor */
+.settings-card .btn-secondary,
+#whatsapp-container .btn-secondary,
+form .btn-secondary {
+    color: #d4af37 !important;       /* Texto Dourado */
+    border: 2px solid #d4af37 !important; /* Borda Dourada */
+    background-color: transparent !important;
+    font-weight: 700 !important;
+}
+
+/* Efeito ao passar o mouse (Fica todo dourado) */
+.settings-card .btn-secondary:hover,
+#whatsapp-container .btn-secondary:hover,
+form .btn-secondary:hover {
+    background-color: #d4af37 !important;
+    color: white !important;
+}
+
+/* Garante que o botão de "Digitar Código" no mobile também fique legível */
+.method-btn {
+    border: 1px solid #ddd !important;
+    color: #333 !important;
+}
+
+/* ==================================================
+   MELHORIA FINAL: BOTÃO NOVO AGENDAMENTO (MOBILE)
+   ================================================== */
+
+@media (max-width: 768px) {
+    
+    /* Esconde o texto do botão e transforma em bolinha flutuante */
+    #appointments-section .btn-primary {
+        position: fixed !important;
+        bottom: 25px !important;
+        right: 20px !important;
+        
+        width: 60px !important;
+        height: 60px !important;
+        border-radius: 50% !important;
+        
+        padding: 0 !important;
+        margin: 0 !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.6) !important;
+        z-index: 1000 !important;
+        
+        /* Esconde o texto "Novo Agendamento" e deixa só o ícone */
+        font-size: 0 !important; 
+    }
+
+    /* 2. Garante que o ícone fique grande e visível */
+    #appointments-section .btn-primary i {
+        font-size: 1.8rem !important;
+        margin: 0 !important;
+    }
+
+    /* 3. O botão da Visão Geral (Agenda da Semana) volta ao normal (barra) */
+    .calendar-header .btn-primary {
+        position: relative !important;
+        width: 100% !important;
+        border-radius: 8px !important;
+        height: auto !important;
+        box-shadow: none !important;
+        font-size: 1rem !important;
+        margin-top: 10px !important;
+    }
+
+    /* Garante que o ícone fique visível e grande */
+    #appointments-section .btn-primary i,
+    .calendar-header .btn-primary i {
+        font-size: 1.5rem !important;
+        margin: 0 !important;
+    }
+}
+
+/* ==================================================
+   DESIGN: SEÇÃO DE SERVIÇOS (Mobile & PC)
+   ================================================== */
+
+/* Ajuste do Grid de Serviços para Celular */
+@media (max-width: 768px) {
+    .services-grid {
+        /* Uma coluna única no celular para os cards ficarem grandes */
+        grid-template-columns: 1fr !important; 
+        gap: 15px !important;
+    }
+}
+
+/* Cartão de Serviço (Visual Moderno) */
+.service-card {
+    background: white !important;
+    border: 1px solid #eee !important;
+    border-left: 5px solid #d4af37 !important; /* Detalhe Dourado na esquerda */
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+}
+
+.service-card h4 {
+    margin: 0 0 5px 0;
+    color: #1a1a2e;
+    font-size: 1.1rem;
+}
+
+.service-price {
+    font-size: 1.4rem !important;
+    color: #d4af37 !important;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.service-card small {
+    color: #888;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Botão de Excluir (Lixeira) */
+.service-card .btn-delete {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #fff5f5 !important;
+    color: #e74c3c !important;
+    width: 35px !important;
+    height: 35px !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ffe0e0 !important;
+    transition: all 0.2s;
+}
+
+.service-card .btn-delete:hover {
+    background: #e74c3c !important;
+    color: white !important;
+    transform: scale(1.1);
+}
+
+/* Mensagem de Erro Bonita */
+.error-message-box {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    color: #c53030;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+/* ==================================================
+   DESIGN: FORMULÁRIO DE SERVIÇOS
+   ================================================== */
+
+/* Container do Formulário (Caixa Branca) */
+.service-form-wrapper {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    margin-bottom: 2rem;
+    max-width: 600px; /* Largura ideal para leitura */
+    margin-left: auto;
+    margin-right: auto; /* Centraliza na tela */
+}
+
+/* Ajuste dos Inputs específicos desta área */
+.service-form-wrapper label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+/* Garante que a linha dupla (Preço/Duração) fique perfeita */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Divide em 2 colunas iguais */
+    gap: 20px; /* Espaço entre elas */
+}
+
+/* Ajuste Responsivo para Celular */
+@media (max-width: 768px) {
+    .service-form-wrapper {
+        padding: 1.5rem;
+    }
+    
+    /* No celular, um embaixo do outro para não apertar */
+    .form-row {
+        grid-template-columns: 1fr !important; 
+        gap: 15px;
+    }
+}
+
+/* ==================================================
+   CORREÇÃO: INPUT DE DATA (FILTRO)
+   ================================================== */
+
+/* Container da barra de filtros */
+.filters-bar {
+    display: flex;
+    gap: 10px;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #eee; /* Borda externa visível */
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Estilo dos inputs (Select e Date) */
+.filters-bar select,
+.filters-bar input[type="date"] {
+    width: 100%; /* Ocupa o espaço disponível */
+    padding: 12px 15px;
+    
+    /* CORREÇÃO PRINCIPAL: BORDA VISÍVEL */
+    border: 1px solid #ccc !important; 
+    border-radius: 8px;
+    
+    background-color: #fff;
+    color: #333;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s;
+    
+    /* Garante altura igual para o botão e o input */
+    height: 45px;
+}
+
+/* Foco Dourado */
+.filters-bar select:focus,
+.filters-bar input[type="date"]:focus {
+    border-color: #d4af37 !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* Ícone de Calendário (WebKit/Chrome) */
+.filters-bar input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+.filters-bar input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Ajuste Mobile: Empilhar */
+@media (max-width: 768px) {
+    .filters-bar {
+        flex-direction: column; /* Um embaixo do outro */
+    }
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: TEXTO NO INPUT DE DATA (MOBILE)
+   ================================================== */
+
+/* 1. Garante que o input tenha posição relativa para segurar o texto */
+.filters-bar input[type="date"] {
+    position: relative;
+    color: #333 !important; /* Texto preto quando selecionado */
+}
+
+/* 2. Esconde a máscara feia padrão do navegador quando vazio */
+.filters-bar input[type="date"]:invalid::-webkit-datetime-edit {
+    color: transparent;
+}
+
+/* 3. CRIA O TEXTO "FAKE" (PLACEHOLDER) */
+.filters-bar input[type="date"]:invalid::before {
+    content: "📅 Escolher Data"; /* O texto que você quer que apareça */
+    color: #888;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Permite clicar através do texto */
+    font-size: 0.95rem;
+}
+
+/* 4. Quando focado ou com data, esconde o texto fake */
+.filters-bar input[type="date"]:focus::before,
+.filters-bar input[type="date"]:valid::before {
+    display: none;
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: MENU DE FUNÇÕES NO CELULAR
+   ================================================== */
+
+@media (max-width: 768px) {
+    
+    .sidebar {
+        /* 1. Fixação e Posicionamento */
+        position: sticky !important;
+        top: 0 !important; /* Cola no topo da área de rolagem */
+        z-index: 950 !important; /* Fica acima do conteúdo, abaixo da navbar */
+        
+        /* 2. Layout Horizontal com Scroll */
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important; /* Permite arrastar para o lado */
+        white-space: nowrap !important;
+        width: 100% !important;
+        
+        /* 3. Visual "App" (Fundo Sólido é o segredo) */
+        background: #ffffff !important;
+        border-bottom: 1px solid #eee !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+        
+        /* 4. Espaçamento */
+        padding: 12px 15px !important;
+        gap: 10px !important;
+        margin-bottom: 20px !important;
+        
+        /* Esconde a barra de rolagem feia */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    /* Esconde barra de rolagem no Chrome */
+    .sidebar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Estilo dos Botões (Cápsulas) */
+    .sidebar-item {
+        flex: 0 0 auto !important; /* Não deixa encolher */
+        margin: 0 !important;
+        padding: 8px 16px !important;
+        
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        
+        border-radius: 25px !important; /* Bem redondo */
+        border: 1px solid #f0f0f0 !important;
+        background: #f8f9fa !important;
+        color: #666 !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    
+    .sidebar-item i {
+        font-size: 0.9rem !important;
+        margin: 0 !important;
+    }
+
+    /* Botão Ativo (Selecionado) */
+    .sidebar-item.active {
+        background: #1a1a2e !important; /* Azul Escuro */
+        color: #d4af37 !important;      /* Dourado */
+        border-color: #1a1a2e !important;
+        box-shadow: 0 2px 8px rgba(26, 26, 46, 0.25) !important;
+    }
+}
+
+/* ==================================================
+   MELHORIA VISUAL: FORMULÁRIO DE AGENDAMENTO (PC)
+   ================================================== */
+
+@media (min-width: 769px) {
+    
+    /* 1. Aumenta a largura do modal para caber duas colunas confortavelmente */
+    #new-appointment-modal .modal-content {
+        max-width: 650px !important;
+        padding: 2.5rem !important;
+    }
+
+    /* 2. Transforma o formulário em uma GRADE de 2 colunas */
+    #appointment-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Duas colunas de tamanho igual */
+        gap: 20px; /* Espaço entre as colunas */
+    }
+
+    /* 3. A linha de Data e Hora (que já tem 2 campos dentro) deve ocupar a largura total */
+    /* Assim ela mantém os dois campos alinhados com a linha de cima */
+    #appointment-form .form-row {
+        grid-column: span 2; /* Ocupa as 2 colunas da grade pai */
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Divide internamente em 2 */
+        gap: 20px;
+    }
+
+    /* 4. A área de Observações deve ocupar a largura total */
+    #appointment-form .form-group:nth-last-of-type(1) { 
+        grid-column: span 2;
+    }
+
+    /* 5. O Botão de Confirmar também ocupa a largura total */
+    #appointment-form button[type="submit"] {
+        grid-column: span 2;
+        padding: 15px;
+        font-size: 1.1rem;
+        margin-top: 10px;
+    }
+
+    /* --- ESTILIZAÇÃO DOS INPUTS (Visual mais Premium) --- */
+    
+    /* Aumenta a altura e suaviza as bordas */
+    #appointment-form select,
+    #appointment-form input,
+    #appointment-form textarea {
+        background-color: #fcfcfc;
+        border: 1px solid #e0e0e0 !important;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+
+    /* Efeito de Foco Dourado */
+    #appointment-form select:focus,
+    #appointment-form input:focus,
+    #appointment-form textarea:focus {
+        background-color: #fff;
+        border-color: #d4af37 !important;
+        box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1); /* Sombra dourada suave */
+    }
+
+    /* Labels mais bonitas */
+    #appointment-form label {
+        font-weight: 600;
+        color: #1a1a2e; /* Azul escuro */
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* Ícones das labels dourados */
+    #appointment-form label i {
+        color: #d4af37;
+    }
+}
+
+/* ==================================================
+   CORREÇÃO FINAL: BOTÃO FLUTUANTE (MOBILE)
+   ================================================== */
+
+@media (max-width: 768px) {
+    
+    /* 1. ESCONDE o botão "Novo Agendamento" na tela de Visão Geral (Dashboard) */
+    .calendar-header .btn-primary {
+        display: none !important;
+    }
+
+    /* 2. MANTÉM o botão flutuante APENAS na aba de Agendamentos */
+    #appointments-section .btn-primary {
+        position: fixed !important; /* Fixa na tela */
+        bottom: 25px !important;    /* Distância do fundo */
+        right: 20px !important;     /* Distância da direita */
+        
+        width: 60px !important;     /* Redondo */
+        height: 60px !important;
+        border-radius: 50% !important;
+        
+        padding: 0 !important;
+        margin: 0 !important;
+        
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        /* Sombra e cor */
+        background: var(--secondary) !important;
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.5) !important;
+        z-index: 1000 !important; /* Fica por cima de tudo */
+        
+        /* Esconde o texto "Novo Agendamento" */
+        font-size: 0 !important; 
+    }
+
+    /* Garante que o ícone (+) fique grande e visível */
+    #appointments-section .btn-primary i {
+        font-size: 1.8rem !important;
+        margin: 0 !important;
+        color: var(--primary) !important; /* Ícone Azul Escuro */
+    }
+}
+
+/* ==================================================
+   ALERTA VISUAL DE NOTIFICAÇÃO (TOAST)
+   ================================================== */
+
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1a1a2e; /* Azul Escuro */
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    border: 2px solid #d4af37; /* Borda Dourada */
+    min-width: 300px;
+}
+
+.notification-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(10px);
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    color: #d4af37;
+}
+
+/* ==================================================
+   DESIGN: PÁGINA DE SERVIÇOS
+   ================================================== */
+
+/* 1. O Cartão do Formulário */
+.service-form-wrapper {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 16px;
+    /* Sombra suave para destacar do fundo */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+    border: 1px solid #f0f0f0;
+    max-width: 700px;
+    margin: 0 auto; /* Centraliza na tela */
+    position: relative;
+}
+
+/* 2. A Grade de Serviços (Lista) */
+.services-grid {
+    display: grid;
+    /* PC: 3 colunas | Tablet: 2 colunas | Celular: 1 coluna */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* 3. O Card Individual de Serviço */
+.service-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Efeito ao passar o mouse no card */
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: #d4af37;
+}
+
+.service-card h4 {
+    margin: 0 0 5px 0;
+    color: #1a1a2e;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.service-price {
+    font-size: 1.5rem;
+    color: #d4af37;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.service-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+    font-size: 0.9rem;
+    background: #f9f9f9;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+/* Botão de Excluir (Lixeira discreta) */
+.btn-delete-service {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    border: 1px solid #ffecec;
+    color: #e74c3c;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-delete-service:hover {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+}
+
+/* ==================================================
+   CORREÇÃO: CAMPOS DE NOVO CLIENTE (Responsivo)
+   ================================================== */
+
+/* Padrão (Mobile): Um embaixo do outro */
+.new-client-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* PC (Telas maiores): Lado a lado */
+@media (min-width: 769px) {
+    .new-client-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Divide em 2 */
+        gap: 15px;
+    }
+}
+
+/* Ajuste extra para garantir que os inputs fiquem bonitos */
+#novos-campos-cliente input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* ==================================================
+   POPUP DE BOAS-VINDAS
+   ================================================== */
+
+.welcome-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.welcome-modal.active {
+    display: flex;
+}
+
+.welcome-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(8px);
+}
+
+.welcome-content {
+    position: relative;
+    background: white;
+    border-radius: 24px;
+    max-width: 650px;
+    width: 90%;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.welcome-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.welcome-close:hover {
+    background: #e0e0e0;
+    transform: rotate(90deg);
+}
+
+.welcome-close i {
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.welcome-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a3e 100%);
+    padding: 2.5rem 2rem 1.25rem;
+    text-align: center;
+    border-radius: 24px 24px 0 0;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.welcome-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+}
+
+.welcome-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 0.875rem;
+    background: linear-gradient(135deg, #d4af37 0%, #f4a261 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.welcome-icon i {
+    font-size: 1.85rem;
+    color: white;
+}
+
+.welcome-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 1.65rem;
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    line-height: 1.3;
+}
+
+.welcome-body {
+    padding: 1.25rem 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Estiliza a barra de rolagem para ficar discreta */
+.welcome-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.welcome-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.welcome-body::-webkit-scrollbar-thumb {
+    background: #d4af37;
+    border-radius: 10px;
+}
+
+.welcome-body::-webkit-scrollbar-thumb:hover {
+    background: #c9a12e;
+}
+
+.welcome-image {
+    text-align: center;
+    margin-bottom: 0.875rem;
+}
+
+.welcome-image i {
+    font-size: 3rem;
+    color: #d4af37;
+    opacity: 0.2;
+}
+
+.welcome-text {
+    text-align: center;
+}
+
+.welcome-intro {
+    font-size: 1.05rem;
+    color: #1a1a2e;
+    font-weight: 600;
+    margin-bottom: 0.65rem;
+}
+
+.welcome-description {
+    font-size: 0.875rem;
+    color: #555;
+    line-height: 1.55;
+    margin-bottom: 1.1rem;
+}
+
+.welcome-description strong {
+    color: #1a1a2e;
+    font-weight: 700;
+}
+
+.welcome-features {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 0.875rem;
+    margin-bottom: 1.1rem;
+}
+
+.welcome-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.welcome-feature-item:last-child {
+    border-bottom: none;
+}
+
+.welcome-feature-item i {
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d4af37;
+    font-size: 1rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-feature-item span {
+    color: #333;
+    font-size: 0.85rem;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.welcome-note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 0.7rem 0.95rem;
+    border-radius: 8px;
+    color: #856404;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.welcome-note i {
+    color: #ffc107;
+    font-size: 0.95rem;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.welcome-footer {
+    padding: 1.15rem 2rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.welcome-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.welcome-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #d4af37;
+}
+
+.welcome-checkbox span {
+    color: #555;
+    font-size: 0.875rem;
+}
+
+.welcome-footer .btn {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.welcome-footer .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.welcome-credits {
+    text-align: center;
+    padding: 1rem;
+    background: #1a1a2e;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    border-radius: 0 0 24px 24px;
+    flex-shrink: 0;
+}
+
+.welcome-credits strong {
+    color: #d4af37;
+    font-weight: 600;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .welcome-content {
+        width: 95%;
+        max-height: 95vh;
+        border-radius: 16px;
+    }
+    
+    .welcome-header {
+        padding: 2rem 1.5rem 1.5rem;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .welcome-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 1rem;
+    }
+    
+    .welcome-icon i {
+        font-size: 2rem;
+    }
+    
+    .welcome-body {
+        padding: 1.5rem;
+    }
+    
+    .welcome-image i {
+        font-size: 3.5rem;
+    }
+    
+    .welcome-intro {
+        font-size: 1.1rem;
+    }
+    
+    .welcome-description {
+        font-size: 0.9rem;
+    }
+    
+    .welcome-features {
+        padding: 1rem;
+    }
+    
+    .welcome-feature-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .welcome-footer {
+        padding: 1.5rem;
+    }
+    
+    .welcome-footer .btn {
+        width: 100%;
+        justify-content: center;
+        font-size: 1rem;
+        padding: 0.875rem 1.5rem;
+    }
+    
+    .welcome-close {
+        top: 15px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+    }
+}   

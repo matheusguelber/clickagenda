@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickAgenda - Plataforma de Agendamento para Barbearias</title>
+
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <i class="fas fa-cut"></i>
+                    <span>ClickAgenda</span>
+                </div>
+
+                <audio id="notification-sound" src="assets/notification.mp3" preload="auto"></audio>
+
+                <div id="user-nav" style="display: none;">
+                    
+                    <div class="notification-wrapper" id="notification-bell">
+                        <div class="notification-bell-icon" onclick="toggleNotificationDropdown(event)">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-badge">0</span>
+                        </div>
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notif-header">
+                                <h4>Notificações</h4>
+                                <small onclick="verPendentes()">Ver pendentes</small>
+                            </div>
+                            <div class="notif-list" id="notif-list-content">
+                                <div class="notif-empty">Carregando...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-wrapper">
+                        <div class="user-avatar" onclick="toggleProfileDropdown()">
+                            <span id="user-initials">US</span>
+                        </div>
+                        
+                        <div class="profile-dropdown" id="profile-dropdown">
+                            <div class="profile-info">
+                                <strong id="profile-name">Usuário</strong>
+                                <span>Barbeiro</span>
+                            </div>
+                            <ul class="profile-links">
+                                <li><a href="#settings" onclick="showSection('settings'); toggleProfileDropdown(event);"><i class="fas fa-cog"></i> Configurações</a></li>
+                                <li><a href="#" onclick="fazerLogout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="guest-nav">
+                    <div class="nav-links" id="nav-links-menu">
+                        <a href="#home" class="public-link" onclick="navegarParaInicio(); return false;">Início</a>
+                        <a href="#features" class="public-link" onclick="navegarParaFuncionalidades(); return false;">Funcionalidades</a>
+                        <button class="btn btn-secondary" onclick="showModal('login')">Entrar</button>
+                    </div>
+                    <button class="hamburger-menu" id="hamburger-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Simplifique seus agendamentos com ClickAgenda</h1>
+            <p>A solução completa para gerenciar sua barbearia de forma profissional e automatizada</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="showDashboard()">Começar Agora</button>
+                <button class="btn btn-secondary" onclick="navegarParaFuncionalidades()">Conhecer Funcionalidades</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Funcionalidades do ClickAgenda</h2>
+            <p class="section-subtitle">Tudo que você precisa para gerenciar sua barbearia de forma profissional</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Agendamento Online</h3>
+                    <p>Seus clientes podem agendar serviços de forma autônoma através do seu link personalizado, visualizando horários disponíveis em tempo real.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Link personalizado para compartilhar</li>
+                        <li><i class="fas fa-check-circle"></i> Visualização de horários livres</li>
+                        <li><i class="fas fa-check-circle"></i> Confirmação instantânea</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>Gestão de Agendamentos</h3>
+                    <p>Controle total sobre todos os agendamentos com sistema de status, filtros por data e confirmação rápida.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Confirmar ou cancelar com 1 clique</li>
+                        <li><i class="fas fa-check-circle"></i> Filtros por status e data</li>
+                        <li><i class="fas fa-check-circle"></i> Histórico completo</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <h3>Gestão de Clientes</h3>
+                    <p>Cadastro automático de clientes com histórico completo de atendimentos e total gasto.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Perfil de cada cliente</li>
+                        <li><i class="fas fa-check-circle"></i> Histórico de agendamentos</li>
+                        <li><i class="fas fa-check-circle"></i> Total gasto por cliente</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <h3>Catálogo de Serviços</h3>
+                    <p>Cadastre todos os serviços que você oferece com preços e duração personalizados.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Serviços ilimitados</li>
+                        <li><i class="fas fa-check-circle"></i> Preços personalizados</li>
+                        <li><i class="fas fa-check-circle"></i> Controle de duração</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Relatórios e Estatísticas</h3>
+                    <p>Acompanhe o desempenho do seu negócio com dashboards intuitivos e dados em tempo real.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Faturamento do mês</li>
+                        <li><i class="fas fa-check-circle"></i> Taxa de presença</li>
+                        <li><i class="fas fa-check-circle"></i> Total de clientes</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-screen-button"></i>
+                    </div>
+                    <h3>100% Responsivo</h3>
+                    <p>Acesse de qualquer dispositivo: computador, tablet ou smartphone com interface adaptada.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Design moderno e limpo</li>
+                        <li><i class="fas fa-check-circle"></i> Funciona em todos os dispositivos</li>
+                        <li><i class="fas fa-check-circle"></i> Interface intuitiva</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h3>Pronto para revolucionar sua barbearia?</h3>
+                <p>Comece agora mesmo e tenha controle total dos seus agendamentos!</p>
+                <button class="btn btn-primary btn-large" onclick="showModal('login')">
+                    <i class="fas fa-rocket"></i> Começar Gratuitamente
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard hidden" id="dashboard-barbeiro">
+        <div class="container">
+            <h2 class="section-title">Painel de Controle</h2>
+            <div class="dashboard-container">
+                <aside class="sidebar">
+                    <div class="sidebar-item active" onclick="showSection('overview')">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Visão Geral</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('appointments')">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Agendamentos</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('clients')">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('services')">
+                        <i class="fas fa-scissors"></i>
+                        <span>Serviços</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('my-link')">
+                        <i class="fas fa-link"></i>
+                        <span>Meu Link</span>
+                    </div>
+                    <div class="sidebar-item" onclick="showSection('settings')">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </div>
+                </aside>
+
+                <main class="main-content">
+                    
+                    <div id="overview-section">
+                        <h3>Bem-vindo ao ClickAgenda!</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Agendamentos Hoje</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Clientes Cadastrados</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">R$ 0,00</div>
+                                <div class="stat-label">Faturamento do Mês</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">0%</div>
+                                <div class="stat-label">Taxa de Presença</div>
+                            </div>
+                        </div>
+
+                        <div class="calendar-section">
+                            <div class="calendar-header">
+                                <h3>Agenda da Semana</h3>
+                                <button class="btn btn-primary" onclick="abrirModalNovoAgendamento()">
+                                    <i class="fas fa-plus"></i> Novo Agendamento
+                                </button>
+                            </div>
+                            <div class="calendar-grid">
+                                </div>
+                        </div>
+
+                        <div class="appointments-list">
+                            <h3>Próximos Agendamentos</h3>
+                            </div>
+                    </div>
+
+                    <div id="appointments-section" class="hidden">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                            <h3>Todos os Agendamentos</h3>
+                            <button class="btn btn-primary" onclick="abrirModalNovoAgendamento()">
+                                <i class="fas fa-plus"></i> Novo Agendamento
+                            </button>
+                        </div>
+
+                        <div class="filters-bar">
+                            <select id="filter-status" onchange="carregarTodosAgendamentos()">
+                                <option value="todos">Todos os Status</option>
+                                <option value="pendente">Pendentes</option>
+                                <option value="confirmado">Confirmados</option>
+                                <option value="cancelado">Cancelados</option>
+                            </select>
+                            
+                            <input type="date" id="filter-date" onchange="carregarTodosAgendamentos()" required>
+                            
+                            <button class="btn btn-secondary" onclick="limparFiltros()">
+                                <i class="fas fa-times"></i> Limpar Filtros
+                            </button>
+                        </div>
+
+                        <div id="lista-agendamentos-completa" class="appointments-list-full">
+                            <p style="text-align: center; color: var(--text-light); padding: 2rem;">
+                                Carregando agendamentos...
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="clients-section" class="hidden">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                            <h3>Meus Clientes</h3>
+                            <span style="color: var(--text-light);">
+                                <i class="fas fa-users"></i> 
+                                <span id="total-clientes-count">0</span> clientes
+                            </span>
+                        </div>
+
+                        <div class="search-bar">
+                            <div class="input-with-icon">
+                                <i class="fas fa-search"></i>
+                                <input type="text" 
+                                    id="search-client" 
+                                    placeholder="Buscar por nome ou telefone..." 
+                                    onkeyup="buscarClientes()">
+                            </div>
+                        </div>
+
+                        <div id="lista-clientes" class="clients-grid">
+                            <p style="text-align: center; color: var(--text-light); padding: 2rem;">
+                                Carregando clientes...
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="services-section" class="hidden">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 class="section-title" style="text-align: left; margin: 0; font-size: 1.8rem;">Gerenciar Serviços</h2>
+    </div>
+
+    <div class="service-form-wrapper">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <h4 style="color: var(--primary); margin: 0; font-size: 1.2rem;">
+                <i class="fas fa-plus-circle" style="color: #d4af37;"></i> Adicionar Novo
+            </h4>
+            <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Cadastre os cortes e serviços que sua barbearia oferece.</p>
+        </div>
+
+        <form id="form-adicionar-servico">
+            <div class="form-group">
+                <label>Nome do Serviço</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-cut"></i>
+                    <input type="text" name="nome_servico" placeholder="Ex: Corte Degradê + Barba" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-tag"></i>
+                        <input type="number" name="preco" placeholder="45.00" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Duração (min)</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-clock"></i>
+                        <input type="number" name="duracao" placeholder="30" step="5" required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                <i class="fas fa-save"></i> Salvar Serviço
+            </button>
+        </form>
+    </div>
+
+    <div style="margin-top: 3rem;">
+        <h3 style="color: var(--primary); margin-bottom: 1rem; border-left: 5px solid #d4af37; padding-left: 10px;">
+            Serviços Ativos
+        </h3>
+        
+        <div id="lista-de-servicos" class="services-grid">
+            </div>
+    </div>
+
+</div>
+                    
+                    <div id="my-link-section" class="hidden">
+                        
+                        <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Gerenciar Atendimento</h2>
+
+                        <div class="settings-card">
+                            <div class="card-header-row">
+                                <h3><i class="fas fa-link"></i> Link de Agendamento</h3>
+                            </div>
+
+                            <p style="color: #666; margin-bottom: 1rem;">
+                                Copie este link e envie para seus clientes agendarem diretamente:
+                            </p>
+                            
+                            <div class="link-input-group">
+                                <input type="text" id="link-agendamento" readonly>
+                                <button class="btn btn-primary" onclick="copiarLink()">
+                                    <i class="fas fa-copy"></i> Copiar Link
+                                </button>
+                            </div>
+
+                            <div class="link-actions">
+                                <p>
+                                    <i class="fas fa-eye"></i> <strong>Pré-visualização:</strong> Veja como seus clientes enxergam sua página.
+                                </p>
+                                <button class="btn btn-primary" onclick="abrirPreview()">
+                                    <i class="fas fa-external-link-alt"></i> Abrir Minha Página
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="card-header-row">
+                                <h3><i class="fas fa-clock"></i> Horários de Funcionamento</h3>
+                                <button class="btn btn-primary" onclick="salvarConfiguracoesHorario()">
+                                    <i class="fas fa-save"></i> Salvar Alterações
+                                </button>
+                            </div>
+
+                            <p style="color: #666; margin-bottom: 2rem;">
+                                Defina os dias e horários em que sua barbearia está aberta.
+                            </p>
+
+                            <form id="form-horarios">
+                                <div class="schedule-grid">
+                                    <div class="schedule-header">Dia</div>
+                                    <div class="schedule-header">Status</div>
+                                    <div class="schedule-header">Abertura</div>
+                                    <div class="schedule-header">Fechamento</div>
+
+                                    <div class="schedule-row"><div class="day-label">Domingo</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_0" onchange="toggleInputs(0)"><span class="slider round"></span></label><span class="status-text">Fechado</span></div><div><input type="time" name="inicio_0" disabled></div><div><input type="time" name="fim_0" disabled></div></div>
+                                    <div class="schedule-row"><div class="day-label">Segunda-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_1" checked onchange="toggleInputs(1)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_1" value="09:00"></div><div><input type="time" name="fim_1" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Terça-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_2" checked onchange="toggleInputs(2)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_2" value="09:00"></div><div><input type="time" name="fim_2" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Quarta-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_3" checked onchange="toggleInputs(3)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_3" value="09:00"></div><div><input type="time" name="fim_3" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Quinta-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_4" checked onchange="toggleInputs(4)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_4" value="09:00"></div><div><input type="time" name="fim_4" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Sexta-feira</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_5" checked onchange="toggleInputs(5)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_5" value="09:00"></div><div><input type="time" name="fim_5" value="18:00"></div></div>
+                                    <div class="schedule-row"><div class="day-label">Sábado</div><div class="day-status"><label class="switch"><input type="checkbox" name="aberto_6" checked onchange="toggleInputs(6)"><span class="slider round"></span></label><span class="status-text">Aberto</span></div><div><input type="time" name="inicio_6" value="09:00"></div><div><input type="time" name="fim_6" value="14:00"></div></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="settings-section" class="hidden">
+    <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">Configurações da Conta</h2>
+
+    <div class="settings-card" style="background: #f0f8ff; border: 1px solid #cceeff;">
+    <div class="card-header-row">
+        <h3 style="color: #0056b3;"><i class="fas fa-headset"></i> Precisa de Ajuda?</h3>
+    </div>
+    <p style="color: #444; margin-bottom: 1rem;">
+        Encontrou algum problema ou tem alguma dúvida? Nossa equipe de suporte está pronta para te ajudar.
+    </p>
+    <a href="mailto:suporteclickagenda@gmail.com" class="btn" style="background: #0056b3; color: white;">
+        <i class="fas fa-envelope"></i> Contatar Suporte
+    </a>
+    <p style="font-size: 0.85rem; color: #666; margin-top: 10px;">
+        E-mail: <strong>suporteclickagenda@gmail.com</strong>
+    </p>
+</div>
+
+    
+    <!-- Área de integração automática com WhatsApp -->
+    <!-- Tudo sobre o WhatsApp automático -->
+<div class="settings-card">
+    <div class="card-header-row">
+        <h3><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Automático</h3>
+        <div id="whatsapp-status-indicator" style="display: flex; align-items: center; gap: 8px;">
+            <span class="status-dot" style="width: 12px; height: 12px; border-radius: 50%; background: #ccc;"></span>
+            <span class="status-text" style="color: #666; font-size: 0.9rem;">Desconectado</span>
+        </div>
+    </div>
+
+    <!-- Caixa de informações explicando como funciona -->
+    <div class="whatsapp-info-box" style="display: flex; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left: 4px solid #25D366; border-radius: 8px; margin-bottom: 1.5rem;">
+        <i class="fas fa-info-circle" style="font-size: 1.5rem; color: #25D366; margin-top: 0.25rem;"></i>
+        <div>
+            <strong style="display: block; color: #2e7d32; margin-bottom: 0.5rem;">Como funciona?</strong>
+            <p style="color: #1b5e20; font-size: 0.85rem; line-height: 1.5; margin: 0;">
+                Conecte seu WhatsApp escaneando o QR Code abaixo. Após conectar, as confirmações de agendamento serão enviadas <strong>automaticamente</strong> para seus clientes, sem precisar clicar em nada!
+            </p>
+        </div>
+    </div>
+
+    <!-- Área que mostra o status e o QR Code -->
+    <div id="whatsapp-qr-container" style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 12px; margin-bottom: 1.5rem;">
+        
+        <!-- Mostra o QR Code para conectar -->
+        <div id="qr-code-display" style="display: none;">
+            <p style="color: #666; margin-bottom: 1rem; font-weight: 600;">
+                <i class="fas fa-mobile-alt"></i> Abra o WhatsApp no celular e escaneie o código
+            </p>
+            <img id="qr-code-image" src="" alt="QR Code" style="max-width: 280px; border: 4px solid #25D366; border-radius: 12px; padding: 10px; background: white;">
+            <p style="color: #999; font-size: 0.85rem; margin-top: 1rem;">
+                WhatsApp → Aparelhos conectados → Conectar aparelho
+            </p>
+        </div>
+        
+        <!-- Mensagem de conexão em andamento -->
+        <div id="whatsapp-connecting" style="display: none; color: #666;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #FFA500; margin-bottom: 1rem;"></i>
+            <p style="font-weight: 600;">Conectando WhatsApp...</p>
+            <p style="font-size: 0.85rem; color: #999;">Aguarde alguns segundos</p>
+        </div>
+        
+        <!-- Mensagem de sucesso ao conectar -->
+        <div id="whatsapp-connected" style="display: none; color: #25D366;">
+            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <p style="font-weight: 600; font-size: 1.1rem; margin: 0;">WhatsApp Conectado com Sucesso!</p>
+            <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">As mensagens serão enviadas automaticamente</p>
+        </div>
+        
+        <!-- Mensagem de desconexão -->
+        <div id="whatsapp-disconnected">
+            <i class="fab fa-whatsapp" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+            <p style="color: #666; margin-bottom: 0;">WhatsApp não está conectado</p>
+            <p style="color: #999; font-size: 0.85rem; margin-top: 0.5rem;">Clique no botão abaixo para conectar</p>
+        </div>
+    </div>
+
+    <!-- Botões para conectar, desconectar, resetar ou testar -->
+    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <button id="btn-connect-whatsapp" class="btn btn-primary" onclick="conectarWhatsApp()" style="min-width: 160px;">
+            <i class="fab fa-whatsapp"></i> Conectar WhatsApp
+        </button>
+        
+        <button id="btn-disconnect-whatsapp" class="btn btn-secondary" onclick="desconectarWhatsApp()" style="display: none; min-width: 160px;">
+            <i class="fas fa-sign-out-alt"></i> Desconectar
+        </button>
+        
+        <button class="btn btn-secondary" onclick="resetarWhatsApp()" style="min-width: 160px;">
+            <i class="fas fa-redo-alt"></i> Resetar Sessão
+        </button>
+        
+        <button class="btn" onclick="testarMensagemWhatsApp()" style="background: #0088cc; color: white; min-width: 160px;">
+            <i class="fas fa-paper-plane"></i> Testar Mensagem
+        </button>
+    </div>
+
+    <!-- Aviso importante sobre manter o WhatsApp Web aberto -->
+    <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px;">
+        <p style="margin: 0; font-size: 0.85rem; color: #856404; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span><strong>Importante:</strong> Mantenha o WhatsApp Web aberto para receber mensagens. Se desconectar, você precisará escanear o QR Code novamente.</span>
+        </p>
+    </div>
+</div>
+
+    <div class="settings-card">
+    <div class="card-header-row">
+        <h3><i class="fas fa-camera"></i> Foto de Perfil</h3>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; align-items: center; padding: 1rem 0;">
+        <div class="profile-image-preview" id="settings-profile-preview">
+            <span id="settings-profile-initials">US</span>
+        </div>
+        
+        <div style="margin-top: 1.5rem; text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+    <input type="file" id="upload-foto-input" accept="image/png, image/jpeg" style="display: none;">
+    
+    <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-upload" onclick="document.getElementById('upload-foto-input').click()">
+            <i class="fas fa-upload"></i> Escolher Foto
+        </button>
+
+        <button type="button" class="btn btn-remove" onclick="removerFotoPerfil()">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+    
+    <p id="upload-status-text" style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+        JPG ou PNG, máx. 2MB
+    </p>
+</div>
+    </div>
+</div>
+
+    <form id="form-perfil" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee;">
+        <div class="form-group">
+            <label>Nome da Barbearia / Profissional</label>
+            <div class="input-with-icon">
+                <i class="fas fa-user"></i>
+                <input type="text" name="nome" id="perfil-nome" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>E-mail de Acesso</label>
+            <div class="input-with-icon">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" id="perfil-email" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Telefone / WhatsApp</label>
+            <div class="input-with-icon">
+                <i class="fas fa-phone"></i>
+                <input type="tel" name="telefone" id="perfil-telefone" onkeyup="this.value=phoneMask(this.value)">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Salvar Alterações
+        </button>
+    </form>
+
+    <h4 style="margin-bottom: 1rem; color: var(--primary);">Alterar Senha</h4>
+    <form id="form-senha">
+        <div class="form-group">
+            <label>Senha Atual</label>
+            <div class="input-with-icon">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="senha_atual" id="senha-atual" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('senha-atual')">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label>Nova Senha</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-key"></i>
+                    <input type="password" name="nova_senha" id="nova-senha" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Confirmar</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-check"></i>
+                    <input type="password" name="confirmar_senha" id="conf-senha" required>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-secondary">
+            <i class="fas fa-lock"></i> Atualizar Senha
+        </button>
+    </form>
+</div>
+
+    </section>
+
+   <div class="modal" id="new-appointment-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-calendar-plus"></i> Novo Agendamento</h2>
+            <button class="close-modal" onclick="closeModal('new-appointment')">&times;</button>
+        </div>
+        <form id="appointment-form">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Cliente</label>
+                <select name="cliente" id="cliente-select" required onchange="verificarNovoCliente(this)">
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+
+            <div id="novos-campos-cliente" style="display: none; background: #fffdf0; padding: 15px; border: 1px dashed #d4af37; border-radius: 8px; margin-bottom: 15px; grid-column: span 2;">
+                <p style="color: #d4af37; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
+                    <i class="fas fa-user-plus"></i> Cadastrando Novo Cliente
+                </p>
+                
+                <div class="new-client-row">
+                    <input type="text" name="novo_nome" placeholder="Nome Completo" style="background: white; border: 1px solid #ddd;">
+                    <input type="tel" name="novo_telefone" placeholder="(00) 00000-0000" style="background: white; border: 1px solid #ddd;" onkeyup="this.value=phoneMask(this.value)">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-cut"></i> Serviço</label>
+                <select name="servico_id" required>
+                    <option value="">Carregando serviços...</option>
+                </select>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Data</label>
+                    <input type="date" name="data" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Horário</label>
+                    <input type="time" name="hora" required>
+                </div>
+            </div>
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label><i class="fas fa-comment"></i> Observações</label>
+                <textarea name="observacoes" rows="2" placeholder="Opcional"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; grid-column: span 2;">
+                <i class="fas fa-check"></i> Confirmar Agendamento
+            </button>
+        </form>
+    </div>
+</div>
+
+    <div class="modal" id="new-service-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Serviço</h2>
+                <button class="close-modal" onclick="closeModal('new-service')">&times;</button>
+            </div>
+            <form id="service-form">
+                <div class="form-group">
+                    <label>Nome do Serviço</label>
+                    <input type="text" placeholder="Ex: Corte Masculino" required>
+                </div>
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" placeholder="40.00" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Duração (minutos)</label>
+                    <input type="number" placeholder="30" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea rows="3" placeholder="Descrição do serviço (opcional)"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Adicionar Serviço</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="login-modal">
+        <div class="modal-content login-modal-content">
+            <div class="modal-header">
+                <div class="login-logo">
+                    <i class="fas fa-cut"></i>
+                    <h2>ClickAgenda</h2>
+                </div>
+                <button class="close-modal" onclick="closeModal('login')">&times;</button>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <h3 class="form-title">Bem-vindo de volta!</h3>
+                <p class="form-description">Entre com sua conta para continuar</p>
+
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="seu@email.com" required>
+                    </div>
+                </div>
+            
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="senha" id="login-password" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('login-password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox">
+                        <span class="checkbox-text">Lembrar-me</span>
+                    </label>
+                    <a href="#" class="forgot-link">Esqueceu a senha?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+
+                <div class="form-footer">
+                    <p>Não tem uma conta? <a href="#" onclick="switchToRegister(); return false;">Cadastre-se gratuitamente</a></p>
+                </div>
+            </form>
+
+            <form id="register-form" class="auth-form hidden">
+                <h3 class="form-title">Cadastre sua Barbearia</h3>
+                <p class="form-description">Crie sua conta e comece a gerenciar seus agendamentos</p>
+
+                <div class="form-group">
+                    <label>Nome da Barbearia</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-store"></i>
+                        <input type="text" name="nome" placeholder="Ex: Barbearia do João" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nome do Responsável</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="João Silva" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>E-mail Profissional</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="contato@suabarbearia.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Telefone / WhatsApp</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" name="telefone" id="phone-input" placeholder="(00) 00000-0000" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Endereço da Barbearia</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" placeholder="Rua, número, bairro - cidade" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="senha" id="register-password" placeholder="Mínimo 6 caracteres" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('register-password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <span class="strength-text" id="strength-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirmar Senha</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="register-password-confirm" placeholder="Digite a senha novamente" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('register-password-confirm')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="barbershop-info-box">
+                    <i class="fas fa-info"></i> <div>
+                        <strong>Como funciona?</strong>
+                        <p>Após o cadastro, você terá acesso ao painel administrativo onde poderá configurar seus serviços, horários e gerar seu link personalizado de agendamento para compartilhar com seus clientes.</p>
+                    </div>
+                </div>
+
+                    <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" required>
+                        <span class="checkbox-text">
+                            Aceito os 
+                            <a href="#" onclick="showModal('terms'); return false;">Termos de Uso</a> e 
+                            <a href="#" onclick="showModal('privacy'); return false;">Política de Privacidade</a>
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle"></i> Criar Conta Profissional
+                </button>
+
+                <div class="form-footer">
+                    <p>Já tem uma conta? <a href="#" onclick="switchToLogin(); return false;">Fazer login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="edit-service-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Editar Serviço</h2>
+            <button class="close-modal" onclick="closeModal('edit-service')">&times;</button>
+        </div>
+        <form id="form-editar-servico">
+            <input type="hidden" name="id" id="edit-servico-id">
+            
+            <div class="form-group">
+                <label>Nome do Serviço</label>
+                <input type="text" name="nome_servico" id="edit-servico-nome" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" name="preco" id="edit-servico-preco" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Duração (minutos)</label>
+                    <input type="number" name="duracao" id="edit-servico-duracao" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="edit-service-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Serviço</h2>
+            <button class="close-modal" onclick="closeModal('edit-service')">&times;</button>
+        </div>
+        <form id="form-editar-servico">
+            <input type="hidden" name="id" id="edit-servico-id">
+            
+            <div class="form-group">
+                <label>Nome do Serviço</label>
+                <input type="text" name="nome_servico" id="edit-servico-nome" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" name="preco" id="edit-servico-preco" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Duração (min)</label>
+                    <input type="number" name="duracao" id="edit-servico-duracao" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="edit-appointment-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Agendamento</h2>
+            <button class="close-modal" onclick="closeModal('edit-appointment')">&times;</button>
+        </div>
+        <form id="form-editar-agendamento">
+            <input type="hidden" name="id" id="edit_agendamento_id">
+
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Cliente</label>
+                <input type="text" id="edit_cliente_nome" readonly style="background: #f9f9f9; color: #666; border-color: #eee;">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-cut"></i> Serviço</label>
+                <select name="servico_id" id="edit_servico_id" required>
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+            
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Data</label>
+                    <input type="date" name="data" id="edit_data" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Horário</label>
+                    <input type="time" name="hora" id="edit_hora" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> Observações</label>
+                <textarea name="observacoes" id="edit_observacoes" rows="2"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 ClickAgenda - Universidade São Francisco | Projeto de Software</p>
+            <p>Desenvolvido por: Nayara Victória, Matheus Rubens</p>
+        </div>
+    </footer>
+
+    <div class="modal" id="terms-modal" style="z-index: 2002;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>Termos de Uso</h2>
+            <button class="close-modal" onclick="closeModal('terms')">&times;</button>
+        </div>
+        <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px; line-height: 1.6; color: #555;">
+            <p><strong>1. Introdução</strong><br>
+            Bem-vindo ao ClickAgenda. Ao utilizar nossa plataforma, você concorda com os termos descritos abaixo.</p>
+
+            <p><strong>2. Gestão da Agenda</strong><br>
+            O profissional (você) é o único responsável por manter seus horários e disponibilidade atualizados na plataforma. O ClickAgenda não se responsabiliza por conflitos de agenda decorrentes de falha na atualização dos horários.</p>
+
+            <p><strong>3. Responsabilidades</strong><br>
+            O ClickAgenda é uma plataforma de intermediação. A qualidade e execução dos serviços são de inteira responsabilidade do profissional (barbeiro) selecionado.</p>
+            
+            <p><strong>4. Cancelamentos</strong><br>
+            O uso indevido da plataforma, como agendamentos falsos ou não comparecimento recorrente, poderá resultar na suspensão da conta.</p>
+        </div>
+        <div style="margin-top: 1.5rem; text-align: right;">
+            <button class="btn btn-primary" onclick="closeModal('terms')">Entendi</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="privacy-modal" style="z-index: 2002;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>Política de Privacidade</h2>
+            <button class="close-modal" onclick="closeModal('privacy')">&times;</button>
+        </div>
+        <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px; line-height: 1.6; color: #555;">
+            <p><strong>1. Coleta de Dados</strong><br>
+            Coletamos apenas os dados necessários para o agendamento: Nome, E-mail e Telefone.</p>
+
+            <p><strong>2. Uso das Informações</strong><br>
+            Seus dados são utilizados exclusivamente para:</p>
+            <ul style="margin-left: 20px; margin-bottom: 10px;">
+                <li>Confirmar sua identidade nos agendamentos;</li>
+                <li>Enviar lembretes e notificações via WhatsApp;</li>
+                <li>Manter histórico de serviços.</li>
+            </ul>
+
+            <p><strong>3. Compartilhamento</strong><br>
+            Não vendemos nem compartilhamos seus dados com terceiros para fins de marketing. Seus dados são visíveis apenas para o estabelecimento onde você agendou.</p>
+            
+            <p><strong>4. Segurança</strong><br>
+            Utilizamos criptografia para proteger suas senhas e dados sensíveis.</p>
+        </div>
+        <div style="margin-top: 1.5rem; text-align: right;">
+            <button class="btn btn-primary" onclick="closeModal('privacy')">Li e Concordo</button>
+        </div>
+    </div>
+</div>
+    <div id="toast-container"></div>
+    <div id="confirm-modal" class="confirm-modal"></div>
+    
+    <script src="js/toast.js"></script>
+    <script src="js/main.js"></script>
+    
+
+<!-- Modal para escolher entre QR Code ou Código -->
+
+<!-- Modal principal para escolher o método de conexão -->
+<div class="modal" id="whatsapp-method-modal" style="z-index: 3000;">
+    <div class="modal-content" style="max-width: 480px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 1.5rem; margin: -2rem -2rem 2rem -2rem; border-radius: 12px 12px 0 0;">
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 0.75rem; color: white;">
+                <i class="fab fa-whatsapp"></i> Conectar WhatsApp
+            </h2>
+            <button class="close-modal" onclick="closeModal('whatsapp-method')" style="color: white;">&times;</button>
+        </div>
+
+        <!-- Explicação rápida para o usuário -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+                Escolha como deseja conectar seu WhatsApp ao ClickAgenda
+            </p>
+        </div>
+
+        <!-- Cartões para escolher o método de conexão -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+            
+            <!-- Cartão para conectar via QR Code -->
+            <div class="method-card" onclick="escolherMetodo('qr')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9;">
+                <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-qrcode" style="font-size: 1.8rem; color: white;"></i>
+                </div>
+                <h4 style="color: #333; margin-bottom: 0.5rem; font-size: 1rem;">QR Code</h4>
+                <p style="font-size: 0.85rem; color: #666; margin: 0; line-height: 1.4;">
+                    Escaneie com<br>o celular
+                </p>
+            </div>
+
+            <!-- Cartão para conectar via código (em breve) -->
+            <div class="method-card method-card-disabled" onclick="escolherMetodo('code')" style="cursor: pointer; padding: 2rem 1rem; border: 2px solid #e0e0e0; border-radius: 12px; text-align: center; transition: all 0.3s; background: #f9f9f9; opacity: 0.6; position: relative;">
+                
+                <!-- Selo "Em breve" -->
+                <div style="position: absolute; top: 10px; right: 10px; background: #f39c12; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700;">
+                    EM BREVE
+                </div>
+                
+                <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #999 0%, #666 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-key" style="font-size: 1.8rem; color: white;"></i>
+                </div>
+                <h4 style="color: #666; margin-bottom: 0.5rem; font-size: 1rem;">Código</h4>
+                <p style="font-size: 0.85rem; color: #999; margin: 0; line-height: 1.4;">
+                    Digite o<br>código no app
+                </p>
+            </div>
+        </div>
+
+        <!-- Dica sobre o método por código -->
+        <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <p style="margin: 0; font-size: 0.85rem; color: #856404; display: flex; align-items: flex-start; gap: 0.5rem;">
+                <i class="fas fa-info-circle" style="margin-top: 2px;"></i>
+                <span><strong>Dica:</strong> O método por código é mais rápido e não precisa de câmera!</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para escanear QR Code -->
+<div class="modal" id="whatsapp-qr-modal" style="z-index: 3001;">
+    <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-header" style="background: #25D366; color: white; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 12px 12px 0 0;">
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: white;">
+                <i class="fas fa-qrcode"></i> Escanear QR Code
+            </h3>
+            <button class="close-modal" onclick="closeModal('whatsapp-qr'); voltarEscolha();" style="color: white;">&times;</button>
+        </div>
+
+        <div id="qr-modal-content" style="text-align: center;">
+            <!-- Mostra animação de carregando QR Code -->
+            <div id="qr-loading" style="padding: 2rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: #25D366; margin-bottom: 1rem;"></i>
+                <p style="color: #666; font-weight: 600;">Gerando QR Code...</p>
+                <p style="font-size: 0.85rem; color: #999;">Aguarde alguns segundos</p>
+            </div>
+
+            <!-- Mostra o QR Code gerado -->
+            <div id="qr-display" style="display: none;">
+                <img id="qr-image" src="" alt="QR Code" style="max-width: 280px; border: 4px solid #25D366; border-radius: 12px; padding: 10px; background: white;">
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #f0f8ff; border-radius: 8px;">
+                    <p style="margin: 0 0 0.5rem 0; color: #0066cc; font-weight: 600;">
+                        <i class="fas fa-mobile-alt"></i> Como escanear:
+                    </p>
+                    <ol style="text-align: left; font-size: 0.85rem; color: #555; padding-left: 1.5rem; margin: 0; line-height: 1.8;">
+                        <li>Abra o WhatsApp no celular</li>
+                        <li>Toque em "Aparelhos conectados"</li>
+                        <li>Toque em "Conectar aparelho"</li>
+                        <li>Escaneie o código acima</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Mensagem de erro ao gerar QR Code -->
+            <div id="qr-error" style="display: none; padding: 2rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                <p style="color: #e74c3c; font-weight: bold;">Erro ao gerar QR Code</p>
+                <p id="qr-error-msg" style="font-size: 0.85rem; color: #666;"></p>
+                <button class="btn btn-primary" onclick="conectarWhatsAppMetodo('qr')" style="margin-top: 1rem;">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para emparelhar usando código -->
+<div class="modal" id="whatsapp-code-modal" style="z-index: 3001;">
+    <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-header" style="background: #0088cc; color: white; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 12px 12px 0 0;">
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: white;">
+                <i class="fas fa-key"></i> Código de Emparelhamento
+            </h3>
+            <button class="close-modal" onclick="closeModal('whatsapp-code'); voltarEscolha();" style="color: white;">&times;</button>
+        </div>
+
+        <!-- Primeiro passo: pedir o número do WhatsApp -->
+        <div id="code-step-phone" style="padding: 1rem;">
+            <p style="text-align: center; color: #666; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                Digite o número do WhatsApp que deseja conectar
+            </p>
+
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                    <i class="fas fa-phone"></i> Número de Telefone
+                </label>
+                <input 
+                    type="tel" 
+                    id="phone-code-input" 
+                    placeholder="(19) 99999-9999" 
+                    onkeyup="this.value=phoneMask(this.value)"
+                    style="width: 100%; padding: 0.875rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem;"
+                >
+            </div>
+
+            <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #0088cc;">
+                <p style="margin: 0; font-size: 0.85rem; color: #0066aa; display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <i class="fas fa-info-circle" style="margin-top: 2px;"></i>
+                    <span>Digite o número <strong>COM</strong> o DDD (código de área)</span>
+                </p>
+            </div>
+
+            <button class="btn btn-primary" onclick="solicitarCodigo()" style="width: 100%; padding: 1rem; font-size: 1rem;">
+                <i class="fas fa-arrow-right"></i> Gerar Código
+            </button>
+        </div>
+
+        <!-- Passo 2: Exibir Código -->
+        <div id="code-step-display" style="display: none; text-align: center; padding: 1rem;">
+            <!-- Mostra animação de carregando código -->
+            <div id="code-loading" style="padding: 2rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: #0088cc; margin-bottom: 1rem;"></i>
+                <p style="color: #666; font-weight: 600;">Gerando código...</p>
+            </div>
+
+            <!-- Mostra o código gerado para emparelhar -->
+            <div id="code-display" style="display: none;">
+                <div style="background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%); padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 0.5rem;">Seu código é:</p>
+                    <div id="pairing-code-display" style="font-size: 3rem; font-weight: bold; color: white; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+                        ----
+                    </div>
+                </div>
+
+                <div style="background: #f0f8ff; padding: 1rem; border-radius: 8px; text-align: left;">
+                    <p style="margin: 0 0 0.5rem 0; color: #0066cc; font-weight: 600; text-align: center;">
+                        <i class="fas fa-mobile-alt"></i> Como usar:
+                    </p>
+                    <ol style="font-size: 0.85rem; color: #555; padding-left: 1.5rem; margin: 0; line-height: 1.8;">
+                        <li>Abra o WhatsApp no celular</li>
+                        <li>Toque em "Aparelhos conectados"</li>
+                        <li>Toque em "Conectar aparelho"</li>
+                        <li>Escolha "Conectar com número de telefone"</li>
+                        <li>Digite o código acima</li>
+                    </ol>
+                </div>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <p style="margin: 0; font-size: 0.85rem; color: #856404; display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <i class="fas fa-clock"></i>
+                        <span>O código expira em <strong>3 minutos</strong></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Mensagem de erro ao gerar código -->
+            <div id="code-error" style="display: none; padding: 2rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                <p style="color: #e74c3c; font-weight: bold;">Erro ao gerar código</p>
+                <p id="code-error-msg" style="font-size: 0.85rem; color: #666;"></p>
+                <button class="btn btn-secondary" onclick="voltarParaNumero()" style="margin-top: 1rem;">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Hover nos cards de método */
+.method-card:hover {
+    border-color: #25D366 !important;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.2);
+}
+
+/* Animação de Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal.active .modal-content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+    .modal-content {
+        max-width: 95% !important;
+        padding: 1.5rem !important;
+    }
+    
+    .method-card {
+        padding: 1.5rem 0.75rem !important;
+    }
+    
+    #pairing-code-display {
+        font-size: 2.5rem !important;
+        letter-spacing: 5px !important;
+    }
+}
+</style>
+
+<div class="modal" id="edit-appointment-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Agendamento</h2>
+            <button class="close-modal" onclick="closeModal('edit-appointment')">&times;</button>
+        </div>
+        <form id="form-editar-agendamento">
+            <input type="hidden" name="id" id="edit_agendamento_id">
+
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Cliente</label>
+                <input type="text" id="edit_cliente_nome" readonly style="background: #f0f0f0; color: #666; border-color: #ddd;">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-cut"></i> Serviço</label>
+                <select name="servico_id" id="edit_servico_id" required>
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+            
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Data</label>
+                    <input type="date" name="data" id="edit_data" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Horário</label>
+                    <input type="time" name="hora" id="edit_hora" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> Observações</label>
+                <textarea name="observacoes" id="edit_observacoes" rows="3"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+
+<!-- Modal de Boas-Vindas -->
+<div class="welcome-modal" id="welcome-modal">
+    <div class="welcome-overlay"></div>
+    <div class="welcome-content">
+        <button class="welcome-close" onclick="fecharWelcomeModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="welcome-header">
+            <div class="welcome-icon">
+                <i class="fas fa-cut"></i>
+            </div>
+            <h2>Seja Bem-Vindo ao ClickAgenda!</h2>
+        </div>
+        
+        <div class="welcome-body">
+            <div class="welcome-image">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            
+            <div class="welcome-text">
+                <p class="welcome-intro">
+                    Estamos felizes em tê-lo aqui! 🎉
+                </p>
+                
+                <p class="welcome-description">
+                    O <strong>ClickAgenda</strong> é um projeto acadêmico desenvolvido por alunos do curso de 
+                    <strong>Análise e Desenvolvimento de Sistemas</strong> da <strong>Universidade São Francisco (USF)</strong>, 
+                    atualmente em sua <strong>versão 1.0 (Beta)</strong>.
+                </p>
+                
+                <div class="welcome-features">
+                    <div class="welcome-feature-item">
+                        <i class="fas fa-flask"></i>
+                        <span>Projeto experimental em desenvolvimento</span>
+                    </div>
+                    <div class="welcome-feature-item">
+                        <i class="fas fa-users"></i>
+                        <span>Criado para facilitar a gestão de barbearias</span>
+                    </div>
+                    <div class="welcome-feature-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Desenvolvido com fins educacionais</span>
+                    </div>
+                </div>
+                
+                <p class="welcome-note">
+                    <i class="fas fa-info-circle"></i>
+                    Estamos constantemente aprimorando a plataforma. Seu feedback é essencial para tornarmos 
+                    o ClickAgenda ainda melhor!
+                </p>
+            </div>
+        </div>
+        
+        <div class="welcome-footer">
+            <label class="welcome-checkbox">
+                <input type="checkbox" id="nao-mostrar-novamente">
+                <span>Não mostrar esta mensagem novamente</span>
+            </label>
+            
+            <button class="btn btn-primary" onclick="confirmarWelcomeModal()">
+                Entendi, vamos começar! <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        <div class="welcome-credits">
+            Desenvolvido por: <strong>Nayara Victória & Matheus Rubens</strong> | USF 2025
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
